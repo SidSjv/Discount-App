@@ -21,7 +21,7 @@ class CampaignCreate extends FormRequest {
      */
     public function rules() {
         return [
-            //
+            'campaign_nsme' => 'required',
         ];
     }
 }

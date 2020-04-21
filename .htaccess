@@ -1,0 +1,19 @@
+Header always unset X-Powered-By
+Header always unset X-Frame-Options env=HTTPS
+<IfModule mod_rewrite.c>
+Header always unset X-Frame-Options env=HTTPS
+Header always unset X-Powered-By
+Options +FollowSymLinks
+RewriteEngine On
+Header always unset X-Frame-Options
+RewriteCond %{REQUEST_URI} !^/public/ 
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+
+
+RewriteRule ^(.*)$ /public/$1 
+#RewriteRule ^ index.php [L]
+RewriteRule ^(/)?$ public/index.php [L] 
+</IfModule>
