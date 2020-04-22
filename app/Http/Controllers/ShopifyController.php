@@ -142,7 +142,6 @@ class ShopifyController extends Controller {
                                 'access_token' => $access_token,
                                 'permanent_domain' => $store_details['myshopify_domain'],
                                 'phone' => $store_details['phone'],
-                                'country' => $store_details['country'],
                                 'currency' => $store_details['currency'],
                                 'support_email' => $store_details['customer_email'],
                                 'email' => $store_details['email'],
