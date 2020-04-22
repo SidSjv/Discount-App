@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Store;
 use App\Models\StoreInstallations;
+use App\Models\StorePlans;
+use App\Plans;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -55,7 +57,7 @@ class ShopifyController extends Controller {
                     return Redirect::to('login');
                 } else {
                     $rac_check = StorePlans::where('store_id', $check->id)->latest()->first();
-                    if(checkNotNullAndCountGreaterThanZero($rac_check) && $rac_check->status !== 'Active'){
+                    if($rac_check !== NULL && $rac_check->count() > 0 && $rac_check->status !== 'Active'){
                         $store = Store::where('id', $rac_check->store_id)->first();
                         return Redirect::to($this->createAnotherRACAndRedirect($rac_check->plan_id, $store->permanent_domain));
                     }
