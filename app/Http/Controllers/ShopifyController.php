@@ -34,11 +34,11 @@ class ShopifyController extends Controller {
     private $password;
 
     public function __construct(){
-        $this->apiKey               = config('app.shopify_api_key');
-        $this->apiSecret            = config('app.shopify_api_secret');
+        $this->apiKey               = config('custom.shopify_api_key');
+        $this->apiSecret            = config('custom.shopify_api_secret');
+        $this->apiVersion           = config('custom.shopify_rest_api_version');
         $this->app_name             = config('app.name');
         $this->forwardingAddress    = config('app.url');
-        $this->apiVersion           = config('app.shopify_rest_api_version');
         $this->scopes               = 'write_products,write_customers,write_orders,write_draft_orders,read_locations,write_fulfillments,write_checkouts';
         $this->state                = Str::random(12);
         $this->redirectUri          = $this->forwardingAddress.'/shopify/callback';
@@ -54,7 +54,7 @@ class ShopifyController extends Controller {
             if($check !== NULL && $check->count() > 0 && $check->status == 'Active'){
                 $current_plan = StorePlans::where('store_id', $check->id)->where('status', 'Active')->first();
                 if($current_plan !== NULL && $current_plan->count() > 0){
-                    return Redirect::to('login');
+                    return redirect()->route('home');
                 } else {
                     $rac_check = StorePlans::where('store_id', $check->id)->latest()->first();
                     if($rac_check !== NULL && $rac_check->count() > 0 && $rac_check->status !== 'Active'){
@@ -88,7 +88,7 @@ class ShopifyController extends Controller {
     private function activateRAC($request){
         $store_details = Store::where('id', $request['store_id'])->first();
         //$activateURL = 'https://'.$store_details->permanent_domain.'/admin/api/'.$this->apiVersion.'/recurring_application_charges/'.$request['charge_id'].'/activate.json';
-        $activateURL = getShopifyURLForStore('recurring_application_charges/'.$request['charge_id'].'/activate.json', null, $store_details->permanent_domain);
+        $activateURL = getShopifyURLForStore($store_details->permanent_domain, 'recurring_application_charges/'.$request['charge_id'].'/activate.json', null, $store_details->permanent_domain);
         $activateURLHeaders = ['Content-Type:application/json', 'X-Shopify-Access-Token:'. $store_details->access_token, 'X-Frame-Options: allow'];
         $redirectUrl = 'https://'.config('app.url').'/login?login='.$store_details->email;
         $activateURLBody = $this->getRACActivationPayload($request);    
@@ -119,8 +119,7 @@ class ShopifyController extends Controller {
 
     private function checkIfRACIsAccepted($charge_id, $store_id){
         $store_details = Store::where('id', $store_id)->first();
-        ///////$endpoint = 'https://'.$store_details->permanent_domain.'/admin/api/'.$this->apiVersion.'/recurring_application_charges/'.$charge_id.'.json';
-        $endpoint = getShopifyURLForStore('recurring_application_charges/'.$charge_id.'.json', null,$store_details->permanent_domain);
+        $endpoint = getShopifyURLForStore('recurring_application_charges/'.$charge_id.'.json', null, $store_details->permanent_domain);
         $headers = ['Content-Type'=>'application/json', 'X-Shopify-Access-Token' => $store_details->access_token, 'X-Frame-Options' => 'allow'];
         $response = json_decode($this->makeAGETCallToShopify($endpoint, [], $headers), true);
         $plan_details = StorePlans::where('rac_id', $charge_id)->first();    
@@ -143,7 +142,6 @@ class ShopifyController extends Controller {
                                 'store_name' => $store_details['name'],
                                 'access_token' => $access_token,
                                 'permanent_domain' => $store_details['myshopify_domain'],
-                                'custom_domain' => $store_details['domain'],
                                 'phone' => $store_details['phone'],
                                 'country' => $store_details['country'],
                                 'currency' => $store_details['currency'],
@@ -163,18 +161,18 @@ class ShopifyController extends Controller {
         }
     }
 
-    private function createAnotherRACAndRedirect($id, $storeName){
-        $store_details = $this->getStoreDetailsByDomain($storeName);
-        if(isset($id) && isset($storeName)){
-            $shopify_payload = $this->getRACPayload($id, $storeName);
-            $shopify_headers = [ 'X-Shopify-Access-Token:'.$store_details->access_token, 'Content-Type:application/json', 'X-Frame-Options: Allow' ];
-            $response = $this->makeAPOSTCallToShopify($shopify_payload, getShopifyURLForStore('recurring_application_charges.json', null, $storeName), $shopify_headers);
-            $body = json_decode($response['sBody'], true);     
-            $body = $body['recurring_application_charge'];
-            $this->assignStorePlan($store_details->id, 'Inactive', $body['id'], $id, $body['confirmation_url']);
-            return $body['confirmation_url'];
-        } else return response()->json(['status' => false, 'message' => 'Malformed Request'], 400);
-    }
+    // private function createAnotherRACAndRedirect($id, $storeName){
+    //     $store_details = $this->getStoreDetailsByDomain($storeName);
+    //     if(isset($id) && isset($storeName)){
+    //         $shopify_payload = $this->getRACPayload($id, $storeName);
+    //         $shopify_headers = [ 'X-Shopify-Access-Token:'.$store_details->access_token, 'Content-Type:application/json' ];
+    //         $response = $this->makeAPOSTCallToShopify($shopify_payload, getShopifyURLForStore('recurring_application_charges.json', null, $storeName), $shopify_headers);
+    //         $body = json_decode($response['sBody'], true);     
+    //         $body = $body['recurring_application_charge'];
+    //         $this->assignStorePlan($store_details->id, 'Inactive', $body['id'], $id, $body['confirmation_url']);
+    //         return $body['confirmation_url'];
+    //     } else return response()->json(['status' => false, 'message' => 'Malformed Request'], 400);
+    // }
 
     private function getRACPayload($plan_id, $store_domain){
         $store_details = $this->getStoreDetailsByDomain($store_domain);
@@ -182,7 +180,7 @@ class ShopifyController extends Controller {
         $checkForTrialDays = $this->getTrialDaysCountForStore($store_details->id);
         $shopify_payload = [];
         $shopify_payload['recurring_application_charge'] = [
-            'name' => 'Developer Tools',
+            'name' => $this->app_name,
             "price" => $plan_details->price,
             "return_url" => $this->forwardingAddress . "/shopify/activate?store_id=".$store_details->id,
             "test" => true
@@ -201,57 +199,30 @@ class ShopifyController extends Controller {
             $this->updateUser($id, $payload['permanent_domain']);
         } else {
             $id = Store::insertGetId($payload);
-            $this->createAUser($payload['permanent_domain']);
+            $this->insertInstallationData($payload['permanent_domain']);
             $check = $this->getStoreDetailsByDomain($payload['permanent_domain']);
-            SendPasswordToUserJob::dispatch($check->email, $this->password, User::where('store_id', $id)->first())->delay(now());    
         }
-        $this->syncStoreOrders($id);
-        $this->syncLocations($id);
-        $order_webhook_events = [
-            'orders/create' => '/newOrder',
-            'orders/updated' => '/updateOrder',
-            'orders/delete' => '/deleteOrder',
-            //'orders/cancelled' => '/updateOrder',
-            //'orders/fulfilled' => '/updateOrder',
-            //'orders/paid' => '/updateOrder',
-            //'orders/partially_fulfilled' => '/updateOrder'
+        //$this->syncStoreOrders($id);
+        //$this->syncLocations($id);
+        $webhook_events = [
+            'products/create' => '/newProduct',
+            'products/updated' => '/updateProduct',
+            'products/delete' => '/deleteProduct',
+            'customers/create' => '/newCustomer',
+            'customers/update' => '/updateCustomer',
+            'customers/delete' => '/deleteCustomer',
+            'collections/create' => '/newCollection',
+            'collections/update' => '/updateCollection',
+            'collections/delete' => '/deleteCollection' 
         ];
-        $this->registerForOrderWebhook($payload, $order_webhook_events);
+        $this->registerForWebhooks($payload, $webhook_events);
         //$this->syncCountriesAndStates($id);
         $this->registerForAppDeletionWebhook($payload);
-        $this->registerForLocationCreateAndUpdateWebhook($payload);
         //Comment this line when paid subscription is required
         $this->giveFreePlanToStore($id);
         return true;
         //Un-comment this line when paid subscriptions needed.
         //return $this->checkForStoreRecurringApplicationCharge($id);
-    }
-
-    private function syncCountriesAndStates($user_id) {
-        SyncCountriesAndStatesJob::dispatch($user_id);
-    }
-
-    private function registerForLocationCreateAndUpdateWebhook($payload) {
-        $shopify_payload = json_encode(["webhook" => ["topic" => "locations/create, locations/update", "address" => $this->forwardingAddress.'/newLocation', "format" => "json"]]);
-        ///////$endpoint = 'https://'.$payload["permanent_domain"].'/admin/api/'.$this->apiVersion.'/webhooks.json';
-        $endpoint = getShopifyURLForStore('webhooks.json', null, $payload['permanent_domain']);
-        $headers = ['Content-Type:application/json', 'X-Shopify-Access-Token:'.$payload['access_token']];
-        $response = $this->makeAPOSTCallToShopify($shopify_payload, $endpoint, $headers);
-        Log::info(['message' => 'Registered For Location create/update Webhook', 'payload' => $shopify_payload, 'response' => $response]);
-        return true;
-    }
-
-    private function syncLocations($user_id) {
-        $user_details = User::where('id', $user_id)->first();
-        if(checkNotNullAndCountGreaterThanZero($user_details))
-            SyncLocationsJob::dispatchNow($user_details);
-    }
-
-    private function updateUser($id, $domain){
-        $user = User::where('store_id', $id)->first();
-        User::where('store_id', $id)->update(['password' => Hash::make($this->password)]);
-        $store_details = $this->getStoreDetailsByDomain($domain);
-        SendPasswordToUserJob::dispatch($store_details->email, $this->password, $user)->delay(now()->addMinutes(1));
     }
 
     //Comment This Function when paid subscriptions are required
@@ -269,12 +240,7 @@ class ShopifyController extends Controller {
         return true;
     }
 
-    private function syncStoreOrders($store_id){
-        SyncOrdersJob::dispatch($store_id)->onQueue('high');
-        return true;
-    }
-
-    private function registerForOrderWebhook($payload, $events) {
+    private function registerForWebhooks($payload, $events) {
         ///////$endpoint = 'https://'.$payload["permanent_domain"].'/admin/api/'.$this->apiVersion.'/webhooks.json';
         $endpoint = getShopifyURLForStore('webhooks.json', null, $payload["permanent_domain"]);
         $headers = ['Content-Type:application/json', 'X-Shopify-Access-Token:'.$payload['access_token']];    
@@ -286,16 +252,8 @@ class ShopifyController extends Controller {
         return true;
     }
 
-    private function createAUser($domain){
+    private function insertInstallationData($domain){
         $store_details = Store::where('permanent_domain', $domain)->first();
-        User::create([
-            'name' => $store_details->store_name,
-            'email' => trim($store_details->permanent_domain),
-            'password' => Hash::make($this->password),
-            'login' => 'First',
-            'store_id' => (int) $store_details->id,
-            'email_verified_at' => date('Y-m-d h:i:s')
-        ]);
         $this->insertStoreInstallationData($store_details->id);
     }
 
@@ -326,11 +284,10 @@ class ShopifyController extends Controller {
 
     private function registerForAppDeletionWebhook($payload){
         $shopify_payload = json_encode(["webhook" => ["topic" => "app/uninstalled", "address" => $this->forwardingAddress.'/deleteShopData', "format" => "json"]]);
-        ///////$endpoint = 'https://'.$payload["permanent_domain"].'/admin/api/'.$this->apiVersion.'/webhooks.json';
         $endpoint = getShopifyURLForStore('webhooks.json', null, $payload["permanent_domain"]);
         $headers = ['Content-Type:application/json', 'X-Shopify-Access-Token:'.$payload['access_token']];
         $response = $this->makeAPOSTCallToShopify($shopify_payload, $endpoint, $headers);
-        //Log::info(['message' => 'Registered For Webhook', 'payload' => $shopify_payload, 'response' => $response]);
+        Log::info(['message' => 'Registered For Webhook', 'payload' => $shopify_payload, 'response' => $response]);
         return true;
     }
 

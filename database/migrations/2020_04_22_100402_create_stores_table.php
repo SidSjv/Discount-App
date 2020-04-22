@@ -22,6 +22,7 @@ class CreateStoresTable extends Migration {
             $table->string('support_email')->nullable();
             $table->string('location_id')->nullable();
             $table->string('currency')->nullable();
+            $tanle->string('status')->nullable();
             $table->timestamps();
         });
     }
