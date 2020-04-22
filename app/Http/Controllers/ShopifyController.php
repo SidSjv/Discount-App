@@ -138,7 +138,7 @@ class ShopifyController extends Controller {
                             $store_details = $store_details['shop'];
                             $payload = [
                                 'store_id' => $store_details['id'],
-                                'store_name' => $store_details['name'],
+                                'name' => $store_details['name'],
                                 'access_token' => $access_token,
                                 'permanent_domain' => $store_details['myshopify_domain'],
                                 'phone' => $store_details['phone'],
