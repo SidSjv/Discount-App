@@ -194,11 +194,11 @@ class ShopifyController extends Controller {
             Store::where('permanent_domain', $payload['permanent_domain'])->update($payload);
             StorePlans::where('id', $check->id)->update(['status' => 'Inactive']); //Mark all previous plans inactive
             $id = $check->id;
-            $this->updateUser($id, $payload['permanent_domain']);
+            //$this->updateUser($id, $payload['permanent_domain']);
         } else {
             $id = Store::insertGetId($payload);
-            $this->insertInstallationData($payload['permanent_domain']);
-            $check = $this->getStoreDetailsByDomain($payload['permanent_domain']);
+            $this->insertStoreInstallationData($id);
+            //$check = $this->getStoreDetailsByDomain($payload['permanent_domain']);
         }
         //$this->syncStoreOrders($id);
         //$this->syncLocations($id);
@@ -250,11 +250,6 @@ class ShopifyController extends Controller {
         return true;
     }
 
-    private function insertInstallationData($domain){
-        $store_details = Store::where('permanent_domain', $domain)->first();
-        $this->insertStoreInstallationData($store_details->id);
-    }
-
     private function checkForStoreRecurringApplicationCharge($store_id){
         $store_details = Store::where('id', $store_id)->first();
         $response = json_decode($this->makeAGETCallToShopify('https://'.$store_details->permanent_domain.'/admin/api/'.$this->apiVersion.'/recurring_application_charges.json', [], ['Content-Type' => 'application/json','X-Shopify-Access-Token' => $store_details->access_token]), true);
@@ -285,7 +280,7 @@ class ShopifyController extends Controller {
         $endpoint = getShopifyURLForStore('webhooks.json', null, $payload["permanent_domain"]);
         $headers = ['Content-Type:application/json', 'X-Shopify-Access-Token:'.$payload['access_token']];
         $response = $this->makeAPOSTCallToShopify($shopify_payload, $endpoint, $headers);
-        Log::info(['message' => 'Registered For Webhook', 'payload' => $shopify_payload, 'response' => $response]);
+        Log::info(['message' => 'Registered For App Deletion Webhook', 'payload' => $shopify_payload, 'response' => $response]);
         return true;
     }
 
