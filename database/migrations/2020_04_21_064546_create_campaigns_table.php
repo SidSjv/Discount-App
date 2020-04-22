@@ -4,17 +4,16 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCampaignsTable extends Migration
-{
+class CreateCampaignsTable extends Migration {
     /**
      * Run the migrations.
      *
      * @return void
      */
-    public function up()
-    {
+    public function up() {
         Schema::create('campaigns', function (Blueprint $table) {
             $table->id();
+            $table->string('store_id');
             $table->timestamps();
         });
     }
@@ -24,8 +23,7 @@ class CreateCampaignsTable extends Migration
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('campaigns');
     }
 }

@@ -10,7 +10,9 @@ class CampaignController extends Controller {
 
     }
 
-    public function createCampaign(CampaignCreate $request) {
-        
+    public function store(CampaignCreate $request) {
+        if($request->wantsJson()) { //API call
+            
+        }  
     }
 }
