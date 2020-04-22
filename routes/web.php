@@ -17,3 +17,8 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 Route::get('/', 'HomeController@home')->name('home');
+//Store Installation Routes
+Route::get('/install', 'ShopifyController@welcome');
+Route::get('/shopify', 'ShopifyController@onBoard');
+Route::get('/shopify/callback', 'ShopifyController@callBack');
+Route::get('/shopify/activate', 'ShopifyController@activate');
