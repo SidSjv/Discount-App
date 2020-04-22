@@ -241,6 +241,7 @@ class ShopifyController extends Controller {
     private function registerForWebhooks($payload, $events) {
         ///////$endpoint = 'https://'.$payload["permanent_domain"].'/admin/api/'.$this->apiVersion.'/webhooks.json';
         $endpoint = getShopifyURLForStore('webhooks.json', null, $payload["permanent_domain"]);
+        Log::info('Endpoint for webhook - '.$endpoint);
         $headers = ['Content-Type:application/json', 'X-Shopify-Access-Token:'.$payload['access_token']];    
         foreach($events as $event => $route) {
             $shopify_payload = json_encode(["webhook" => ["topic" => $event, "address" => $this->forwardingAddress.$route, "format" => "json"]]);

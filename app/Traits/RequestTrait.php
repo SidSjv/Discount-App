@@ -34,7 +34,7 @@ trait RequestTrait{
         $curlHeaderSize = $aHeaderInfo['header_size'];
         $sBody = trim(mb_substr($result, $curlHeaderSize));
 
-        return ['httpCode' => $httpCode, 'result' => $result, 'aHeaderInfo' => $aHeaderInfo, 'curlHeaderSize' => $curlHeaderSize, 'sBody' => $sBody];
+        return ['httpCode' => $httpCode, 'sBody' => $sBody];
     }
 
     /**
