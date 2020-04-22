@@ -12,6 +12,6 @@ class Campaign extends Model {
     }
 
     public function getRuleByType($type) {
-        
+
     }
 }
