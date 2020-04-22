@@ -4,7 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Plans extends Model
-{
-    //
+class Plans extends Model {
+    protected $gaurded = [];
 }
