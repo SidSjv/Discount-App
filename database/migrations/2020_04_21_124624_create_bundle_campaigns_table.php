@@ -13,6 +13,7 @@ class CreateBundleCampaignsTable extends Migration {
     public function up() {
         Schema::create('bundle_campaigns', function (Blueprint $table) {
             $table->id();
+            $table->string('campaign_id')->nullable();
             $table->timestamps();
         });
     }

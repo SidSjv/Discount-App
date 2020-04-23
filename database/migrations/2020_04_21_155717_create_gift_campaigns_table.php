@@ -12,7 +12,8 @@ class CreateGiftCampaignsTable extends Migration {
      */
     public function up() {
         Schema::create('gift_campaigns', function (Blueprint $table) {
-            $table->id();
+            $table->id()->index();
+            $table->string('campaign_id')->nullable();
             $table->timestamps();
         });
     }

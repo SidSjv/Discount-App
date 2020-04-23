@@ -12,7 +12,7 @@ class CreateStoresTable extends Migration {
      */
     public function up() {
         Schema::create('stores', function (Blueprint $table) {
-            $table->id();
+            $table->id()->index();
             $table->string('store_id')->nullable();
             $table->string('name')->nullable();
             $table->string('access_token')->nullable();

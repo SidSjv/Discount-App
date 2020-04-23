@@ -13,7 +13,7 @@ class CreateCustomersTable extends Migration {
      */
     public function up() {
         Schema::create('customers', function (Blueprint $table) {
-            $table->id();
+            $table->id()->index();
             $table->string('store_id')->nullable();
             $table->string('email')->nullable();
             $table->string('accepts_marketing')->nullable();

@@ -22,12 +22,10 @@ class StoreController extends Controller {
 
     public function syncStoreData($id){
         try{
-        Products::dispatchNow($id);
-        //Customers::dispatch($id);
-        //Collections::dispatch($id);
-        $store_details = Store::where('id', $id)->first();
-        $url = getShopifyURLForStore('webhooks.json', null, $store_details->permanent_domain);
-        return response()->json(['status' => true, 'message' => 'Submitted !', 'url' => $url], 200);
+        //Products::dispatchNow($id);
+        //Customers::dispatchNow($id);
+        Collections::dispatch($id);
+        return response()->json(['status' => true, 'message' => 'Submitted !'], 200);
         } catch(Exception $e) {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 200);
         }

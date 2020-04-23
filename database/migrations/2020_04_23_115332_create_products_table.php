@@ -12,7 +12,7 @@ class CreateProductsTable extends Migration {
      */
     public function up() {
         Schema::create('products', function (Blueprint $table) {
-            $table->id();
+            $table->id()->index();
             $table->string('store_id')->nullable();
             $table->string('title')->nullable();
             $table->longText('body_html')->nullable();
