@@ -14,6 +14,7 @@ class StoreController extends Controller {
     }
 
     public function index(Request $request) {
+        echo '<pre>';
         print_r($request->headers->all());
     }
 
