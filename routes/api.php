@@ -15,6 +15,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('authenticateAPI')->group(function() {
     Route::resource('campaign', 'CampaignController');
-    Route::get('home', 'StoreController@index')->name('home');
+    Route::get('home/{id}', 'StoreController@index')->name('home');
     Route::get('syncStoreData/{id}', 'StoreController@syncStoreData');
 });

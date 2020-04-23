@@ -56,7 +56,7 @@ class ShopifyController extends Controller {
             if($check !== NULL && $check->count() > 0 && $check->status == 'Active'){
                 $current_plan = StorePlans::where('store_id', $check->id)->where('status', 'Active')->first();
                 if($current_plan !== NULL && $current_plan->count() > 0){
-                    return redirect()->route('home');
+                    return redirect()->route('home', $check->id);
                 } else {
                     $rac_check = StorePlans::where('store_id', $check->id)->latest()->first();
                     if($rac_check !== NULL && $rac_check->count() > 0 && $rac_check->status !== 'Active'){
