@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\Sync\Collections;
+use App\Jobs\Sync\Customers;
+use App\Jobs\Sync\Products;
 use App\Models\Store;
 use App\Models\StoreInstallations;
 use App\Models\StorePlans;
@@ -148,7 +151,7 @@ class ShopifyController extends Controller {
                                 'status' => 'Active'
                             ];
                             $exec = $this->storeShopifyStoreDetailsAndActivateBilling($payload); 
-                            return $exec === true ? Redirect::to(config('app.url').'/login?login='.$store_details['myshopify_domain']) : Redirect::to($exec);
+                            return $exec === true ? Redirect::to('https://'.$store_details['myshopify_domain'].'/admin/apps/'.config('custom.app_name')) : Redirect::to($exec);
                         }
                     } else return response()->json(['status' => false, 'message' => 'Shopify Gave Error Code - '.$response['httpCode']], 400);
                 } else return response()->json(['status' => false, 'message' => 'Malformed request'], 400);
@@ -200,8 +203,9 @@ class ShopifyController extends Controller {
             $this->insertStoreInstallationData($id);
             //$check = $this->getStoreDetailsByDomain($payload['permanent_domain']);
         }
-        //$this->syncStoreOrders($id);
-        //$this->syncLocations($id);
+        $this->syncStoreCustomers($id);
+        $this->syncStoreCollections($id);
+        $this->syncStoreProducts($id);
         $webhook_events = [
             'products/create' => '/newProduct',
             'products/updated' => '/updateProduct',
@@ -223,6 +227,18 @@ class ShopifyController extends Controller {
         //return $this->checkForStoreRecurringApplicationCharge($id);
     }
 
+    private function syncStoreCollections($id) {
+        Collections::dispatch($id);
+    }
+
+    private function syncStoreProducts($id) {
+        Products::dispatch($id);
+    }
+
+    private function syncStoreCustomers($id) {
+        Customers::dispatch($id);
+    }
+
     //Comment This Function when paid subscriptions are required
     private function giveFreePlanToStore($store_id){
         $free_plan = Plans::where('name', 'Free')->first();
@@ -235,19 +251,6 @@ class ShopifyController extends Controller {
             'rac_id' => null,
             'confirmation_url' => null
         ]);
-        return true;
-    }
-
-    private function registerForWebhooks($payload, $events) {
-        ///////$endpoint = 'https://'.$payload["permanent_domain"].'/admin/api/'.$this->apiVersion.'/webhooks.json';
-        $endpoint = getShopifyURLForStore('webhooks.json', null, $payload["permanent_domain"]);
-        Log::info('Endpoint for webhook - '.$endpoint);
-        $headers = ['Content-Type:application/json', 'X-Shopify-Access-Token:'.$payload['access_token']];    
-        foreach($events as $event => $route) {
-            $shopify_payload = json_encode(["webhook" => ["topic" => $event, "address" => $this->forwardingAddress.$route, "format" => "json"]]);
-            $response = $this->makeAPOSTCallToShopify($shopify_payload, $endpoint, $headers);
-            Log::info(['message' => 'Registered For Order Webhook - '.$event, 'response' => $response]);
-        }
         return true;
     }
 
@@ -344,17 +347,17 @@ class ShopifyController extends Controller {
         return response()->json(['success' => true, 'message' => 'No Customer Data Found'], 200);    
     }
 
-    public function deleteShopData(Request $request){
-        //Log::info(['request recieved' => $request->all()]);
-        $store_details = $this->getStoreDetailsByDomain($request->shop_domain);
-        if(checkNotNullAndCountGreaterThanZero($store_details)){
-            Store::where('id', $store_details->id)->update(['status' => 'Inactive']); //Deactivate that store
-            StorePlans::where('store_id', $store_details->id)->update(['status' => 'Inactive']);
-            $temp = StoreInstallations::where('store_id', $store_details->id)->orderBy('id', 'DESC')->first();
-            if(checkNotNullAndCountGreaterThanZero($temp)) StoreInstallations::where('id', $temp->id)->update(['uninstallation_date' => date('Y-m-d h:i:s')]);
-            Order::where('store_id', $store_details->id)->delete();
-            //SendReviewJob::dispatchNow($store_details);
-        }
-        return response()->json(['success' => true, 'message' => 'Successfully deleted Shop Data'], 200);
-    }
+    // public function deleteShopData(Request $request){
+    //     //Log::info(['request recieved' => $request->all()]);
+    //     $store_details = $this->getStoreDetailsByDomain($request->shop_domain);
+    //     if(checkNotNullAndCountGreaterThanZero($store_details)){
+    //         Store::where('id', $store_details->id)->update(['status' => 'Inactive']); //Deactivate that store
+    //         StorePlans::where('store_id', $store_details->id)->update(['status' => 'Inactive']);
+    //         $temp = StoreInstallations::where('store_id', $store_details->id)->orderBy('id', 'DESC')->first();
+    //         if(checkNotNullAndCountGreaterThanZero($temp)) StoreInstallations::where('id', $temp->id)->update(['uninstallation_date' => date('Y-m-d h:i:s')]);
+    //         Order::where('store_id', $store_details->id)->delete();
+    //         //SendReviewJob::dispatchNow($store_details);
+    //     }
+    //     return response()->json(['success' => true, 'message' => 'Successfully deleted Shop Data'], 200);
+    // }
 }
