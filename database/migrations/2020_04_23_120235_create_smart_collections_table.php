@@ -21,6 +21,7 @@ class CreateSmartCollectionsTable extends Migration {
             $table->string('updated_at')->nullable();
             $table->longText('body_html')->nullable();
             $table->string('published_at')->nullable();
+            $table->string('disjunctive')->nullable();
             $table->string('sort_order')->nullable();
             $table->string('template_suffix')->nullable();
             $table->string('published_scope')->nullable();
