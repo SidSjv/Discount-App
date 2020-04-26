@@ -23,6 +23,7 @@ class CreateSmartCollectionsTable extends Migration {
             $table->string('published_at')->nullable();
             $table->string('disjunctive')->nullable();
             $table->string('sort_order')->nullable();
+            $table->string('rules')->nullable();
             $table->string('template_suffix')->nullable();
             $table->string('published_scope')->nullable();
             $table->string('admin_graphql_api_id')->nullable();
