@@ -28,9 +28,10 @@ class CampaignController extends Controller {
                 $bogo_item['buy_ids'] = json_encode($bogo_item['buy_ids']);
                 $bogo_item['customer_ids_eligible'] = json_encode($bogo_item['customer_ids_eligible']);
                 //dd($bogo_item);
-                BOGOCampaign::create($bogo_item);
+                if(isset($bogo_item['id']) && $bogo_item['id'] !== null) BOGOCampaign::where('id', $bogo_item['id'])->update($bogo_item);
+                else BOGOCampaign::create($bogo_item);
             }
         }
-        return response()->json(['status' => true, 'message' => 'Campaign Created Successfully !'], 200);
+        return response()->json(['status' => true, 'message' => 'Campaign Created / Updated Successfully !'], 200);
     }
 }
