@@ -15,9 +15,8 @@ class StoreController extends Controller {
     }
 
     public function index($id, Request $request) {
-        $store_details = Store::where('id', $id)->first();
         echo '<pre>';
-        print_r($store_details);
+        print_R($request->all());
     }
 
     public function syncStoreData($id){
