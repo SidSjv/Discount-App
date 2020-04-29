@@ -16,7 +16,8 @@ class StoreController extends Controller {
 
     public function index($id, Request $request) {
         echo '<pre>';
-        print_R($request->all());
+        print_r($request->headers->all());
+        print_r($request->all());
     }
 
     public function syncStoreData($id){
