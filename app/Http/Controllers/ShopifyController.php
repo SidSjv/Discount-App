@@ -209,7 +209,7 @@ class ShopifyController extends Controller {
             'password' => $this->password,
             'scopes' => '*'
         ];
-        $response = json_decode($this->makeAPOSTCallToShopify($payload, $url, []), true);
+        $response = $this->makeAPOSTCallToShopify($payload, $url, []);
         if($response !== null) {
             User::where('id', $user->id)->update(['access_token' => $response['access_token']]);
         }
