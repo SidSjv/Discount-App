@@ -12,7 +12,8 @@ class CreateBundleCampaignsTable extends Migration {
      */
     public function up() {
         Schema::create('bundle_campaigns', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id')->index();
+            $table->string('name')->nullable();
             $table->string('campaign_id')->nullable();
             $table->timestamps();
         });

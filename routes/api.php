@@ -17,4 +17,7 @@ Route::middleware('authenticateAPI')->group(function() {
     Route::resource('campaign', 'CampaignController');
     Route::get('home/{id}', 'StoreController@index')->name('home');
     Route::get('syncStoreData/{id}', 'StoreController@syncStoreData');
+    Route::middleware('auth:api')->group(function () {
+        Route::get('test', 'CampaignController@test');
+    });
 });

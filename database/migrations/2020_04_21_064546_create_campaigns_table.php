@@ -12,9 +12,13 @@ class CreateCampaignsTable extends Migration {
      */
     public function up() {
         Schema::create('campaigns', function (Blueprint $table) {
-            $table->id()->index();
+            $table->bigIncrements('id')->index();
             $table->string('store_id');
             $table->string('name')->nullable();
+            $table->string('start_date')->nullable();
+            $table->string('end_date')->nullable();
+            $table->string('status')->nullable();
+            $table->enum('valid', ['Active', 'Inactive'])->default('Active');
             $table->timestamps();
         });
     }

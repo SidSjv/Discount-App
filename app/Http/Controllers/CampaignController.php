@@ -4,12 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CampaignCreate;
 use App\Models\BOGOCampaign;
+use App\Models\BulkCampaigns;
 use App\Models\Campaign;
+use App\Models\DiscountCampaigns;
 use Illuminate\Http\Request;
 
 class CampaignController extends Controller {
     public function __construct() {
         $this->middleware('authenticateAPI');
+    }
+
+    public function show($id, Request $request) {
+        if(isset($id) && $id !== null) {
+            $campaigns = Campaign::where('store_id', $id)->get();
+            if($campaigns !== null && $campaigns->count() > 0) {
+                $payload = [];
+                foreach($campaigns as $campaign) {
+                    $temp = ['campaign_id' => $campaign->id, 'name' => $campaign->name];
+                    $temp['bogo'] = BOGOCampaign::where('campaign_id', $campaign->id)->get()->pluck('name');
+                    $temp['discount'] = DiscountCampaigns::where('campaign_id', $campaign->id)->get()->pluck('name');
+                    $temp['bulk'] = BulkCampaigns::where('campaign_id', $campaign->id)->get()->pluck('name');
+                    $payload[] = $temp;
+                }
+                return response()->json(['status' => true, 'campaigns' => $payload], 200);
+            } else return response()->json(['status' => true, 'campaigns' => null], 200);
+        } 
+        return response()->json(['status' => false, 'message' => 'Invalid / Missing store_id in request headers !'], 200);
     }
 
     public function store(CampaignCreate $request) {

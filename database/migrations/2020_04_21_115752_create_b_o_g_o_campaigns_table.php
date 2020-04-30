@@ -12,8 +12,9 @@ class CreateBOGOCampaignsTable extends Migration {
      */
     public function up() {
         Schema::create('bogo_campaigns', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id')->index();
             $table->string('campaign_id');
+            $table->string('name');
             $table->string('buy_type');
             $table->string('buy_ids');
             $table->string('buy_quantity');
