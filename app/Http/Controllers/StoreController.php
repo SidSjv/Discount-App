@@ -19,16 +19,16 @@ class StoreController extends Controller {
         if($request->expectsJson()) {
             $store_details = Store::where('id', $id)->first();
             if($store_details !== null && $store_details->count() > 0)
-                return User::where('store_id', $id)->first()->pluck('access_token');
+                return ['token' => User::where('store_id', $id)->first()->pluck('access_token')];
         }
     }
 
     public function syncStoreData($id){
         try{
-        //Products::dispatchNow($id);
-        //Customers::dispatchNow($id);
-        Collections::dispatch($id);
-        return response()->json(['status' => true, 'message' => 'Submitted !'], 200);
+            Products::dispatchNow($id);
+            Customers::dispatchNow($id);
+            Collections::dispatch($id);
+            return response()->json(['status' => true, 'message' => 'Completed !'], 200);
         } catch(Exception $e) {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 200);
         }
