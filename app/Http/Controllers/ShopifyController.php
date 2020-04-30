@@ -210,6 +210,7 @@ class ShopifyController extends Controller {
             'scopes' => '*'
         ];
         $response = $this->makeAPOSTCallToShopify($payload, $url, []);
+        dd($response);
         if($response !== null) {
             User::where('id', $user->id)->update(['access_token' => $response['access_token']]);
         }
