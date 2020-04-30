@@ -210,10 +210,10 @@ class ShopifyController extends Controller {
             'scopes' => '*'
         ];
         $response = $this->makeAPOSTCallToShopify($payload, $url, []);
-        dd($response);
-        if($response !== null) {
+        if($response !== null && isset($response['httpCode']) && $response['httpCode'] == '200') {
+            $response = json_decode($response['sBody'], true);
             User::where('id', $user->id)->update(['access_token' => $response['access_token']]);
-        }
+        } else Log::info('Something went wrong during local access token - '.json_encode($response));
     }
 
     private function storeShopifyStoreDetailsAndActivateBilling($payload){
