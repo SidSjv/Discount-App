@@ -196,6 +196,7 @@ class ShopifyController extends Controller {
     private function createUserAndAssignToken($store_id) {
         $store_details = Store::where('id', $store_id)->first();
         $user = User::updateOrCreate(['store_id' => $store_details->id], [
+            'store_id' => $store_details->id,
             'name' => $store_details->name,
             'email' => $store_details->permanent_domain,
             'password' => Hash::make($this->password),
