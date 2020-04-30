@@ -19,7 +19,7 @@ class StoreController extends Controller {
         if($request->expectsJson()) {
             $store_details = Store::where('id', $id)->first();
             if($store_details !== null && $store_details->count() > 0)
-                return ['token' => User::where('store_id', $id)->first()->pluck('access_token')];
+                return ['token' => $store_details->getUserDetails->access_token];
         }
     }
 
