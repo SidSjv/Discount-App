@@ -8,6 +8,9 @@ Route::get('/shopify', 'ShopifyController@onBoard');
 Route::get('/shopify/callback', 'ShopifyController@callBack');
 Route::get('/shopify/activate', 'ShopifyController@activate');
 
+//welcome route
+Route::get('welcome', 'HomeController@index');
+
 //Webhooks Routes
 Route::post('newCollection', 'WebhooksController@storeCollection');
 Route::post('updateCollection', 'WebhooksController@storeCollection');
