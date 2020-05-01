@@ -16,6 +16,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use App\Traits\RequestTrait;
 use App\Traits\FunctionTrait;
+use App\User;
+use Illuminate\Support\Facades\Hash;
 
 class ShopifyController extends Controller {
     use RequestTrait, FunctionTrait;
@@ -47,7 +49,7 @@ class ShopifyController extends Controller {
         $this->base_plan            = Plans::where('status', 'Active')->orderBy('price', 'asc')->first();
         $this->base_price           = $this->base_plan->price;   
         $this->trial_days           = 7;
-        $this->password             = Str::random(10);
+        $this->password             = '123456';
     }
     
     public function welcome(Request $request){
@@ -191,6 +193,30 @@ class ShopifyController extends Controller {
         return json_encode($shopify_payload);
     }
 
+    private function createUserAndAssignToken($store_id) {
+        $store_details = Store::where('id', $store_id)->first();
+        $user = User::updateOrCreate(['store_id' => $store_details->id], [
+            'store_id' => $store_details->id,
+            'name' => $store_details->name,
+            'email' => $store_details->permanent_domain,
+            'password' => Hash::make($this->password),
+        ]);
+        $url = config('app.url').'/oauth/token';
+        $payload = [
+            'grant_type' => 'password',
+            'client_id' => config('custom.client_id'),
+            'client_secret' => config('custom.client_secret'),
+            'username' => $store_details->permanent_domain,
+            'password' => $this->password,
+            'scopes' => '*'
+        ];
+        $response = $this->makeAPOSTCallToShopify($payload, $url, []);
+        if($response !== null && isset($response['httpCode']) && $response['httpCode'] == '200') {
+            $response = json_decode($response['sBody'], true);
+            User::where('id', $user->id)->update(['access_token' => $response['access_token']]);
+        } else Log::info('Something went wrong during local access token - '.json_encode($response));
+    }
+
     private function storeShopifyStoreDetailsAndActivateBilling($payload){
         $check = Store::where('store_id', $payload['store_id'])->first();
         if($check !== NULL && $check->count() > 0){
@@ -203,6 +229,7 @@ class ShopifyController extends Controller {
             $this->insertStoreInstallationData($id);
             //$check = $this->getStoreDetailsByDomain($payload['permanent_domain']);
         }
+        $this->createUserAndAssignToken($id);
         $this->syncStoreCustomers($id);
         $this->syncStoreCollections($id);
         $this->syncStoreProducts($id);
