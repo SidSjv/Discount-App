@@ -1,0 +1,71 @@
+.dashboard {
+    .content {
+        //padding: 2rem;
+    }
+
+    .table__filter {
+        padding: 2rem;
+        .filter_wrapper {
+            display: flex;
+            .search_filter {
+                flex: 1;
+                .button_group {
+                    height: 100%;
+                    display: flex;
+                    flex-wrap: nowrap;
+                    margin-top: 0;
+                    margin-left: 0;
+                    .group_item {
+                        position: relative;
+                        z-index: 10;
+                        margin-top: 0;
+                        margin-left: 0;
+                        width: 100%;
+                        input {
+                            &::placeholder {
+                                font-size: 1.4rem;
+                            }
+                        }
+                    }
+                }
+            }
+            .export_filter {
+                .Polaris-Select__Backdrop {
+                    border-radius: 0;
+                }
+            }
+        }
+    }
+
+    .table {
+        position: relative;
+        .sort_wrapper {
+            position: absolute;
+            right: 2rem;
+        }
+        .Polaris-ResourceItem__Owned {
+            margin-top: 3px;
+        }
+    }
+
+    .analytics {
+        margin-bottom: 4rem;
+        padding: 1rem;
+        border: 2px solid $border-color;
+        .highcharts-credits {
+            display: none;
+        }
+        .highcharts-background {
+            fill: #f4f6f8;
+        }
+        // .highcharts-series-0 {
+        //     display: none;
+        // }
+    }
+
+    .links__wrapper {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 3rem;
+    }
+}

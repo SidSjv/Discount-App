@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('authenticateAPI')->group(function() {
-    Route::get('home/{id}', 'StoreController@index')->name('home');
+    Route::get('home', 'StoreController@index');
     Route::middleware('auth:api')->group(function () {
         Route::get('test', 'CampaignController@test');
         Route::resource('campaign', 'CampaignController');

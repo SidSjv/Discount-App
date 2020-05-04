@@ -9,7 +9,7 @@ Route::get('/shopify/callback', 'ShopifyController@callBack');
 Route::get('/shopify/activate', 'ShopifyController@activate');
 
 //welcome route
-Route::get('welcome', 'HomeController@index');
+Route::get('home', 'HomeController@index');
 
 //Webhooks Routes
 Route::post('newCollection', 'WebhooksController@storeCollection');

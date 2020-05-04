@@ -1,8 +1,17 @@
 // Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
+//@import url("https://fonts.googleapis.com/css?family=Nunito");
 
 // Variables
-@import 'variables';
+@import "variables";
+@import "base";
+@import "typography";
+@import "utilities";
+
+//Dashboard
+@import "../js//components/Dashboard/dashboard.scss";
 
 // Bootstrap
-@import '~bootstrap/scss/bootstrap';
+
+.card-header {
+    text-align: center;
+}

@@ -15,9 +15,9 @@ class StoreController extends Controller {
         
     }
 
-    public function index($id, Request $request) {
+  public function index(Request $request) {
         if($request->expectsJson()) {
-            $store_details = Store::where('id', $id)->first();
+            $store_details = Store::where('id', $request->store_id)->first();
             if($store_details !== null && $store_details->count() > 0)
                 return ['token' => $store_details->getUserDetails->access_token];
         }

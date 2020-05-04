@@ -1,0 +1,127 @@
+//To push the content to right
+.pull__right {
+    text-align: right;
+}
+.loading__wrapper {
+    position: relative;
+}
+
+//Heading
+//h2
+.Polaris-Heading {
+}
+
+.Polaris-Icon__Svg {
+    color: transparent;
+    fill: #637381;
+}
+
+.card {
+    overflow: hidden;
+    background-color: var(--p-surface, white);
+    box-shadow: var(
+        --p-card-shadow,
+        0 0 0 1px rgba(63, 63, 68, 0.05),
+        0 1px 3px 0 rgba(63, 63, 68, 0.15)
+    );
+    border-radius: var(--p-border-radius-wide, 3px);
+    box-sizing: border-box;
+}
+
+.save__btn {
+    margin-top: 2rem;
+}
+
+.link__btn {
+    text-decoration: none;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.6rem;
+    min-width: 3.6rem;
+    margin: 0;
+    padding: 0.7rem 1.6rem;
+    background: linear-gradient(to bottom, white, #f9fafb);
+    border: 0.1rem solid var(--p-border, #c4cdd5);
+    box-shadow: 0 1px 0 0 rgba(22, 29, 37, 0.05);
+    border-radius: 3px;
+    line-height: 1;
+    color: #212b36;
+    text-align: center;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    text-decoration: none;
+    transition-property: background, border, box-shadow;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.64, 0, 0.35, 1);
+    -webkit-tap-highlight-color: transparent;
+}
+.link__btn-primary {
+    background: linear-gradient(to bottom, #6371c7, #5563c1);
+    border-color: #3f4eae;
+    box-shadow: inset 0 1px 0 0 #6774c8, 0 1px 0 0 rgba(22, 29, 37, 0.05),
+        0 0 0 0 transparent;
+    color: white;
+    &:hover {
+        background: linear-gradient(to bottom, #5c6ac4, #4959bd);
+        border-color: #3f4eae;
+        color: white;
+        text-decoration: none;
+    }
+}
+//Grid system
+.row {
+    display: flex;
+}
+.col-6 {
+    max-width: 60%;
+}
+.col-5 {
+    max-width: 50%;
+}
+.col-4 {
+    max-width: 40%;
+}
+.input__fields {
+    margin-bottom: 1.6rem;
+}
+//Margin
+
+.mt-1 {
+    margin-top: 1rem !important;
+}
+.mt-2 {
+    margin-top: 2rem !important;
+}
+.mt-3 {
+    margin-top: 3rem !important;
+}
+.mt-4 {
+    margin-top: 4rem !important;
+}
+
+.mb-1 {
+    margin-bottom: 1rem !important;
+}
+.mb-2 {
+    margin-bottom: 2rem !important;
+}
+
+.mb-3 {
+    margin-bottom: 3rem !important;
+}
+.mb-4 {
+    margin-bottom: 4rem !important;
+}
+
+//Text
+
+.text-center {
+    text-align: center;
+}
+
+.text__heading {
+    font-size: 1.6rem;
+}
