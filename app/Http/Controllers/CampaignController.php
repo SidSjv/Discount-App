@@ -7,8 +7,10 @@ use App\Models\BOGOCampaign;
 use App\Models\BulkCampaigns;
 use App\Models\Campaign;
 use App\Models\DiscountCampaigns;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CampaignController extends Controller {
     public function __construct() {
@@ -34,7 +36,9 @@ class CampaignController extends Controller {
     }
 
     public function store(CampaignCreate $request) {
+        try{
         $request = $request->all();
+        DB::beginTransaction();
         $exists = Campaign::where('name', $request['campaign_name'])->where('store_id', Auth::user()->store_id)->exists();
         $message = $exists ? 'Updated' : 'Created';
         $campaign_row = Campaign::updateOrCreate([
@@ -57,7 +61,7 @@ class CampaignController extends Controller {
         if(isset($request['Discount'])) {
             foreach($request['Discount'] as $discount_item) {
                 $discount_item['campaign_id'] = $campaign_row->id;
-                $discount_item['customer_ids_eligible'] = json_encode($discount_item['customer_ids_eligible']);
+                $discount_item['eligible_customers'] = json_encode($discount_item['eligible_customers']);
                 if(isset($discount_item['id']) && $discount_item['id'] !== null) DiscountCampaigns::where('id', $discount_item['id'])->update($discount_item);
                 else DiscountCampaigns::create($bogo_item);
             }
@@ -65,11 +69,16 @@ class CampaignController extends Controller {
         if(isset($request['Bulk'])) {
             foreach($request['Bulk'] as $bulk_item) {
                 $bulk_item['campaign_id'] = $campaign_row->id;
-                $bulk_item['customer_ids_eligible'] = json_encode($bulk_item['customer_ids_eligible']);
+                $bulk_item['eligible_customers'] = json_encode($bulk_item['eligible_customers']);
                 if(isset($bulk_item['id']) && $bulk_item['id'] !== null) BulkCampaigns::where('id', $bulk_item['id'])->update($bulk_item);
                 else BulkCampaigns::create($bogo_item);
             }
         }
+        DB::commit();
         return response()->json(['status' => true, 'message' => 'Campaign '.$message.' Successfully !'], 200);
+        } catch(Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 501);
+        }
     }
 }
