@@ -63,7 +63,7 @@ class CampaignController extends Controller {
                 $discount_item['campaign_id'] = $campaign_row->id;
                 $discount_item['eligible_customers'] = json_encode($discount_item['eligible_customers']);
                 if(isset($discount_item['id']) && $discount_item['id'] !== null) DiscountCampaigns::where('id', $discount_item['id'])->update($discount_item);
-                else DiscountCampaigns::create($bogo_item);
+                else DiscountCampaigns::create($discount_item);
             }
         }
         if(isset($request['Bulk'])) {
@@ -71,7 +71,7 @@ class CampaignController extends Controller {
                 $bulk_item['campaign_id'] = $campaign_row->id;
                 $bulk_item['eligible_customers'] = json_encode($bulk_item['eligible_customers']);
                 if(isset($bulk_item['id']) && $bulk_item['id'] !== null) BulkCampaigns::where('id', $bulk_item['id'])->update($bulk_item);
-                else BulkCampaigns::create($bogo_item);
+                else BulkCampaigns::create($bulk_item);
             }
         }
         DB::commit();
