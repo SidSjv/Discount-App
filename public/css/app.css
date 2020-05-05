@@ -357,6 +357,11 @@ ul {
   margin-bottom: 3rem;
 }
 
+.dashboard .pagination__wrapper {
+  margin-top: 3rem;
+  text-align: center;
+}
+
 .card-header {
   text-align: center;
 }

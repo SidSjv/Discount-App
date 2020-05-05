@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Analytics from "./Analytics";
 import {
     Card,
@@ -7,22 +7,54 @@ import {
     Select,
     ResourceList,
     ResourceItem,
-    Badge
+    Badge,
+    Pagination
 } from "@shopify/polaris";
+import Spinner from "../UI/Spinner";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Dashboard = () => {
     let initData = {
         selected: 0,
         filter: "",
-        sort: ""
+        sort: "",
+        data: "",
+        store_id: "",
+        loading: false
     };
 
     const [state, setState] = useState(initData);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [page, setpage] = useState(1);
 
     //Desctruct the state
-    const { selected, filter, sort } = state;
+    const { selected, filter, sort, data, loading, store_id } = state;
+
+    //Use Effect
+    useEffect(() => {
+        let store_id = localStorage.getItem("discountapp_storeId");
+        setState({
+            ...state,
+            loading: true
+        });
+        axios
+            .get(`/campaign/${store_id}`)
+            .then(res => {
+                console.log(res);
+                setState({
+                    ...state,
+                    loading: false
+                });
+            })
+            .catch(err => {
+                console.log(err);
+                setState({
+                    ...state,
+                    loading: false
+                });
+            });
+    }, []);
 
     //On change
     const handleTabChange = selectedTabIndex => {
@@ -37,6 +69,18 @@ const Dashboard = () => {
             ...state,
             [id]: value
         });
+    };
+
+    //Pagination
+    const nextPage = () => {
+        params.page_number = page + 1;
+        params.limit = 20;
+        setpage(currentPage => currentPage + 1);
+    };
+    const previousPage = () => {
+        params.page_number = page - 1;
+        params.limit = 20;
+        setpage(currentPage => currentPage - 1);
     };
 
     //Tabs
@@ -87,8 +131,8 @@ const Dashboard = () => {
 
     //Resourse Item
     const resourceName = {
-        singular: "customer",
-        plural: "customers"
+        singular: "discount",
+        plural: "discounts"
     };
     const items = [
         {
@@ -132,6 +176,7 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard">
+            {loading && <Spinner />}
             <h1 className="title mb-2">Sales Overview</h1>
             <Analytics />
             <div className="links__wrapper">
@@ -219,6 +264,14 @@ const Dashboard = () => {
                     </div>
                 </div>
             </Card>
+            <div className="pagination__wrapper">
+                <Pagination
+                    onPrevious={previousPage}
+                    onNext={nextPage}
+                    hasPrevious={page > 1 ? true : false}
+                    hasNext={data && data.length >= 20 ? true : false}
+                />
+            </div>
         </div>
     );
 };
