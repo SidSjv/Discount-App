@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import axios from "axios";
 import {
@@ -16,6 +16,8 @@ import { AppProvider } from "@shopify/polaris";
 import en from "@shopify/polaris/locales/en.json";
 
 const Index = props => {
+    const [isFetched, setFetched] = useState(false);
+
     let location = useLocation();
     useEffect(() => {
         let query = new URLSearchParams(location.search);
@@ -27,20 +29,26 @@ const Index = props => {
                 let token = res.data.token;
                 localStorage.setItem("discountapp_token", token);
                 localStorage.setItem("discountapp_storeId", store_id);
+                setFetched(true);
             })
             .catch(err => {
                 console.log(err);
             });
     }, []);
-    return (
-        <AppProvider i18n={en}>
-            <div className="main_section">
-                <Switch>
-                    <Route path="/home/" component={Dashboard} />
-                </Switch>
-            </div>
-        </AppProvider>
-    );
+
+    if (isFetched) {
+        return (
+            <AppProvider i18n={en}>
+                <div className="main_section">
+                    <Switch>
+                        <Route path="/home/" component={Dashboard} />
+                    </Switch>
+                </div>
+            </AppProvider>
+        );
+    }
+
+    return null;
 };
 
 export default Index;
