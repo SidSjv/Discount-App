@@ -2,16 +2,14 @@
 //@import url("https://fonts.googleapis.com/css?family=Nunito");
 
 // Variables
+@import "mixins";
 @import "variables";
 @import "base";
 @import "typography";
 @import "utilities";
 
 //Dashboard
-@import "../js//components/Dashboard/dashboard.scss";
+@import "../js/components/Dashboard/dashboard.scss";
 
-// Bootstrap
-
-.card-header {
-    text-align: center;
-}
+//Campaign
+@import "../js/components/Campaign/campaign.scss";

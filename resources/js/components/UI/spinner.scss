@@ -1,3 +1,5 @@
+@import "../../../sass//variables";
+
 .spinner {
     position: fixed;
     width: 100%;
@@ -14,4 +16,31 @@
     position: absolute;
     left: 48%;
     top: 40%;
+}
+
+//See more
+.see__more {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: $link-color;
+    font-weight: 600;
+    cursor: pointer;
+    &:focus {
+        outline: none;
+        border: none;
+    }
+    &-wrapper {
+        font-size: 1.4rem;
+        font-weight: var(--p-button-font-weight, 400);
+        line-height: 1.6rem;
+        text-transform: none;
+        letter-spacing: normal;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-width: 1px;
+        min-height: 1px;
+    }
 }

@@ -1,0 +1,32 @@
+/******* Wizard page d ********/
+@import "../../../sass//mixins";
+
+.wizard {
+    .campaign__wrapper {
+        @include flexbox();
+        .campaign__icon {
+            margin-right: 2rem;
+            min-width: 6rem;
+        }
+
+        .campaign__details {
+            flex: 1;
+            .campaign__title {
+                font-weight: 600;
+            }
+            .campaign__info {
+                margin-bottom: 0.7rem;
+            }
+            .examples {
+                @include flexbox();
+                .examples__block {
+                    margin-left: 1rem;
+                    flex: 1;
+                    .example__list {
+                        margin-bottom: 3px;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import Analytics from "./Analytics";
 import {
     Card,
@@ -19,9 +19,11 @@ const Dashboard = () => {
         selected: 0,
         filter: "",
         sort: "",
-        data: "",
+        campaigns: "",
         store_id: "",
-        loading: false
+        loading: false,
+        isFetched: false,
+        items: []
     };
 
     const [state, setState] = useState(initData);
@@ -29,7 +31,16 @@ const Dashboard = () => {
     const [page, setpage] = useState(1);
 
     //Desctruct the state
-    const { selected, filter, sort, data, loading, store_id } = state;
+    const {
+        selected,
+        filter,
+        sort,
+        campaigns,
+        loading,
+        store_id,
+        isFetched,
+        items
+    } = state;
 
     //Use Effect
     useEffect(() => {
@@ -42,16 +53,20 @@ const Dashboard = () => {
             .get(`/campaign/${store_id}`)
             .then(res => {
                 console.log(res);
+                let data = res.data;
                 setState({
                     ...state,
-                    loading: false
+                    loading: false,
+                    campaigns: data.campaigns,
+                    isFetched: true
                 });
             })
             .catch(err => {
                 console.log(err);
                 setState({
                     ...state,
-                    loading: false
+                    loading: false,
+                    isFetched: true
                 });
             });
     }, []);
@@ -124,8 +139,8 @@ const Dashboard = () => {
         { label: "Discount code(A-Z)", value: "oldestUpdate" },
         { label: "Discount code(Z-A)", value: "mostSpent" },
         { label: "Start date(accending)", value: "mostOrders" },
-        { label: "Start date(decending)", value: "mostOrders" },
-        { label: "End date(accending)", value: "lastNameAlpha" },
+        { label: "Start date(decending)", value: "mostOrderss" },
+        { label: "End date(accending)", value: "lastNameAlphaa" },
         { label: "End date(decending)", value: "lastNameAlpha" }
     ];
 
@@ -134,26 +149,26 @@ const Dashboard = () => {
         singular: "discount",
         plural: "discounts"
     };
-    const items = [
-        {
-            id: 231,
-            url: "customers/231",
-            name: "Mae Jemison",
-            location: "Decatur, USA"
-        },
-        {
-            id: 246,
-            url: "customers/246",
-            name: "Ellen Ochoa",
-            location: "Los Angeles, USA"
-        },
-        {
-            id: 276,
-            url: "customers/276",
-            name: "Joe Smith",
-            location: "Arizona, USA"
-        }
-    ];
+    // const items = [
+    //     {
+    //         id: 231,
+    //         url: "customers/231",
+    //         name: "Mae Jemison",
+    //         location: "Decatur, USA"
+    //     },
+    //     {
+    //         id: 246,
+    //         url: "customers/246",
+    //         name: "Ellen Ochoa",
+    //         location: "Los Angeles, USA"
+    //     },
+    //     {
+    //         id: 276,
+    //         url: "customers/276",
+    //         name: "Joe Smith",
+    //         location: "Arizona, USA"
+    //     }
+    // ];
 
     const bulkActions = [
         {
@@ -175,104 +190,123 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="dashboard">
+        <Fragment>
             {loading && <Spinner />}
-            <h1 className="title mb-2">Sales Overview</h1>
-            <Analytics />
-            <div className="links__wrapper">
-                <Link className="link__btn" to="/settings">
-                    Settings
-                </Link>
-                <Link className="link__btn link__btn-primary" to="/discounts">
-                    Create Discounts
-                </Link>
-            </div>
-            <Card>
-                <Tabs
-                    tabs={tabs}
-                    selected={selected}
-                    onSelect={handleTabChange}
-                ></Tabs>
-                <div className="content">
-                    {/* Filter */}
-                    <div className="table__filter">
-                        <div className="filter_wrapper">
-                            <div className="export_filter">
-                                <Select
-                                    options={filter_options}
-                                    onChange={handleSelectChange}
-                                    value={filter}
-                                    id="filter"
-                                />
-                            </div>
-                            <div className="search_filter">
-                                <div className="button_group">
-                                    <div className="group_item">
-                                        <form>
-                                            <div className="Polaris-TextField">
-                                                <div className="Polaris-TextField__Prefix">
-                                                    <span className="Polaris-Filters__SearchIcon">
-                                                        <span className="Polaris-Icon">
-                                                            <svg
-                                                                viewBox="0 0 20 20"
-                                                                className="Polaris-Icon__Svg"
-                                                                focusable="false"
-                                                                aria-hidden="true"
-                                                            >
-                                                                <path
-                                                                    d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8m9.707 4.293l-4.82-4.82A5.968 5.968 0 0 0 14 8 6 6 0 0 0 2 8a6 6 0 0 0 6 6 5.968 5.968 0 0 0 3.473-1.113l4.82 4.82a.997.997 0 0 0 1.414 0 .999.999 0 0 0 0-1.414"
-                                                                    fillRule="evenodd"
-                                                                ></path>
-                                                            </svg>
-                                                        </span>
-                                                    </span>
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    className="Polaris-TextField__Input search_input"
-                                                    placeholder="Search discount codes"
-                                                />
-                                                <div className="Polaris-TextField__Backdrop"></div>
+
+            {isFetched && (
+                <div className="dashboard">
+                    <h1 className="title mb-2">Sales Overview</h1>
+                    <Analytics />
+                    <div className="links__wrapper">
+                        <Link className="link__btn" to="/settings">
+                            Settings
+                        </Link>
+                        <Link
+                            className="link__btn link__btn-primary"
+                            to="/campaign"
+                        >
+                            Create Discounts
+                        </Link>
+                    </div>
+                    <Card>
+                        <Tabs
+                            tabs={tabs}
+                            selected={selected}
+                            onSelect={handleTabChange}
+                        ></Tabs>
+                        <div className="content">
+                            {/* Filter */}
+                            <div className="table__filter">
+                                <div className="filter_wrapper">
+                                    <div className="export_filter">
+                                        <Select
+                                            options={filter_options}
+                                            onChange={handleSelectChange}
+                                            value={filter}
+                                            id="filter"
+                                        />
+                                    </div>
+                                    <div className="search_filter">
+                                        <div className="button_group">
+                                            <div className="group_item">
+                                                <form>
+                                                    <div className="Polaris-TextField">
+                                                        <div className="Polaris-TextField__Prefix">
+                                                            <span className="Polaris-Filters__SearchIcon">
+                                                                <span className="Polaris-Icon">
+                                                                    <svg
+                                                                        viewBox="0 0 20 20"
+                                                                        className="Polaris-Icon__Svg"
+                                                                        focusable="false"
+                                                                        aria-hidden="true"
+                                                                    >
+                                                                        <path
+                                                                            d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8m9.707 4.293l-4.82-4.82A5.968 5.968 0 0 0 14 8 6 6 0 0 0 2 8a6 6 0 0 0 6 6 5.968 5.968 0 0 0 3.473-1.113l4.82 4.82a.997.997 0 0 0 1.414 0 .999.999 0 0 0 0-1.414"
+                                                                            fillRule="evenodd"
+                                                                        ></path>
+                                                                    </svg>
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                        <input
+                                                            type="text"
+                                                            className="Polaris-TextField__Input search_input"
+                                                            placeholder="Search discount codes"
+                                                        />
+                                                        <div className="Polaris-TextField__Backdrop"></div>
+                                                    </div>
+                                                </form>
                                             </div>
-                                        </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            <div className="table">
+                                <div className="sort_wrapper">
+                                    <Select
+                                        label="Sort by"
+                                        labelInline
+                                        options={sort_options}
+                                        onChange={handleSelectChange}
+                                        value={sort}
+                                        id="sort"
+                                    />
+                                </div>
+                                {items && items.length > 0 ? (
+                                    <ResourceList
+                                        resourceName={resourceName}
+                                        items={items}
+                                        renderItem={renderItem}
+                                        selectedItems={selectedItems}
+                                        onSelectionChange={setSelectedItems}
+                                        bulkActions={bulkActions}
+                                        resolveItemId={resolveItemIds}
+                                        selectable
+                                    />
+                                ) : (
+                                    <div className="not__found">
+                                        {" "}
+                                        <p>No campaign found</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                    <div className="table">
-                        <div className="sort_wrapper">
-                            <Select
-                                label="Sort by"
-                                labelInline
-                                options={sort_options}
-                                onChange={handleSelectChange}
-                                value={sort}
-                                id="sort"
-                            />
-                        </div>
-                        <ResourceList
-                            resourceName={resourceName}
-                            items={items}
-                            renderItem={renderItem}
-                            selectedItems={selectedItems}
-                            onSelectionChange={setSelectedItems}
-                            bulkActions={bulkActions}
-                            resolveItemId={resolveItemIds}
-                            selectable
+                    </Card>
+                    <div className="pagination__wrapper">
+                        <Pagination
+                            onPrevious={previousPage}
+                            onNext={nextPage}
+                            hasPrevious={page > 1 ? true : false}
+                            hasNext={
+                                campaigns && campaigns.length >= 20
+                                    ? true
+                                    : false
+                            }
                         />
                     </div>
                 </div>
-            </Card>
-            <div className="pagination__wrapper">
-                <Pagination
-                    onPrevious={previousPage}
-                    onNext={nextPage}
-                    hasPrevious={page > 1 ? true : false}
-                    hasNext={data && data.length >= 20 ? true : false}
-                />
-            </div>
-        </div>
+            )}
+        </Fragment>
     );
 };
 

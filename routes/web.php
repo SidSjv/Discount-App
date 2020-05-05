@@ -10,6 +10,8 @@ Route::get('/shopify/activate', 'ShopifyController@activate');
 
 //welcome route
 Route::get('home', 'HomeController@index');
+Route::get('campaign', 'HomeController@index');
+Route::get('settings', 'HomeController@index');
 
 //Webhooks Routes
 Route::post('newCollection', 'WebhooksController@storeCollection');

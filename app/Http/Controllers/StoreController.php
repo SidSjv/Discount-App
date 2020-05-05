@@ -15,11 +15,7 @@ class StoreController extends Controller {
         
     }
 
-<<<<<<< HEAD
-  public function index(Request $request) {
-=======
     public function index(Request $request) {
->>>>>>> ad36dad673c000ff33c98e5651a8542f6a01f8c8
         if($request->expectsJson()) {
             $store_details = Store::where('id', $request->store_id)->first();
             if($store_details !== null && $store_details->count() > 0)

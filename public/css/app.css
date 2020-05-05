@@ -1,3 +1,34 @@
+/*  **************  FLexbox Mixins ************* */
+
+/*  **************  Media Query Mixins ************* */
+
+/* Portrait phones and smaller */
+
+.containerrrrrr {
+  padding: 0 15px;
+}
+
+@media (max-width: 686px) {
+  .containerrrrrr {
+    padding: 0 20px;
+  }
+}
+
+@media (min-width: 992px) {
+  .containerrrrrr {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1100px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .containerrrrrr {
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+}
+
 img {
   max-width: 100%;
 }
@@ -6,6 +37,142 @@ img {
   padding: 0 3.6rem;
   margin-top: 3.2rem;
   margin-bottom: 3.2rem;
+}
+
+/** - UI Title Bar -**/
+
+.title__bar {
+  display: flex;
+  flex-wrap: wrap;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  border-bottom: 0;
+  box-sizing: border-box;
+}
+
+.title__bar-main-group {
+  flex: 1 1 auto;
+  max-width: 100%;
+}
+
+.title__bar-action-group {
+  display: flex;
+}
+
+.title__bar-actions {
+  display: flex;
+  flex: 0 0 auto;
+  z-index: 23;
+}
+
+.title__bar .action__bar {
+  display: flex;
+  margin: 0 auto;
+  position: relative;
+  margin-top: 0.8rem;
+  margin-right: auto;
+  margin-left: -0.8rem;
+  padding: 0;
+  z-index: inherit;
+}
+
+.title__bar .action__bar-items {
+  flex: 1 1 auto;
+  -moz-justify-content: flex-start;
+  -ms-justify-content: flex-start;
+  justify-content: flex-start;
+  -ms-flex-pack: flex-start;
+  margin-left: 0;
+  margin-right: 1.6rem;
+  margin-top: 0;
+}
+
+.title__bar .action__bar-links {
+  display: flex;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  flex: 0 1 auto;
+}
+
+.title__bar .action__bar-link,
+.title__bar .action__bar button {
+  background: transparent;
+  box-shadow: none;
+  padding: 0.8rem;
+  margin-right: 0.8rem;
+  border-radius: 3px;
+  color: #637381;
+  text-decoration: none;
+  display: inline-block;
+  white-space: nowrap;
+  border: 0;
+  outline: 0;
+  font-size: 1.4rem;
+  font-family: inherit;
+  font-weight: 400;
+  cursor: pointer;
+  height: auto;
+  display: flex;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+}
+
+.title__bar .action__bar-link .Polaris-Icon,
+.title__bar .action__bar button .Polaris-Icon {
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.title__bar .action__bar-link .Polaris-Button__Icon,
+.title__bar .action__bar button .Polaris-Button__Icon {
+  margin-top: 0.4rem;
+}
+
+/*  -End of Title Bar - */
+
+.breadcumbs {
+  overflow: visible;
+  color: #798c9c;
+  display: flex;
+  display: block;
+  white-space: nowrap;
+}
+
+.breadcumbs a,
+.breadcumbs button {
+  display: -moz-inline-flex;
+  display: inline-flex;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center;
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 2rem;
+  text-transform: initial;
+  letter-spacing: initial;
+  color: #637381;
+  color: #637381;
+  border-radius: 3px;
+  text-decoration: none;
+  will-change: background;
+  transition: background 200ms cubic-bezier(0.64, 0, 0.35, 1);
+  padding-top: 0.4rem;
+  padding-right: 0.4rem;
+  padding-bottom: 0.4rem;
+  padding-left: 0;
+  margin-left: -0.7rem;
+  border: none;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+}
+
+.breadcumbs a:hover,
+.breadcumbs button:hover {
+  color: #212b36;
 }
 
 table {
@@ -326,6 +493,7 @@ ul {
 
 .dashboard .table {
   position: relative;
+  min-height: 8rem;
 }
 
 .dashboard .table .sort_wrapper {
@@ -362,7 +530,78 @@ ul {
   text-align: center;
 }
 
-.card-header {
+.dashboard .not__found {
   text-align: center;
+}
+
+.dashboard .not__found p {
+  padding-top: 2rem;
+}
+
+/******* Wizard page d ********/
+
+/*  **************  FLexbox Mixins ************* */
+
+/*  **************  Media Query Mixins ************* */
+
+/* Portrait phones and smaller */
+
+.containerrrrrr {
+  padding: 0 15px;
+}
+
+@media (max-width: 686px) {
+  .containerrrrrr {
+    padding: 0 20px;
+  }
+}
+
+@media (min-width: 992px) {
+  .containerrrrrr {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1100px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .containerrrrrr {
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+}
+
+.wizard .campaign__wrapper {
+  display: flex;
+}
+
+.wizard .campaign__wrapper .campaign__icon {
+  margin-right: 2rem;
+  min-width: 6rem;
+}
+
+.wizard .campaign__wrapper .campaign__details {
+  flex: 1;
+}
+
+.wizard .campaign__wrapper .campaign__details .campaign__title {
+  font-weight: 600;
+}
+
+.wizard .campaign__wrapper .campaign__details .campaign__info {
+  margin-bottom: 0.7rem;
+}
+
+.wizard .campaign__wrapper .campaign__details .examples {
+  display: flex;
+}
+
+.wizard .campaign__wrapper .campaign__details .examples .examples__block {
+  margin-left: 1rem;
+  flex: 1;
+}
+
+.wizard .campaign__wrapper .campaign__details .examples .examples__block .example__list {
+  margin-bottom: 3px;
 }
 
