@@ -17,7 +17,8 @@ class CampaignController extends Controller {
        // $this->middleware('auth:api');
     }
 
-    public function show($id, Request $request) {
+    public function index(Request $request) {
+        $id = Auth::user()->store_id;
         if(isset($id) && $id !== null) {
             $campaigns = Campaign::where('store_id', $id)->get();
             if($campaigns !== null && $campaigns->count() > 0) {
