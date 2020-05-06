@@ -48,10 +48,14 @@ class CampaignController extends Controller {
         if(isset($request->tab)) {
             if($request->tab !== 'all')
                 $campaigns = $campaigns->where('status', $request->tab);
-            if(isset($request->sortBy) && isset($request->sortOrder))
-                $campaigns = $campaigns->orderBy($request->sortBy, $request->sortOrder);
             if(isset($request->searchTerm))
                 $campaigns = $campaigns->where('name', 'LIKE', '%'.$request->searchTerm.'%');
+            if(isset($request->start_date)) 
+                $campaigns = $campaigns->where('start_date', 'LIKE', '%'.date('Y-m-d', strtotime($request->start_date)).'%');
+            if(isset($request->end_date)) 
+                $campaigns = $campaigns->where('end_date', 'LIKE', '%'.date('Y-m-d', strtotime($request->end_date)).'%');
+            if(isset($request->sortBy) && isset($request->sortOrder))
+                $campaigns = $campaigns->orderBy($request->sortBy, $request->sortOrder);
             if(isset($request->limit))
                 $campaigns = $campaigns->limit($request->limit);
         }
