@@ -20,11 +20,11 @@ class CampaignController extends Controller {
     public function index(Request $request) {
         $id = Auth::user()->store_id;
         if(isset($id) && $id !== null) {
-            $campaigns = Campaign::where('store_id', $id)->get();
+            $campaigns = Campaign::where('store_id', $id)->where('valid', 'Active')->get();
             if($campaigns !== null && $campaigns->count() > 0) {
                 $payload = [];
                 foreach($campaigns as $campaign) {
-                    $temp = ['campaign_id' => $campaign->id, 'name' => $campaign->name];
+                    $temp = ['campaign_id' => $campaign->id, 'name' => $campaign->name, 'status' => $campaign->status, 'start_date' => $campaign->start_date, 'end_date' => $campaign->end_date];
                     $temp['bogo'] = BOGOCampaign::where('campaign_id', $campaign->id)->get()->pluck('name');
                     $temp['discount'] = DiscountCampaigns::where('campaign_id', $campaign->id)->get()->pluck('name');
                     $temp['bulk'] = BulkCampaigns::where('campaign_id', $campaign->id)->get()->pluck('name');
@@ -34,6 +34,10 @@ class CampaignController extends Controller {
             } else return response()->json(['status' => true, 'campaigns' => null], 200);
         } 
         return response()->json(['status' => false, 'message' => 'Invalid / Missing store_id in request headers !'], 200);
+    }
+
+    public function show($id, Request $request) {
+
     }
 
     public function store(CampaignCreate $request) {
