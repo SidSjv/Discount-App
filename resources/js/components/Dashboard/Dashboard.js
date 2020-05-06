@@ -59,6 +59,9 @@ const Dashboard = () => {
                     let obj = {
                         campaign_id: i.campaign_id,
                         name: i.name,
+                        start_date: i.start_date,
+                        end_date: i.end_date,
+                        status: i.status,
                     };
                     if (i.bogo && i.bogo.length > 0) {
                         obj.description = i.bogo;
@@ -329,13 +332,19 @@ const Dashboard = () => {
 };
 
 function renderItem(item, _, index) {
-    const { id, url, name, location } = item;
+    const {
+        campaign_id,
+        name,
+        start_date,
+        end_date,
+        status,
+        description,
+    } = item;
     const media = <Avatar customer size="medium" name={name} />;
 
     return (
         <ResourceItem
-            id={id}
-            url={url}
+            id={campaign_id}
             // media={media}
             sortOrder={index}
             accessibilityLabel={`View details for ${name}`}
@@ -344,17 +353,21 @@ function renderItem(item, _, index) {
                 <tbody>
                     <tr>
                         <td style={{ width: "50%" }}>
-                            <p>2020 Year End Sales</p>
-                            <p>10% for Gold member</p>
-                            <p>5% when buy more than 10 unit</p>
-                            <p>Free Shipping if total amount>$500</p>
+                            <p>{name}</p>
+                            {description &&
+                                description.length > 0 &&
+                                description.map((item, idx) => (
+                                    <p key={idx}>{item}</p>
+                                ))}
                         </td>
                         <td style={{ width: "20%" }}>
-                            <Badge>Expired</Badge>{" "}
+                            <Badge>
+                                {status === "Active" ? "Active" : "Expired"}
+                            </Badge>{" "}
                         </td>
                         <td>0 used</td>
                         <td style={{ textAlign: "right" }}>
-                            16 Feb 20 - 17 Feb 20
+                            {start_date} - {end_date}
                         </td>
                     </tr>
                 </tbody>
