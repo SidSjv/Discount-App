@@ -28,7 +28,16 @@ class CampaignController extends Controller {
             if($campaigns !== null && $campaigns->count() > 0) {
                 $payload = [];
                 foreach($campaigns as $campaign) {
-                    $temp = ['campaign_id' => $campaign->id, 'name' => $campaign->name, 'status' => $campaign->status, 'start_date' => $campaign->start_date, 'end_date' => $campaign->end_date];
+                    $temp = [
+                        'campaign_id' => $campaign->id, 
+                        'name' => $campaign->name, 
+                        'status' => $campaign->status, 
+                        'start_date' => $campaign->start_date, 
+                        'end_date' => $campaign->end_date,
+                        'discount_type' => $campaign->discount_type,
+                        'times_used' => $campaign->times_used,
+                        'created_at' => $campaign->created_at
+                    ];
                     $temp['bogo'] = BOGOCampaign::where('campaign_id', $campaign->id)->get()->pluck('name');
                     $temp['discount'] = DiscountCampaigns::where('campaign_id', $campaign->id)->get()->pluck('name');
                     $temp['bulk'] = BulkCampaigns::where('campaign_id', $campaign->id)->get()->pluck('name');
