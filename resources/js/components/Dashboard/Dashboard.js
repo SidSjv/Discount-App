@@ -67,6 +67,7 @@ const Dashboard = () => {
                     start_date: i.start_date,
                     end_date: i.end_date,
                     status: i.status,
+                    times_used: i.times_used,
                 };
                 if (i.bogo && i.bogo.length > 0) {
                     obj.description = i.bogo;
@@ -92,7 +93,7 @@ const Dashboard = () => {
         axios
             .get(`/campaign`)
             .then((res) => {
-                console.log(res);
+                console.log(res.data.campaigns);
                 let data = res.data;
                 setState({
                     ...state,
@@ -546,7 +547,15 @@ const Dashboard = () => {
 };
 
 function renderItem(item, _, index) {
-    const { idx, name, start_date, end_date, status, description } = item;
+    const {
+        idx,
+        name,
+        start_date,
+        end_date,
+        status,
+        description,
+        times_used,
+    } = item;
 
     return (
         <ResourceItem
@@ -569,7 +578,7 @@ function renderItem(item, _, index) {
                         <td style={{ width: "20%" }}>
                             <Badge>{status}</Badge>{" "}
                         </td>
-                        <td>0 used</td>
+                        <td>{times_used} used</td>
                         <td style={{ textAlign: "right" }}>
                             {dayjs(start_date).format("DD MMM YY")} -{" "}
                             {dayjs(end_date).format("DD MMM YY")}

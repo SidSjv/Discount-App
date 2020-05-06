@@ -34,7 +34,8 @@ const Wizard = () => {
                         ...state,
                         loading: false,
                         isFetched: true,
-                        discount_types: data.discounts
+                        discount_types: data.discounts,
+                        store_id: localStorage.discountapp_storeId
                     });
                 })
                 .catch(err => {
@@ -42,7 +43,8 @@ const Wizard = () => {
                     setState({
                         ...state,
                         loading: false,
-                        isFetched: true
+                        isFetched: true,
+                        store_id: localStorage.discountapp_storeId
                     });
                 });
 
