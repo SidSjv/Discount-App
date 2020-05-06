@@ -48,6 +48,9 @@ class CampaignController extends Controller {
             if(isset($request->sortBy) && isset($request->sortOrder)) {
                 $campaigns = $campaigns->orderBy($request->sortBy, $request->sortOrder);
             }    
+            if(isset($request->searchTerm)) {
+                $campaigns = $campaigns->where('name', 'LIKE', '%'.$request->searchTerm.'%');
+            }
             return $campaigns->get();
         } else return $campaigns->get();
     }
