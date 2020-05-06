@@ -28,6 +28,8 @@ const Dashboard = () => {
         isFetched: false,
         items: [],
         tab: "",
+        placeholder: "Search discount code",
+        inputType: "text",
     };
 
     const [state, setState] = useState(initData);
@@ -47,29 +49,36 @@ const Dashboard = () => {
         isFetched,
         items,
         tab,
+        placeholder,
+        inputType,
     } = state;
+
+    const [searchTerm, setsearchTerm] = useState("");
 
     //Utils function
     const getItems = (campaigns) => {
-        let items = campaigns.map((i) => {
-            let obj = {
-                campaign_id: i.campaign_id,
-                name: i.name,
-                start_date: i.start_date,
-                end_date: i.end_date,
-                status: i.status,
-            };
-            if (i.bogo && i.bogo.length > 0) {
-                obj.description = i.bogo;
-            }
-            if (i.bulk && i.bulk.length > 0) {
-                obj.description = i.bulk;
-            }
-            if (i.discount && i.discount.length > 0) {
-                obj.description = i.discount;
-            }
-            return obj;
-        });
+        let items =
+            campaigns &&
+            campaigns.length > 0 &&
+            campaigns.map((i) => {
+                let obj = {
+                    id: i.campaign_id,
+                    name: i.name,
+                    start_date: i.start_date,
+                    end_date: i.end_date,
+                    status: i.status,
+                };
+                if (i.bogo && i.bogo.length > 0) {
+                    obj.description = i.bogo;
+                }
+                if (i.bulk && i.bulk.length > 0) {
+                    obj.description = i.bulk;
+                }
+                if (i.discount && i.discount.length > 0) {
+                    obj.description = i.discount;
+                }
+                return obj;
+            });
 
         return items;
     };
@@ -109,77 +118,11 @@ const Dashboard = () => {
             getFilterData();
         }
         console.log("changed");
-    }, [sort, tab, filter]);
-
-    //On change
-    const handleTabChange = (selectedTabIndex) => {
-        setState({
-            ...state,
-            selected: selectedTabIndex,
-            tab: tabs[selectedTabIndex].id,
-        });
-    };
-
-    const handleSelectChange = (value, id) => {
-        setState({
-            ...state,
-            [id]: value,
-        });
-    };
-
-    //Handle sort change
-
-    const handleSortChange = (value) => {
-        let sortBy, sortOrder;
-        if (value === "discount(asc)") {
-            (sortBy = "name"), (sortOrder = "asc");
-        }
-        if (value === "discount(desc)") {
-            (sortBy = "name"), (sortOrder = "desc");
-        }
-        if (value === "start_date(asc)") {
-            (sortBy = "start_date"), (sortOrder = "asc");
-        }
-        if (value === "start_date(desc)") {
-            (sortBy = "start_date"), (sortOrder = "desc");
-        }
-        if (value === "end_date(asc)") {
-            (sortBy = "end_date"), (sortOrder = "asc");
-        }
-        if (value === "end_date(desc)") {
-            (sortBy = "end_date"), (sortOrder = "desc");
-        }
-        setState({
-            ...state,
-            sort: value,
-            sortBy: sortBy,
-            sortOrder: sortOrder,
-        });
-    };
-
-    //Handle Filter cahnge
-    const handleFilterChange = (value) => {
-        setState({
-            ...state,
-            filter: value,
-        });
-    };
-
-    //Pagination
-    const nextPage = () => {
-        params.page_number = page + 1;
-        params.limit = 20;
-        setpage((currentPage) => currentPage + 1);
-    };
-    const previousPage = () => {
-        params.page_number = page - 1;
-        params.limit = 20;
-        setpage((currentPage) => currentPage - 1);
-    };
+    }, [sort, tab]);
 
     // Get Filter data
 
-    const getFilterData = () => {
+    const getFilterData = (search, pageNumber) => {
         let params = {
             tab: tab === "" ? "all" : tab,
         };
@@ -188,7 +131,43 @@ const Dashboard = () => {
             params.sortBy = sortBy;
             params.sortOrder = sortOrder;
         }
+        if (searchTerm) {
+            if (filter) {
+                if (filter === "status") {
+                    params.status = searchTerm;
+                } else if (filter === "times_used") {
+                    params.times_used = searchTerm;
+                } else if (filter === "starts") {
+                    params.starts = searchTerm;
+                } else if (filter === "discount_type") {
+                    params.discount_type = searchTerm;
+                }
+            } else {
+                params.searchTerm = searchTerm;
+            }
+        }
+        if (search) {
+            if (filter) {
+                if (filter === "status") {
+                    params.status = search;
+                } else if (filter === "times_used") {
+                    params.times_used = search;
+                } else if (filter === "starts") {
+                    params.starts = search;
+                } else if (filter === "discount_type") {
+                    params.discount_type = search;
+                }
+            } else {
+                params.searchTerm = search;
+            }
+        }
 
+        if (pageNumber) {
+            params.page = pageNumber;
+        }
+        if (page) {
+            params.page = page;
+        }
         setState({
             ...state,
             loading: true,
@@ -214,6 +193,117 @@ const Dashboard = () => {
                     isFetched: true,
                 });
             });
+    };
+
+    //On change
+    const handleTabChange = (selectedTabIndex) => {
+        setState({
+            ...state,
+            selected: selectedTabIndex,
+            tab: tabs[selectedTabIndex].id,
+        });
+    };
+
+    // const handleSelectChange = (value, id) => {
+    //     setState({
+    //         ...state,
+    //         [id]: value,
+    //     });
+    // };
+
+    //Handle search campaign
+
+    const handleSearchCampaign = (e) => {
+        const { value } = e.target;
+        setsearchTerm(value);
+
+        setTimeout(() => {
+            getFilterData(value);
+        }, 1000);
+    };
+    //Handle Filter cahnge
+    const handleFilterChange = (value) => {
+        let inputType, placeholder;
+
+        if (value === "times_used") {
+            inputType = "number";
+            placeholder = "Search by time used";
+        }
+        if (value === "discount_type") {
+            inputType = "text";
+            placeholder = "Search by discount code type";
+        }
+        if (value === "status") {
+            inputType = "text";
+            placeholder = "Search by status";
+        }
+        if (value === "starts") {
+            inputType = "date";
+            placeholder = "Search discount code";
+        }
+        if (value === "") {
+            inputType = "text";
+            placeholder = "Search discount code";
+        }
+
+        setState({
+            ...state,
+            filter: value,
+            placeholder,
+            inputType,
+        });
+    };
+
+    //Handle sort change
+
+    const handleSortChange = (value) => {
+        let sortBy, sortOrder;
+        if (value === "discount(asc)") {
+            sortBy = "name";
+            sortOrder = "asc";
+        }
+        if (value === "discount(desc)") {
+            sortBy = "name";
+            sortOrder = "desc";
+        }
+        if (value === "start_date(asc)") {
+            sortBy = "start_date";
+            sortOrder = "asc";
+        }
+        if (value === "start_date(desc)") {
+            sortBy = "start_date";
+            sortOrder = "desc";
+        }
+        if (value === "end_date(asc)") {
+            sortBy = "end_date";
+            sortOrder = "asc";
+        }
+        if (value === "end_date(desc)") {
+            sortBy = "end_date";
+            sortOrder = "desc";
+        }
+        if (value === "created_at") {
+            sortBy = "created_at";
+            sortOrder = "desc";
+        }
+        setState({
+            ...state,
+            sort: value,
+            sortBy: sortBy,
+            sortOrder: sortOrder,
+        });
+    };
+
+    //Pagination
+    const nextPage = () => {
+        let page_number = page + 1;
+        setpage((currentPage) => currentPage + 1);
+        getFilterData(null, page_number);
+    };
+    const previousPage = () => {
+        let page_number = page - 1;
+        setpage((currentPage) => currentPage - 1);
+        getFilterData(null, page_number);
     };
 
     //Tabs
@@ -247,19 +337,40 @@ const Dashboard = () => {
     ];
     const filter_options = [
         { label: "Filter", value: "" },
-        { label: "Discount code type", value: "yesterday" },
-        { label: "Starts", value: "lastWeek" },
-        { label: "Status", value: "yesterdayy" },
-        { label: "Times used", value: "lastWeekk" },
+        {
+            label: "Discount code type",
+            value: "discount_type",
+        },
+        { label: "Starts", value: "starts" },
+        { label: "Status", value: "status" },
+        { label: "Times used", value: "times_used" },
     ];
     const sort_options = [
-        { label: "Last created", value: "newestUpdate" },
-        { label: "Discount code(A-Z)", value: "discount(asc)" },
-        { label: "Discount code(Z-A)", value: "discount(desc)" },
-        { label: "Start date(accending)", value: "start_date(asc)" },
-        { label: "Start date(decending)", value: "start_date(desc)" },
-        { label: "End date(accending)", value: "end_date(asc)" },
-        { label: "End date(decending)", value: "end_date(desc)" },
+        { label: "Last created", value: "created_at" },
+        {
+            label: "Discount code(A-Z)",
+            value: "discount(asc)",
+        },
+        {
+            label: "Discount code(Z-A)",
+            value: "discount(desc)",
+        },
+        {
+            label: "Start date(accending)",
+            value: "start_date(asc)",
+        },
+        {
+            label: "Start date(decending)",
+            value: "start_date(desc)",
+        },
+        {
+            label: "End date(accending)",
+            value: "end_date(asc)",
+        },
+        {
+            label: "End date(decending)",
+            value: "end_date(desc)",
+        },
     ];
 
     //Resourse Item
@@ -339,7 +450,7 @@ const Dashboard = () => {
                                     <div className="export_filter">
                                         <Select
                                             options={filter_options}
-                                            onChange={handleSelectChange}
+                                            onChange={handleFilterChange}
                                             value={filter}
                                             id="filter"
                                         />
@@ -367,9 +478,15 @@ const Dashboard = () => {
                                                             </span>
                                                         </div>
                                                         <input
-                                                            type="text"
+                                                            type={inputType}
                                                             className="Polaris-TextField__Input search_input"
-                                                            placeholder="Search discount codes"
+                                                            placeholder={
+                                                                placeholder
+                                                            }
+                                                            value={searchTerm}
+                                                            onChange={
+                                                                handleSearchCampaign
+                                                            }
                                                         />
                                                         <div className="Polaris-TextField__Backdrop"></div>
                                                     </div>
@@ -398,7 +515,7 @@ const Dashboard = () => {
                                         selectedItems={selectedItems}
                                         onSelectionChange={setSelectedItems}
                                         bulkActions={bulkActions}
-                                        resolveItemId={resolveItemIds}
+                                        //resolveItemId={resolveItemIds}
                                         selectable
                                     />
                                 ) : (
@@ -416,7 +533,7 @@ const Dashboard = () => {
                             onNext={nextPage}
                             hasPrevious={page > 1 ? true : false}
                             hasNext={
-                                campaigns && campaigns.length >= 20
+                                campaigns && campaigns.length >= 25
                                     ? true
                                     : false
                             }
@@ -429,19 +546,11 @@ const Dashboard = () => {
 };
 
 function renderItem(item, _, index) {
-    const {
-        campaign_id,
-        name,
-        start_date,
-        end_date,
-        status,
-        description,
-    } = item;
-    const media = <Avatar customer size="medium" name={name} />;
+    const { idx, name, start_date, end_date, status, description } = item;
 
     return (
         <ResourceItem
-            id={campaign_id}
+            id={idx}
             // media={media}
             sortOrder={index}
             accessibilityLabel={`View details for ${name}`}
@@ -458,9 +567,7 @@ function renderItem(item, _, index) {
                                 ))}
                         </td>
                         <td style={{ width: "20%" }}>
-                            <Badge>
-                                {status === "Active" ? "Active" : "Expired"}
-                            </Badge>{" "}
+                            <Badge>{status}</Badge>{" "}
                         </td>
                         <td>0 used</td>
                         <td style={{ textAlign: "right" }}>
