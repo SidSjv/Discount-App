@@ -22,9 +22,10 @@ try {
 window.axios = require("axios");
 window.axios.defaults.baseURL = "http://localhost/discountappphp/public/api";
 if (localStorage.discountapp_token) {
-    //console.log(localStorage.discountapp_token);
-    window.axios.defaults.headers.common["Authorization"] =
-        localStorage.discountapp_token;
+    //    console.log("sent token", localStorage.discountapp_token);
+    window.axios.defaults.headers.common[
+        "Authorization"
+    ] = `Bearer ${localStorage.discountapp_token}`;
 }
 
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";

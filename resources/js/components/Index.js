@@ -28,11 +28,14 @@ const Index = props => {
             axios
                 .get(`home?store_id=${store_id}`)
                 .then(res => {
-                    console.log(res);
+                    //console.log(res);
                     let token = res.data.token;
-                    //console.log("token", token);
+                    //console.log("Get token", token);
                     localStorage.setItem("discountapp_token", token);
                     localStorage.setItem("discountapp_storeId", store_id);
+                    window.axios.defaults.headers.common[
+                        "Authorization"
+                    ] = `Bearer ${token}`;
                     setFetched(true);
                 })
                 .catch(err => {
@@ -40,6 +43,9 @@ const Index = props => {
                 });
         } else {
             setFetched(true);
+            window.axios.defaults.headers.common[
+                "Authorization"
+            ] = `Bearer ${localStorage.discountapp_token}`;
         }
     }, []);
 

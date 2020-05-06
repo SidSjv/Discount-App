@@ -8,7 +8,7 @@ import {
     ResourceList,
     ResourceItem,
     Badge,
-    Pagination
+    Pagination,
 } from "@shopify/polaris";
 import Spinner from "../UI/Spinner";
 import { Link } from "react-router-dom";
@@ -23,7 +23,7 @@ const Dashboard = () => {
         store_id: "",
         loading: false,
         isFetched: false,
-        items: []
+        items: [],
     };
 
     const [state, setState] = useState(initData);
@@ -39,7 +39,7 @@ const Dashboard = () => {
         loading,
         store_id,
         isFetched,
-        items
+        items,
     } = state;
 
     //Use Effect
@@ -47,42 +47,60 @@ const Dashboard = () => {
         let store_id = localStorage.getItem("discountapp_storeId");
         setState({
             ...state,
-            loading: true
+            loading: true,
         });
         axios
-            .get(`/campaign/${store_id}`)
-            .then(res => {
+            .get(`/campaign`)
+            .then((res) => {
                 console.log(res);
                 let data = res.data;
+
+                let items = data.campaigns.map((i) => {
+                    let obj = {
+                        campaign_id: i.campaign_id,
+                        name: i.name,
+                    };
+                    if (i.bogo && i.bogo.length > 0) {
+                        obj.description = i.bogo;
+                    }
+                    if (i.bulk && i.bulk.length > 0) {
+                        obj.description = i.bulk;
+                    }
+                    if (i.discount && i.discount.length > 0) {
+                        obj.description = i.discount;
+                    }
+                    return obj;
+                });
                 setState({
                     ...state,
                     loading: false,
                     campaigns: data.campaigns,
-                    isFetched: true
+                    isFetched: true,
+                    items,
                 });
             })
-            .catch(err => {
+            .catch((err) => {
                 console.log(err);
                 setState({
                     ...state,
                     loading: false,
-                    isFetched: true
+                    isFetched: true,
                 });
             });
     }, []);
 
     //On change
-    const handleTabChange = selectedTabIndex => {
+    const handleTabChange = (selectedTabIndex) => {
         setState({
             ...state,
-            selected: selectedTabIndex
+            selected: selectedTabIndex,
         });
     };
 
     const handleSelectChange = (value, id) => {
         setState({
             ...state,
-            [id]: value
+            [id]: value,
         });
     };
 
@@ -90,12 +108,12 @@ const Dashboard = () => {
     const nextPage = () => {
         params.page_number = page + 1;
         params.limit = 20;
-        setpage(currentPage => currentPage + 1);
+        setpage((currentPage) => currentPage + 1);
     };
     const previousPage = () => {
         params.page_number = page - 1;
         params.limit = 20;
-        setpage(currentPage => currentPage - 1);
+        setpage((currentPage) => currentPage - 1);
     };
 
     //Tabs
@@ -104,35 +122,35 @@ const Dashboard = () => {
             id: "all",
             content: "All",
             accessibilityLabel: "All Discounts",
-            panelID: "all-discounts"
+            panelID: "all-discounts",
         },
         {
             id: "active",
             content: "Active",
-            panelID: "active-discounts"
+            panelID: "active-discounts",
         },
         {
             id: "scheduled",
             content: "Scheduled",
-            panelID: "scheduled-discounts"
+            panelID: "scheduled-discounts",
         },
         {
             id: "expired",
             content: "Expired",
-            panelID: "expired-discounts"
+            panelID: "expired-discounts",
         },
         {
             id: "favourite",
             content: "favourite",
-            panelID: "favourite-discounts"
-        }
+            panelID: "favourite-discounts",
+        },
     ];
     const filter_options = [
         { label: "Filter", value: "" },
         { label: "Discount code type", value: "yesterday" },
         { label: "Starts", value: "lastWeek" },
         { label: "Status", value: "yesterdayy" },
-        { label: "Times used", value: "lastWeekk" }
+        { label: "Times used", value: "lastWeekk" },
     ];
     const sort_options = [
         { label: "Last created", value: "newestUpdate" },
@@ -141,13 +159,13 @@ const Dashboard = () => {
         { label: "Start date(accending)", value: "mostOrders" },
         { label: "Start date(decending)", value: "mostOrderss" },
         { label: "End date(accending)", value: "lastNameAlphaa" },
-        { label: "End date(decending)", value: "lastNameAlpha" }
+        { label: "End date(decending)", value: "lastNameAlpha" },
     ];
 
     //Resourse Item
     const resourceName = {
         singular: "discount",
-        plural: "discounts"
+        plural: "discounts",
     };
     // const items = [
     //     {
@@ -173,20 +191,20 @@ const Dashboard = () => {
     const bulkActions = [
         {
             content: "Enable discount codes",
-            onAction: () => console.log("Todo: implement bulk add tags")
+            onAction: () => console.log("Todo: implement bulk add tags"),
         },
         {
             content: "Disable discount codes",
-            onAction: () => console.log("Todo: implement bulk remove tags")
+            onAction: () => console.log("Todo: implement bulk remove tags"),
         },
         {
             content: "Delete discount codes",
-            onAction: () => console.log("Todo: implement bulk delete")
+            onAction: () => console.log("Todo: implement bulk delete"),
         },
         {
             content: "Make favourite",
-            onAction: () => console.log("Todo: implement bulk delete")
-        }
+            onAction: () => console.log("Todo: implement bulk delete"),
+        },
     ];
 
     return (
