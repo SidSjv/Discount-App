@@ -20,7 +20,8 @@ class CampaignController extends Controller {
     public function index(Request $request) {
         $id = Auth::user()->store_id;
         if(isset($id) && $id !== null) {
-            $campaigns = Campaign::where('store_id', $id)->where('valid', 'Active')->get();
+            $campaigns = Campaign::where('store_id', $id)->where('valid', 'Active');
+            $campaigns = $this->filterCampaigns($campaigns, $request);
             if($campaigns !== null && $campaigns->count() > 0) {
                 $payload = [];
                 foreach($campaigns as $campaign) {
@@ -38,6 +39,17 @@ class CampaignController extends Controller {
 
     public function show($id, Request $request) {
 
+    }
+
+    private function filterCampaigns($campaigns, $request) {
+        if(isset($request->tab)) {
+            if($request->tab !== 'all')
+                $campaigns = $campaigns->where('status', $request->tab);
+            if(isset($request->sortBy) && isset($request->sortOrder)) {
+                $campaigns = $campaigns->orderBy($request->sortBy, $request->sortOrder);
+            }    
+            return $campaigns->get();
+        } else return $campaigns->get();
     }
 
     public function store(CampaignCreate $request) {
