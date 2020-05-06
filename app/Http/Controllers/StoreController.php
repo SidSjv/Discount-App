@@ -36,6 +36,7 @@ class StoreController extends Controller {
     }
 
     public function discount_types() {
-        return response()->json(['status' => true, 'discounts' => DiscountTypes::select('id', 'name', 'description')->get()->toArray()], 200);
+        $discount_types = DiscountTypes::select('id', 'name', 'description')->get()->toArray();
+        return ['status' => true, 'discounts' => $discount_types];
     }
 }
