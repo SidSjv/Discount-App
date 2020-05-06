@@ -56,6 +56,8 @@ class CampaignController extends Controller {
                 $campaigns = $campaigns->where('end_date', 'LIKE', '%'.date('Y-m-d', strtotime($request->end_date)).'%');
             if(isset($request->times_used)) 
                 $campaigns = $campaigns->where('times_used', $request->times_used);
+            if(isset($request->discount_type)) 
+                $campaigns = $campaigns->where('discount_type', $request->discount_type);    
             if(isset($request->sortBy) && isset($request->sortOrder))
                 $campaigns = $campaigns->orderBy($request->sortBy, $request->sortOrder);
             if(isset($request->limit))
