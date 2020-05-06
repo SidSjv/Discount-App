@@ -54,6 +54,8 @@ class CampaignController extends Controller {
                 $campaigns = $campaigns->where('start_date', 'LIKE', '%'.date('Y-m-d', strtotime($request->start_date)).'%');
             if(isset($request->end_date)) 
                 $campaigns = $campaigns->where('end_date', 'LIKE', '%'.date('Y-m-d', strtotime($request->end_date)).'%');
+            if(isset($request->times_used)) 
+                $campaigns = $campaigns->where('times_used', $request->times_used);
             if(isset($request->sortBy) && isset($request->sortOrder))
                 $campaigns = $campaigns->orderBy($request->sortBy, $request->sortOrder);
             if(isset($request->limit))
