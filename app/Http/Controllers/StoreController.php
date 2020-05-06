@@ -37,13 +37,6 @@ class StoreController extends Controller {
 
     public function discount_types() {
         $discount_types = DiscountTypes::select('id', 'name', 'description')->get()->toArray();
-        if($discount_types !== null && count($discount_types) > 0){
-            $i = 0;
-            foreach($discount_types as $type){
-                $discount_types[$i]['description'] = json_decode($discount_types[$i]['description'], true);
-                $i++;
-            }
-        }
         return ['status' => true, 'discounts' => $discount_types];
     }
 }
