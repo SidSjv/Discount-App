@@ -13,17 +13,21 @@ import {
 import Spinner from "../UI/Spinner";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import dayjs from "dayjs";
 
 const Dashboard = () => {
     let initData = {
         selected: 0,
         filter: "",
         sort: "",
+        sortOrder: "",
+        sortBy: "",
         campaigns: "",
         store_id: "",
         loading: false,
         isFetched: false,
         items: [],
+        tab: "",
     };
 
     const [state, setState] = useState(initData);
@@ -35,16 +39,43 @@ const Dashboard = () => {
         selected,
         filter,
         sort,
+        sortBy,
+        sortOrder,
         campaigns,
         loading,
         store_id,
         isFetched,
         items,
+        tab,
     } = state;
+
+    //Utils function
+    const getItems = (campaigns) => {
+        let items = campaigns.map((i) => {
+            let obj = {
+                campaign_id: i.campaign_id,
+                name: i.name,
+                start_date: i.start_date,
+                end_date: i.end_date,
+                status: i.status,
+            };
+            if (i.bogo && i.bogo.length > 0) {
+                obj.description = i.bogo;
+            }
+            if (i.bulk && i.bulk.length > 0) {
+                obj.description = i.bulk;
+            }
+            if (i.discount && i.discount.length > 0) {
+                obj.description = i.discount;
+            }
+            return obj;
+        });
+
+        return items;
+    };
 
     //Use Effect
     useEffect(() => {
-        let store_id = localStorage.getItem("discountapp_storeId");
         setState({
             ...state,
             loading: true,
@@ -54,32 +85,12 @@ const Dashboard = () => {
             .then((res) => {
                 console.log(res);
                 let data = res.data;
-
-                let items = data.campaigns.map((i) => {
-                    let obj = {
-                        campaign_id: i.campaign_id,
-                        name: i.name,
-                        start_date: i.start_date,
-                        end_date: i.end_date,
-                        status: i.status,
-                    };
-                    if (i.bogo && i.bogo.length > 0) {
-                        obj.description = i.bogo;
-                    }
-                    if (i.bulk && i.bulk.length > 0) {
-                        obj.description = i.bulk;
-                    }
-                    if (i.discount && i.discount.length > 0) {
-                        obj.description = i.discount;
-                    }
-                    return obj;
-                });
                 setState({
                     ...state,
                     loading: false,
                     campaigns: data.campaigns,
                     isFetched: true,
-                    items,
+                    items: getItems(data.campaigns),
                 });
             })
             .catch((err) => {
@@ -92,11 +103,20 @@ const Dashboard = () => {
             });
     }, []);
 
+    // For filter and sort
+    useEffect(() => {
+        if (sort || filter || tab) {
+            getFilterData();
+        }
+        console.log("changed");
+    }, [sort, tab, filter]);
+
     //On change
     const handleTabChange = (selectedTabIndex) => {
         setState({
             ...state,
             selected: selectedTabIndex,
+            tab: tabs[selectedTabIndex].id,
         });
     };
 
@@ -104,6 +124,44 @@ const Dashboard = () => {
         setState({
             ...state,
             [id]: value,
+        });
+    };
+
+    //Handle sort change
+
+    const handleSortChange = (value) => {
+        let sortBy, sortOrder;
+        if (value === "discount(asc)") {
+            (sortBy = "name"), (sortOrder = "asc");
+        }
+        if (value === "discount(desc)") {
+            (sortBy = "name"), (sortOrder = "desc");
+        }
+        if (value === "start_date(asc)") {
+            (sortBy = "start_date"), (sortOrder = "asc");
+        }
+        if (value === "start_date(desc)") {
+            (sortBy = "start_date"), (sortOrder = "desc");
+        }
+        if (value === "end_date(asc)") {
+            (sortBy = "end_date"), (sortOrder = "asc");
+        }
+        if (value === "end_date(desc)") {
+            (sortBy = "end_date"), (sortOrder = "desc");
+        }
+        setState({
+            ...state,
+            sort: value,
+            sortBy: sortBy,
+            sortOrder: sortOrder,
+        });
+    };
+
+    //Handle Filter cahnge
+    const handleFilterChange = (value) => {
+        setState({
+            ...state,
+            filter: value,
         });
     };
 
@@ -117,6 +175,45 @@ const Dashboard = () => {
         params.page_number = page - 1;
         params.limit = 20;
         setpage((currentPage) => currentPage - 1);
+    };
+
+    // Get Filter data
+
+    const getFilterData = () => {
+        let params = {
+            tab: tab === "" ? "all" : tab,
+        };
+
+        if (sortOrder) {
+            params.sortBy = sortBy;
+            params.sortOrder = sortOrder;
+        }
+
+        setState({
+            ...state,
+            loading: true,
+        });
+        axios
+            .get("/campaign", { params: params })
+            .then((res) => {
+                console.log(res);
+                let data = res.data;
+                setState({
+                    ...state,
+                    loading: false,
+                    campaigns: data.campaigns,
+                    isFetched: true,
+                    items: getItems(data.campaigns),
+                });
+            })
+            .catch((err) => {
+                console.log(err);
+                setState({
+                    ...state,
+                    loading: false,
+                    isFetched: true,
+                });
+            });
     };
 
     //Tabs
@@ -144,7 +241,7 @@ const Dashboard = () => {
         },
         {
             id: "favourite",
-            content: "favourite",
+            content: "Favourite",
             panelID: "favourite-discounts",
         },
     ];
@@ -157,12 +254,12 @@ const Dashboard = () => {
     ];
     const sort_options = [
         { label: "Last created", value: "newestUpdate" },
-        { label: "Discount code(A-Z)", value: "oldestUpdate" },
-        { label: "Discount code(Z-A)", value: "mostSpent" },
-        { label: "Start date(accending)", value: "mostOrders" },
-        { label: "Start date(decending)", value: "mostOrderss" },
-        { label: "End date(accending)", value: "lastNameAlphaa" },
-        { label: "End date(decending)", value: "lastNameAlpha" },
+        { label: "Discount code(A-Z)", value: "discount(asc)" },
+        { label: "Discount code(Z-A)", value: "discount(desc)" },
+        { label: "Start date(accending)", value: "start_date(asc)" },
+        { label: "Start date(decending)", value: "start_date(desc)" },
+        { label: "End date(accending)", value: "end_date(asc)" },
+        { label: "End date(decending)", value: "end_date(desc)" },
     ];
 
     //Resourse Item
@@ -288,9 +385,9 @@ const Dashboard = () => {
                                         label="Sort by"
                                         labelInline
                                         options={sort_options}
-                                        onChange={handleSelectChange}
+                                        onChange={handleSortChange}
                                         value={sort}
-                                        id="sort"
+                                        id="sortBy"
                                     />
                                 </div>
                                 {items && items.length > 0 ? (
@@ -367,7 +464,8 @@ function renderItem(item, _, index) {
                         </td>
                         <td>0 used</td>
                         <td style={{ textAlign: "right" }}>
-                            {start_date} - {end_date}
+                            {dayjs(start_date).format("DD MMM YY")} -{" "}
+                            {dayjs(end_date).format("DD MMM YY")}
                         </td>
                     </tr>
                 </tbody>
