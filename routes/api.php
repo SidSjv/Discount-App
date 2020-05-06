@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('authenticateAPI')->group(function() {
     Route::get('home', 'StoreController@index');
-    Route::resource('campaign', 'CampaignController');
     Route::middleware('auth:api')->group(function () {
-        Route::get('test', 'CampaignController@test');
+        Route::resource('campaign', 'CampaignController');
         Route::resource('customer', 'CustomerController');
         Route::get('syncStoreData/{id}', 'StoreController@syncStoreData');
+        Route::get('discount_types', 'StoreController@discount_types');
     });
 });

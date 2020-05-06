@@ -10,5 +10,6 @@ class DatabaseSeeder extends Seeder {
      */
     public function run() {
         $this->call(PlansSeeder::class);
+        $this->call(DiscountTypesSeeder::class);
     }
 }

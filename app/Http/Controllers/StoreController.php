@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\Sync\Collections;
 use App\Jobs\Sync\Customers;
 use App\Jobs\Sync\Products;
+use App\Models\DiscountTypes;
 use App\Models\Store;
 use App\User;
 use Exception;
@@ -32,5 +33,9 @@ class StoreController extends Controller {
         } catch(Exception $e) {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 200);
         }
+    }
+
+    public function discount_types() {
+        return response()->json(['status' => true, 'discounts' => DiscountTypes::select('id', 'name', 'description')->get()->toArray()], 200);
     }
 }
