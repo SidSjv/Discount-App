@@ -13,8 +13,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CampaignController extends Controller {
+    private $pagination_count;
+    
     public function __construct() {
-       // $this->middleware('auth:api');
+        $this->pagination_count = config('custom.default_pagination_count');
+        $this->middleware('auth:api');
     }
 
     public function index(Request $request) {
@@ -45,14 +48,14 @@ class CampaignController extends Controller {
         if(isset($request->tab)) {
             if($request->tab !== 'all')
                 $campaigns = $campaigns->where('status', $request->tab);
-            if(isset($request->sortBy) && isset($request->sortOrder)) {
+            if(isset($request->sortBy) && isset($request->sortOrder))
                 $campaigns = $campaigns->orderBy($request->sortBy, $request->sortOrder);
-            }    
-            if(isset($request->searchTerm)) {
+            if(isset($request->searchTerm))
                 $campaigns = $campaigns->where('name', 'LIKE', '%'.$request->searchTerm.'%');
-            }
-            return $campaigns->get();
-        } else return $campaigns->get();
+            if(isset($request->limit))
+                $campaigns = $campaigns->limit($request->limit);
+        }
+        return $campaigns->paginate($this->pagination_count);
     }
 
     public function store(CampaignCreate $request) {
