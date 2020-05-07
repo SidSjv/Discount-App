@@ -18,6 +18,7 @@ Route::middleware('authenticateAPI')->group(function() {
     Route::middleware('auth:api')->group(function () {
         Route::resource('campaign', 'CampaignController');
         Route::resource('customer', 'CustomerController');
+        Route::resource('product', 'ProductsController');
         Route::get('syncStoreData/{id}', 'StoreController@syncStoreData');
         Route::get('discount_types', 'StoreController@discount_types');
     });
