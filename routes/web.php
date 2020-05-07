@@ -11,6 +11,8 @@ Route::get('/shopify/activate', 'ShopifyController@activate');
 //welcome route
 Route::get('home', 'HomeController@index');
 Route::get('campaign', 'HomeController@index');
+Route::get('campaign/bogo/', 'HomeController@index');
+Route::get('campaign/bogo/{id}', 'HomeController@index');
 Route::get('settings', 'HomeController@index');
 
 //Webhooks Routes

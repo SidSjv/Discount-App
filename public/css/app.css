@@ -399,6 +399,10 @@ ul {
   margin-bottom: 1.6rem;
 }
 
+.mr-auto {
+  margin-right: auto;
+}
+
 .mt-1 {
   margin-top: 1rem !important;
 }
@@ -603,5 +607,79 @@ ul {
 
 .wizard .campaign__wrapper .campaign__details .examples .examples__block .example__list {
   margin-bottom: 3px;
+}
+
+.wizard .campaign__wrapper .campaign__details .examples .examples__block .example__list p {
+  display: inline-block;
+}
+
+.bogo {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.campaign__layout .form__layout .form__group {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 1.3rem;
+}
+
+.campaign__layout .form__layout .form__group .form__field {
+  width: 48%;
+}
+
+.campaign__layout .form__layout .form__group .form__field .form__field-wrapper {
+  display: flex;
+  align-items: flex-end;
+}
+
+.campaign__layout .form__layout .form__group .form__field .form__field-wrapper div {
+  flex: 1;
+}
+
+.campaign__layout .form__layout .form__group .icon {
+  min-height: 3.6rem;
+  max-height: 3.6rem;
+  padding: 0 1rem;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+}
+
+.campaign__layout .flex__wrapper {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.campaign__layout .flex__wrapper .flex__item {
+  width: 48%;
+  margin-bottom: 1.3rem;
+}
+
+.campaign__layout .flex__wrapper .flex__item-wrapper {
+  display: flex;
+  align-items: flex-end;
+}
+
+.campaign__layout .flex__wrapper .flex__item-wrapper .flex_one {
+  flex: 1;
+}
+
+.campaign__layout .field__item {
+  margin-bottom: 1.3rem;
+}
+
+.campaign__layout .checlbox__item {
+  margin-bottom: 4px;
+}
+
+.campaign__layout .flex__row-equal {
+  display: flex;
+  align-items: flex-end;
+}
+
+.campaign__layout .flex__row-equal .flex__row-item {
+  width: 50%;
 }
 

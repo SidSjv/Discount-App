@@ -24,9 +24,84 @@
                     flex: 1;
                     .example__list {
                         margin-bottom: 3px;
+                        p {
+                            display: inline-block;
+                            // min-width: 25rem;
+                            // max-width: 25rem;
+                        }
                     }
                 }
             }
+        }
+    }
+}
+
+//Create a Layout for Createing campaign
+
+.bogo {
+    width: 80%;
+    margin: 0 auto;
+}
+.campaign__layout {
+    .form__layout {
+        .form__group {
+            @include flexbox();
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 1.3rem;
+            .form__field {
+                width: 48%;
+                .form__field-wrapper {
+                    @include flexbox();
+                    align-items: flex-end;
+
+                    div {
+                        flex: 1;
+                    }
+                }
+            }
+
+            .icon {
+                min-height: 3.6rem;
+                max-height: 3.6rem;
+                padding: 0 1rem;
+                border-bottom-left-radius: 0;
+                border-top-left-radius: 0;
+            }
+        }
+    }
+
+    .flex__wrapper {
+        @include flexbox();
+        align-items: flex-start;
+        justify-content: space-between;
+        .flex__item {
+            width: 48%;
+            margin-bottom: 1.3rem;
+            &-wrapper {
+                @include flexbox();
+                align-items: flex-end;
+                .flex_one {
+                    flex: 1;
+                }
+            }
+        }
+    }
+
+    .field__item {
+        margin-bottom: 1.3rem;
+    }
+    .checlbox__item {
+        margin-bottom: 4px;
+    }
+
+    //FOr equal row
+
+    .flex__row-equal {
+        @include flexbox();
+        align-items: flex-end;
+        .flex__row-item {
+            width: 50%;
         }
     }
 }
