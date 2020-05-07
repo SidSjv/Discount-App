@@ -21,4 +21,8 @@ class CustomerController extends Controller {
             } else return response()->json(['status' => false, 'message' => 'Store Not Found !'], 200);
         }
     }
+
+    public function show($id) {
+        return response()->json(['status' => true, 'customer' => Customers::where('id', $id)->first()->toArray()], 200);
+    }
 }
