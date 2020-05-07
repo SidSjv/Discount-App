@@ -28,7 +28,7 @@ const Wizard = () => {
             axios
                 .get("/discount_types")
                 .then(res => {
-                    console.log(res);
+                    console.log(res.data.discounts);
                     let data = res.data;
                     setState({
                         ...state,
@@ -47,11 +47,6 @@ const Wizard = () => {
                         store_id: localStorage.discountapp_storeId
                     });
                 });
-
-            // setState({
-            //     ...state,
-            //     store_id: localStorage.discountapp_storeId
-            // });
         }
     }, []);
     return (
@@ -70,63 +65,80 @@ const Wizard = () => {
                             title="Offer"
                             description="Choose from a variety of easy-to-use templates to manage and promote  your sales and special offers."
                         >
-                            <Card sectioned>
-                                <div className="campaign__wrapper">
-                                    <div className="campaign__icon">icon</div>
-                                    <div className="campaign__details">
-                                        <h3 className="campaign__title">
-                                            BOGO
-                                        </h3>
-                                        <p className="campaign__info">
-                                            Create a customizable Buy X, Get Y
-                                            offer
-                                        </p>
-                                        <div className="examples">
-                                            <div>Examples:</div>
-                                            <div className="examples__block">
-                                                <div className="example__list">
-                                                    Buy 2 Free 1 ............{" "}
-                                                    <Link
-                                                        to="/campaign/bogo"
-                                                        className="link__text"
-                                                    >
-                                                        {" "}
-                                                        Create{" "}
-                                                    </Link>
+                            {discount_types &&
+                                discount_types.length > 0 &&
+                                discount_types.map((discount, idx) => {
+                                    let description = discount.description
+                                        ? JSON.parse(discount.description)
+                                        : null;
+                                    return (
+                                        <Card sectioned key={discount.id}>
+                                            <div className="campaign__wrapper">
+                                                <div className="campaign__icon">
+                                                    icon
                                                 </div>
-                                                <div className="example__list">
-                                                    Buy 2 Free 1 ............{" "}
-                                                    <Link
-                                                        to="/campaign/bogo"
-                                                        className="link__text"
-                                                    >
-                                                        {" "}
-                                                        Create{" "}
-                                                    </Link>
-                                                </div>
-                                                <div className="example__list">
-                                                    Buy 2 Free 1 ............{" "}
-                                                    <Link
-                                                        to="/campaign/bogo"
-                                                        className="link__text"
-                                                    >
-                                                        {" "}
-                                                        Create{" "}
-                                                    </Link>
+                                                <div className="campaign__details">
+                                                    <h3 className="campaign__title">
+                                                        {discount.name}
+                                                    </h3>
+                                                    <p className="campaign__info">
+                                                        Create a customizable
+                                                        Buy X, Get Y offer
+                                                    </p>
+                                                    <div className="examples">
+                                                        <div>Examples:</div>
+                                                        <div className="examples__block">
+                                                            {description &&
+                                                                description.length >
+                                                                    0 &&
+                                                                description.map(
+                                                                    (
+                                                                        desc,
+                                                                        idx
+                                                                    ) => (
+                                                                        <div
+                                                                            className="example__list"
+                                                                            key={
+                                                                                idx
+                                                                            }
+                                                                        >
+                                                                            <p>
+                                                                                {
+                                                                                    desc.title
+                                                                                }
+                                                                                ............{" "}
+                                                                            </p>
+
+                                                                            {discount.name ===
+                                                                                "BOGO" && (
+                                                                                <Link
+                                                                                    to={`/campaign/bogo/${desc.id}`}
+                                                                                    className="link__text"
+                                                                                >
+                                                                                    {" "}
+                                                                                    Create{" "}
+                                                                                </Link>
+                                                                            )}
+                                                                        </div>
+                                                                    )
+                                                                )}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="text-center mt-2">
-                                    <SeeMoreButton
-                                        isOpen={isOpen}
-                                        seeMoreText="Show all"
-                                        seeLessText="Hide"
-                                        click={() => console.log("clicked")}
-                                    />
-                                </div>
-                            </Card>
+                                            <div className="text-center mt-2">
+                                                <SeeMoreButton
+                                                    isOpen={isOpen}
+                                                    seeMoreText="Show all"
+                                                    seeLessText="Hide"
+                                                    click={() =>
+                                                        console.log("clicked")
+                                                    }
+                                                />
+                                            </div>
+                                        </Card>
+                                    );
+                                })}
 
                             <div className="pull__right mt-3">
                                 <Link

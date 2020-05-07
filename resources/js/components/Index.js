@@ -16,6 +16,7 @@ import { AppProvider } from "@shopify/polaris";
 import en from "@shopify/polaris/locales/en.json";
 import Wizard from "./Campaign/Wizard";
 import Settings from "./Settings/Settings";
+import Bogo from "./Campaign/BOGO/Bogo";
 
 const Index = props => {
     const [isFetched, setFetched] = useState(false);
@@ -56,6 +57,11 @@ const Index = props => {
                     <Switch>
                         <Route path="/home/" component={Dashboard} />
                         <Route exact path="/campaign" component={Wizard} />
+                        <Route
+                            exact
+                            path="/campaign/bogo/:id"
+                            component={Bogo}
+                        />
                         <Route exact path="/settings" component={Settings} />
                     </Switch>
                 </div>

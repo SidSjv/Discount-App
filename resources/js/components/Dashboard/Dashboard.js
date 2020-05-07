@@ -3,12 +3,11 @@ import Analytics from "./Analytics";
 import {
     Card,
     Tabs,
-    Avatar,
     Select,
     ResourceList,
     ResourceItem,
     Badge,
-    Pagination,
+    Pagination
 } from "@shopify/polaris";
 import Spinner from "../UI/Spinner";
 import { Link } from "react-router-dom";
@@ -29,7 +28,7 @@ const Dashboard = () => {
         items: [],
         tab: "",
         placeholder: "Search discount code",
-        inputType: "text",
+        inputType: "text"
     };
 
     const [state, setState] = useState(initData);
@@ -50,24 +49,24 @@ const Dashboard = () => {
         items,
         tab,
         placeholder,
-        inputType,
+        inputType
     } = state;
 
     const [searchTerm, setsearchTerm] = useState("");
 
     //Utils function
-    const getItems = (campaigns) => {
+    const getItems = campaigns => {
         let items =
             campaigns &&
             campaigns.length > 0 &&
-            campaigns.map((i) => {
+            campaigns.map(i => {
                 let obj = {
                     id: i.campaign_id,
                     name: i.name,
                     start_date: i.start_date,
                     end_date: i.end_date,
                     status: i.status,
-                    times_used: i.times_used,
+                    times_used: i.times_used
                 };
                 if (i.bogo && i.bogo.length > 0) {
                     obj.description = i.bogo;
@@ -88,11 +87,11 @@ const Dashboard = () => {
     useEffect(() => {
         setState({
             ...state,
-            loading: true,
+            loading: true
         });
         axios
             .get(`/campaign`)
-            .then((res) => {
+            .then(res => {
                 console.log(res.data.campaigns);
                 let data = res.data;
                 setState({
@@ -100,15 +99,15 @@ const Dashboard = () => {
                     loading: false,
                     campaigns: data.campaigns,
                     isFetched: true,
-                    items: getItems(data.campaigns),
+                    items: getItems(data.campaigns)
                 });
             })
-            .catch((err) => {
+            .catch(err => {
                 console.log(err);
                 setState({
                     ...state,
                     loading: false,
-                    isFetched: true,
+                    isFetched: true
                 });
             });
     }, []);
@@ -125,7 +124,7 @@ const Dashboard = () => {
 
     const getFilterData = (search, pageNumber) => {
         let params = {
-            tab: tab === "" ? "all" : tab,
+            tab: tab === "" ? "all" : tab
         };
 
         if (sortOrder) {
@@ -171,11 +170,11 @@ const Dashboard = () => {
         }
         setState({
             ...state,
-            loading: true,
+            loading: true
         });
         axios
             .get("/campaign", { params: params })
-            .then((res) => {
+            .then(res => {
                 console.log(res);
                 let data = res.data;
                 setState({
@@ -183,25 +182,25 @@ const Dashboard = () => {
                     loading: false,
                     campaigns: data.campaigns,
                     isFetched: true,
-                    items: getItems(data.campaigns),
+                    items: getItems(data.campaigns)
                 });
             })
-            .catch((err) => {
+            .catch(err => {
                 console.log(err);
                 setState({
                     ...state,
                     loading: false,
-                    isFetched: true,
+                    isFetched: true
                 });
             });
     };
 
     //On change
-    const handleTabChange = (selectedTabIndex) => {
+    const handleTabChange = selectedTabIndex => {
         setState({
             ...state,
             selected: selectedTabIndex,
-            tab: tabs[selectedTabIndex].id,
+            tab: tabs[selectedTabIndex].id
         });
     };
 
@@ -214,7 +213,7 @@ const Dashboard = () => {
 
     //Handle search campaign
 
-    const handleSearchCampaign = (e) => {
+    const handleSearchCampaign = e => {
         const { value } = e.target;
         setsearchTerm(value);
 
@@ -223,7 +222,7 @@ const Dashboard = () => {
         }, 1000);
     };
     //Handle Filter cahnge
-    const handleFilterChange = (value) => {
+    const handleFilterChange = value => {
         let inputType, placeholder;
 
         if (value === "times_used") {
@@ -251,13 +250,13 @@ const Dashboard = () => {
             ...state,
             filter: value,
             placeholder,
-            inputType,
+            inputType
         });
     };
 
     //Handle sort change
 
-    const handleSortChange = (value) => {
+    const handleSortChange = value => {
         let sortBy, sortOrder;
         if (value === "discount(asc)") {
             sortBy = "name";
@@ -291,19 +290,19 @@ const Dashboard = () => {
             ...state,
             sort: value,
             sortBy: sortBy,
-            sortOrder: sortOrder,
+            sortOrder: sortOrder
         });
     };
 
     //Pagination
     const nextPage = () => {
         let page_number = page + 1;
-        setpage((currentPage) => currentPage + 1);
+        setpage(currentPage => currentPage + 1);
         getFilterData(null, page_number);
     };
     const previousPage = () => {
         let page_number = page - 1;
-        setpage((currentPage) => currentPage - 1);
+        setpage(currentPage => currentPage - 1);
         getFilterData(null, page_number);
     };
 
@@ -313,71 +312,71 @@ const Dashboard = () => {
             id: "all",
             content: "All",
             accessibilityLabel: "All Discounts",
-            panelID: "all-discounts",
+            panelID: "all-discounts"
         },
         {
             id: "active",
             content: "Active",
-            panelID: "active-discounts",
+            panelID: "active-discounts"
         },
         {
             id: "scheduled",
             content: "Scheduled",
-            panelID: "scheduled-discounts",
+            panelID: "scheduled-discounts"
         },
         {
             id: "expired",
             content: "Expired",
-            panelID: "expired-discounts",
+            panelID: "expired-discounts"
         },
         {
             id: "favourite",
             content: "Favourite",
-            panelID: "favourite-discounts",
-        },
+            panelID: "favourite-discounts"
+        }
     ];
     const filter_options = [
         { label: "Filter", value: "" },
         {
             label: "Discount code type",
-            value: "discount_type",
+            value: "discount_type"
         },
         { label: "Starts", value: "starts" },
         { label: "Status", value: "status" },
-        { label: "Times used", value: "times_used" },
+        { label: "Times used", value: "times_used" }
     ];
     const sort_options = [
         { label: "Last created", value: "created_at" },
         {
             label: "Discount code(A-Z)",
-            value: "discount(asc)",
+            value: "discount(asc)"
         },
         {
             label: "Discount code(Z-A)",
-            value: "discount(desc)",
+            value: "discount(desc)"
         },
         {
             label: "Start date(accending)",
-            value: "start_date(asc)",
+            value: "start_date(asc)"
         },
         {
             label: "Start date(decending)",
-            value: "start_date(desc)",
+            value: "start_date(desc)"
         },
         {
             label: "End date(accending)",
-            value: "end_date(asc)",
+            value: "end_date(asc)"
         },
         {
             label: "End date(decending)",
-            value: "end_date(desc)",
-        },
+            value: "end_date(desc)"
+        }
     ];
 
     //Resourse Item
     const resourceName = {
         singular: "discount",
-        plural: "discounts",
+        plural: "discounts"
     };
     // const items = [
     //     {
@@ -403,20 +402,20 @@ const Dashboard = () => {
     const bulkActions = [
         {
             content: "Enable discount codes",
-            onAction: () => console.log("Todo: implement bulk add tags"),
+            onAction: () => console.log("Todo: implement bulk add tags")
         },
         {
             content: "Disable discount codes",
-            onAction: () => console.log("Todo: implement bulk remove tags"),
+            onAction: () => console.log("Todo: implement bulk remove tags")
         },
         {
             content: "Delete discount codes",
-            onAction: () => console.log("Todo: implement bulk delete"),
+            onAction: () => console.log("Todo: implement bulk delete")
         },
         {
             content: "Make favourite",
-            onAction: () => console.log("Todo: implement bulk delete"),
-        },
+            onAction: () => console.log("Todo: implement bulk delete")
+        }
     ];
 
     return (
@@ -548,18 +547,18 @@ const Dashboard = () => {
 
 function renderItem(item, _, index) {
     const {
-        idx,
+        id,
         name,
         start_date,
         end_date,
         status,
         description,
-        times_used,
+        times_used
     } = item;
 
     return (
         <ResourceItem
-            id={idx}
+            id={id}
             // media={media}
             sortOrder={index}
             accessibilityLabel={`View details for ${name}`}
