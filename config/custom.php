@@ -7,6 +7,8 @@
         'app_name' => env('SHOPIFY_APP_NAME', 'discount-app-staging'),
         'client_id' => env('CLIENTID', '4'),
         'client_secret' => env('CLIENTSECRET', '4N0Vsl2IKOgPlYLNWAnerBB88XWXB7bhiC0eSGnV'),
-        'default_pagination_count' => 25
+        'default_pagination_count' => 25,
+        'product_pagination_count' => 25,
+        'customer_pagination_count' => 25
     ];
 ?>
