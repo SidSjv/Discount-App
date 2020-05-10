@@ -76,3 +76,17 @@
         }
     }
 }
+
+//Text Field
+.input_field {
+    .Polaris-TextField {
+        width: 100%;
+    }
+    .Polaris-InlineError {
+        .Polaris-Icon {
+            .Polaris-Icon__Svg {
+                fill: var(--p-text-critical, #bf0711);
+            }
+        }
+    }
+}

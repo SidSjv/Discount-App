@@ -1,6 +1,9 @@
 img {
     max-width: 100%;
 }
+p {
+    margin-bottom: 0;
+}
 
 .main_section {
     padding: 0 3.6rem;
@@ -182,3 +185,100 @@ table {
 //     border-bottom: 0.1rem solid var(--p-border-subdued, #dfe3e8);
 //     padding-top: 2rem;
 // }
+
+.Polaris-Modal-Section {
+    padding: 0 !important;
+    min-height: 20rem;
+}
+.Polaris-Modal-Header {
+    padding: 0 !important;
+}
+
+//Modal title
+.modal__title {
+    .header__title {
+        padding: 1.6rem 2rem;
+        border-bottom: var(
+            --p-thin-border-subdued,
+            0.1rem solid var(--p-border-subdued, #dfe3e8)
+        );
+    }
+
+    .search_box {
+        padding: 1.6rem;
+    }
+}
+
+.Polaris-Modal-CloseButton {
+    position: absolute;
+    right: 2rem;
+    top: 1.6rem;
+}
+
+//Modal body
+.result__list {
+    // height: 500px;
+    // max-height: inherit;
+    position: relative;
+    .list {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding: 1.6rem 1.6rem;
+        border-bottom: 0.1rem solid var(--p-border-subdued, #dfe3e8);
+
+        .left__item {
+            display: flex;
+            margin-right: 1.6rem;
+            min-width: 1.6rem;
+        }
+        .right__item {
+            display: flex;
+            flex: 1;
+
+            .secondary__name {
+                margin-left: 1.6rem;
+            }
+        }
+    }
+}
+
+//ANTD Date picker customization
+
+// .ant-picker-panel-container {
+//     background: #f4f6f8 !important;
+// }
+
+// .ant-picker-cell {
+//     margin: 0 !important;
+//     padding: 0.8rem !important;
+//     border: 0.1rem solid var(--p-border-subdued, #dfe3e8) !important;
+// }
+
+// .ant-picker-cell-range-start {
+//     background: #5c6ac4 !important;
+//     border: 0.1rem solid #5c6ac4 !important;
+// }
+// .ant-picker-cell-inner {
+//     background: transparent !important;
+// }
+// .ant-picker-cell-in-view.ant-picker-cell-range-start:not(.ant-picker-cell-range-start-single)::before {
+//     background: none !important;
+// }
+
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+    border: 1px solid #5c6ac4 !important;
+}
+
+ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+    background: #5c6ac4 !important;
+}
+
+.ant-picker-cell-in-view.ant-picker-cell-in-range::before,
+.ant-picker-cell-in-view.ant-picker-cell-range-start:not(.ant-picker-cell-range-start-single)::before,
+.ant-picker-cell-in-view.ant-picker-cell-range-start:not(.ant-picker-cell-range-start-single)::before,
+.ant-picker-cell-in-view.ant-picker-cell-range-end:not(.ant-picker-cell-range-end-single)::before {
+    background: #b3bcf5 !important;
+}

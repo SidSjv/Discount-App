@@ -25,10 +25,12 @@
     },
     "dependencies": {
         "@shopify/polaris": "^4.21.0",
+        "antd": "^4.2.0",
         "dayjs": "^1.8.26",
         "highcharts": "^8.0.4",
         "highcharts-react-official": "^3.0.0",
         "popper.js": "^1.16.1",
+        "react-infinite-scroll-component": "^5.0.4",
         "react-router-dom": "^5.1.2"
     }
 }

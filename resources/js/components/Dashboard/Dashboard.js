@@ -13,6 +13,9 @@ import Spinner from "../UI/Spinner";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import dayjs from "dayjs";
+import DatePicker from "antd/es/date-picker";
+
+const { RangePicker } = DatePicker;
 
 const Dashboard = () => {
     let initData = {
@@ -34,6 +37,10 @@ const Dashboard = () => {
     const [state, setState] = useState(initData);
     const [selectedItems, setSelectedItems] = useState([]);
     const [page, setpage] = useState(1);
+    const [{ from, to }, setDate] = useState({
+        from: "",
+        to: ""
+    });
 
     //Desctruct the state
     const {
@@ -118,7 +125,7 @@ const Dashboard = () => {
             getFilterData();
         }
         console.log("changed");
-    }, [sort, tab]);
+    }, [sort, tab, to]);
 
     // Get Filter data
 
@@ -168,6 +175,10 @@ const Dashboard = () => {
         if (page) {
             params.page = page;
         }
+
+        if (from) {
+            params.starts = from;
+        }
         setState({
             ...state,
             loading: true
@@ -201,6 +212,15 @@ const Dashboard = () => {
             ...state,
             selected: selectedTabIndex,
             tab: tabs[selectedTabIndex].id
+        });
+    };
+
+    //Handel Date picker change
+    const handelDateChange = (date, dateString) => {
+        // console.log(date, dateString);
+        setDate({
+            from: dateString[0],
+            to: dateString[1]
         });
     };
 
@@ -458,44 +478,58 @@ const Dashboard = () => {
                                     <div className="search_filter">
                                         <div className="button_group">
                                             <div className="group_item">
-                                                <form>
-                                                    <div className="Polaris-TextField">
-                                                        <div className="Polaris-TextField__Prefix">
-                                                            <span className="Polaris-Filters__SearchIcon">
-                                                                <span className="Polaris-Icon">
-                                                                    <svg
-                                                                        viewBox="0 0 20 20"
-                                                                        className="Polaris-Icon__Svg"
-                                                                        focusable="false"
-                                                                        aria-hidden="true"
-                                                                    >
-                                                                        <path
-                                                                            d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8m9.707 4.293l-4.82-4.82A5.968 5.968 0 0 0 14 8 6 6 0 0 0 2 8a6 6 0 0 0 6 6 5.968 5.968 0 0 0 3.473-1.113l4.82 4.82a.997.997 0 0 0 1.414 0 .999.999 0 0 0 0-1.414"
-                                                                            fillRule="evenodd"
-                                                                        ></path>
-                                                                    </svg>
+                                                {filter !== "starts" && (
+                                                    <form>
+                                                        <div className="Polaris-TextField">
+                                                            <div className="Polaris-TextField__Prefix">
+                                                                <span className="Polaris-Filters__SearchIcon">
+                                                                    <span className="Polaris-Icon">
+                                                                        <svg
+                                                                            viewBox="0 0 20 20"
+                                                                            className="Polaris-Icon__Svg"
+                                                                            focusable="false"
+                                                                            aria-hidden="true"
+                                                                        >
+                                                                            <path
+                                                                                d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8m9.707 4.293l-4.82-4.82A5.968 5.968 0 0 0 14 8 6 6 0 0 0 2 8a6 6 0 0 0 6 6 5.968 5.968 0 0 0 3.473-1.113l4.82 4.82a.997.997 0 0 0 1.414 0 .999.999 0 0 0 0-1.414"
+                                                                                fillRule="evenodd"
+                                                                            ></path>
+                                                                        </svg>
+                                                                    </span>
                                                                 </span>
-                                                            </span>
+                                                            </div>
+
+                                                            <input
+                                                                type={inputType}
+                                                                className="Polaris-TextField__Input search_input"
+                                                                placeholder={
+                                                                    placeholder
+                                                                }
+                                                                value={
+                                                                    searchTerm
+                                                                }
+                                                                onChange={
+                                                                    handleSearchCampaign
+                                                                }
+                                                            />
+
+                                                            <div className="Polaris-TextField__Backdrop"></div>
                                                         </div>
-                                                        <input
-                                                            type={inputType}
-                                                            className="Polaris-TextField__Input search_input"
-                                                            placeholder={
-                                                                placeholder
-                                                            }
-                                                            value={searchTerm}
-                                                            onChange={
-                                                                handleSearchCampaign
-                                                            }
-                                                        />
-                                                        <div className="Polaris-TextField__Backdrop"></div>
-                                                    </div>
-                                                </form>
+                                                    </form>
+                                                )}
+                                                {filter === "starts" && (
+                                                    <RangePicker
+                                                        onChange={
+                                                            handelDateChange
+                                                        }
+                                                    />
+                                                )}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                             <div className="table">
                                 <div className="sort_wrapper">
                                     <Select
