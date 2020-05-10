@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 
 import Index from "./Index";
 import { BrowserRouter as Router } from "react-router-dom";
+import "antd/es/date-picker/style/css";
 
 const Example = () => {
     return (

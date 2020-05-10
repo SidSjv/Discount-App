@@ -91,8 +91,29 @@
     .field__item {
         margin-bottom: 1.3rem;
     }
-    .checlbox__item {
+    .checkbox__item {
         margin-bottom: 4px;
+        .col-5 {
+            margin-top: 5px;
+        }
+    }
+
+    .customer__checked-list {
+        display: flex;
+        justify-content: space-between;
+        .name {
+        }
+        .remove__btn {
+            button {
+                border: none;
+                background: transparent;
+                outline: none;
+                cursor: pointer;
+            }
+        }
+        &:not(:last-child) {
+            padding-bottom: 7px;
+        }
     }
 
     //FOr equal row
