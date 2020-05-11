@@ -75,15 +75,21 @@ const Dashboard = () => {
                     status: i.status,
                     times_used: i.times_used
                 };
+                let description = [];
+                obj.description = description;
                 if (i.bogo && i.bogo.length > 0) {
-                    obj.description = i.bogo;
+                    // obj.description = i.bogo;
+                    description.push(i.bogo);
                 }
                 if (i.bulk && i.bulk.length > 0) {
-                    obj.description = i.bulk;
+                    //obj.description = i.bulk;
+                    description.push(i.bulk);
                 }
                 if (i.discount && i.discount.length > 0) {
-                    obj.description = i.discount;
+                    //obj.description = i.discount;
+                    description.push(i.discount);
                 }
+
                 return obj;
             });
 
