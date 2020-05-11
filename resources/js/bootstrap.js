@@ -20,7 +20,7 @@ try {
  */
 
 window.axios = require("axios");
-window.axios.defaults.baseURL = "http://localhost/discountappphp/public/api";
+window.axios.defaults.baseURL = "https://discount.appsdart.com/api";
 if (localStorage.discountapp_token) {
     //    console.log("sent token", localStorage.discountapp_token);
     window.axios.defaults.headers.common[
