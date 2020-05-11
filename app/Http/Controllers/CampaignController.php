@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CampaignCreate;
 use App\Models\BOGOCampaign;
 use App\Models\BulkCampaigns;
+use App\Models\BundleCampaign;
 use App\Models\Campaign;
 use App\Models\DiscountCampaigns;
 use Exception;
@@ -88,12 +89,16 @@ class CampaignController extends Controller {
             'name' => $request['campaign_name'],
             'store_id' => Auth::user()->store_id    
         ]);
+        if(isset($request['Bundle'])) {
+            foreach($request['Bundle'] as $bundle_item) {
+                $bundle_item['campaign_id'] = $campaign_row->id;
+                if(isset($bundle_item['id']) && $bundle_item['id'] !== null) BundleCampaign::where('id', $bundle_item['id'])->update($bundle_item);
+                else BundleCampaign::create($bundle_item);
+            }
+        }
         if(isset($request['BOGO'])) {
             foreach($request['BOGO'] as $bogo_item) {
                 $bogo_item['campaign_id'] = $campaign_row->id;
-                $bogo_item['get_ids'] = json_encode($bogo_item['get_ids']);
-                $bogo_item['buy_ids'] = json_encode($bogo_item['buy_ids']);
-                $bogo_item['customer_ids_eligible'] = json_encode($bogo_item['customer_ids_eligible']);
                 if(isset($bogo_item['id']) && $bogo_item['id'] !== null) BOGOCampaign::where('id', $bogo_item['id'])->update($bogo_item);
                 else BOGOCampaign::create($bogo_item);
             }
@@ -101,7 +106,6 @@ class CampaignController extends Controller {
         if(isset($request['Discount'])) {
             foreach($request['Discount'] as $discount_item) {
                 $discount_item['campaign_id'] = $campaign_row->id;
-                $discount_item['eligible_customers'] = json_encode($discount_item['eligible_customers']);
                 if(isset($discount_item['id']) && $discount_item['id'] !== null) DiscountCampaigns::where('id', $discount_item['id'])->update($discount_item);
                 else DiscountCampaigns::create($discount_item);
             }
@@ -109,7 +113,6 @@ class CampaignController extends Controller {
         if(isset($request['Bulk'])) {
             foreach($request['Bulk'] as $bulk_item) {
                 $bulk_item['campaign_id'] = $campaign_row->id;
-                $bulk_item['eligible_customers'] = json_encode($bulk_item['eligible_customers']);
                 if(isset($bulk_item['id']) && $bulk_item['id'] !== null) BulkCampaigns::where('id', $bulk_item['id'])->update($bulk_item);
                 else BulkCampaigns::create($bulk_item);
             }
