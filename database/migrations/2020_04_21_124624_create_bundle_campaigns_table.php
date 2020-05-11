@@ -13,8 +13,17 @@ class CreateBundleCampaignsTable extends Migration {
     public function up() {
         Schema::create('bundle_campaigns', function (Blueprint $table) {
             $table->bigIncrements('id')->index();
-            $table->string('name')->nullable();
             $table->string('campaign_id')->nullable();
+            $table->string('name')->nullable();
+            $table->string('buy_type')->nullable();
+            $table->longText('buy_ids')->nullable();
+            $table->string('quantity')->nullable();
+            $table->string('discount_type')->nullable();
+            $table->string('discount_value')->nullable();
+            $table->longText('customer_ids_eligible')->nullable();
+            $table->string('max_no_of_uses_per_order')->nullable();
+            $table->string('max_no_of_uses')->nullable();
+            $table->string('limit_to_one_use_per_order')->nullable();
             $table->timestamps();
         });
     }
