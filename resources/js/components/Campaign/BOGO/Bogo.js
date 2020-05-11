@@ -25,6 +25,11 @@ import "../campaign.scss";
 
 const Bogo = props => {
     let initData = {
+        campaign_name: "",
+        start_date: "",
+        start_time: "",
+        end_date: "",
+        end_time: "",
         selected: "",
         selectedBuys: "",
         param_id: "",
@@ -36,6 +41,9 @@ const Bogo = props => {
                 buy_quantity: "",
                 customer_ids_eligible: "",
                 customer_list: "",
+                collection_list: "",
+                product_list: "",
+                customer_group_list: "",
                 customer_eligible: "everyone",
                 get_type: "specific_collections",
                 get_ids: "",
@@ -52,6 +60,11 @@ const Bogo = props => {
             }
         ],
         customerModalOpen: false,
+        customerGroupModalOpen: false,
+        BuyCollectionsModalOpen: false,
+        BuyProductsModalOpen: false,
+        GetCollectionsModalOpen: false,
+        GetProductsModalOpen: false,
         page: 1,
         isFetching: false,
         loading: false,
@@ -66,10 +79,20 @@ const Bogo = props => {
 
     //Desctruct the state
     const {
+        campaign_name,
+        start_date,
+        start_time,
+        end_date,
+        end_time,
         selected,
         selectedBuys,
         bogo,
         customerModalOpen,
+        customerGroupModalOpen,
+        BuyCollectionsModalOpen,
+        BuyProductsModalOpen,
+        GetCollectionsModalOpen,
+        GetProductsModalOpen,
         isFetching,
         loading,
         customerList,
@@ -80,28 +103,7 @@ const Bogo = props => {
         param_id
     } = state;
 
-    const {
-        buy_type,
-        buy_ids,
-        buy_quantity,
-        customer_ids_eligible,
-        get_type,
-        get_ids,
-        get_quantity,
-        discount_type,
-        discount_value,
-        max_user,
-        max_use_per_order,
-        min_user,
-        min_use_per_order,
-        limit_to_one_use_per_customer,
-        isOpen,
-        customer_eligible
-    } = bogo;
-    //Use effect
-
     // Get customers
-
     const getCustomers = search => {
         let bogos = [...bogo];
         let params = {
@@ -160,6 +162,202 @@ const Bogo = props => {
             });
     };
 
+    //Get customers groups
+    const getCustomerGroups = search => {
+        let bogos = [...bogo];
+        let params = {
+            page: page
+        };
+        if (search) {
+            params.searchTerm = search;
+        }
+        if (searchCustomer) {
+            params.searchTerm = searchCustomer;
+        }
+
+        setState({
+            ...state,
+            loading: true
+        });
+
+        axios
+            .get("/customer/groups", { params: params })
+            .then(res => {
+                let data = res.data;
+                let customerList = [];
+                data.customer_groups.data &&
+                    data.customer_groups.data.length > 0 &&
+                    data.customer_groups.data.map(item => {
+                        if (bogos[pushIndex].customer_ids_eligible) {
+                            bogos[pushIndex].customer_ids_eligible.map(el => {
+                                if (el.id === item.id) {
+                                    item["isChecked"] = true;
+                                }
+                            });
+                        } else {
+                            item["isChecked"] = false;
+                        }
+
+                        customerList.push(item);
+                    });
+
+                bogos[pushIndex].customer_list = customerList;
+                setState({
+                    ...state,
+                    customers: data.customer_groups,
+                    bogo: bogos,
+                    isFetching: false,
+                    loading: false
+                });
+            })
+            .catch(err => {
+                console.log(err);
+                setState({
+                    ...state,
+                    isFetching: false,
+                    loading: false
+                });
+            });
+    };
+
+    //Get collections
+    const getCollections = search => {
+        let bogos = [...bogo];
+        let params = {
+            page: page
+        };
+        if (search) {
+            params.searchTerm = search;
+        }
+        if (searchCustomer) {
+            params.searchTerm = searchCustomer;
+        }
+
+        setState({
+            ...state,
+            loading: true
+        });
+
+        axios
+            .get("/collection", { params: params })
+            .then(res => {
+                console.log(res.data);
+                let data = res.data;
+                let collectionList = [];
+                data.collections.data &&
+                    data.collections.data.length > 0 &&
+                    data.collections.data.map(item => {
+                        if (BuyCollectionsModalOpen) {
+                            if (bogos[pushIndex].buy_ids) {
+                                bogos[pushIndex].buy_ids.map(el => {
+                                    if (el.id === item.id) {
+                                        item["isChecked"] = true;
+                                    }
+                                });
+                            }
+                        } else if (GetCollectionsModalOpen) {
+                            if (bogos[pushIndex].get_ids) {
+                                bogos[pushIndex].get_ids.map(el => {
+                                    if (el.id === item.id) {
+                                        item["isChecked"] = true;
+                                    }
+                                });
+                            }
+                        } else {
+                            item["isChecked"] = false;
+                        }
+
+                        collectionList.push(item);
+                    });
+
+                bogos[pushIndex].customer_list = collectionList;
+                setState({
+                    ...state,
+                    customers: data.collections,
+                    bogo: bogos,
+                    isFetching: false,
+                    loading: false
+                });
+            })
+            .catch(err => {
+                console.log(err);
+                setState({
+                    ...state,
+                    isFetching: false,
+                    loading: false
+                });
+            });
+    };
+
+    //Get Products
+
+    const getProducts = search => {
+        let bogos = [...bogo];
+        let params = {
+            page: page
+        };
+        if (search) {
+            params.searchTerm = search;
+        }
+        if (searchCustomer) {
+            params.searchTerm = searchCustomer;
+        }
+
+        setState({
+            ...state,
+            loading: true
+        });
+
+        axios
+            .get("/product", { params: params })
+            .then(res => {
+                console.log(res.data);
+                let data = res.data;
+                let collectionList = [];
+                data.products.data &&
+                    data.products.data.length > 0 &&
+                    data.products.data.map(item => {
+                        if (BuyProductsModalOpen) {
+                            if (bogos[pushIndex].buy_ids) {
+                                bogos[pushIndex].buy_ids.map(el => {
+                                    if (el.id === item.id) {
+                                        item["isChecked"] = true;
+                                    }
+                                });
+                            }
+                        } else if (GetProductsModalOpen) {
+                            if (bogos[pushIndex].get_ids) {
+                                bogos[pushIndex].get_ids.map(el => {
+                                    if (el.id === item.id) {
+                                        item["isChecked"] = true;
+                                    }
+                                });
+                            }
+                        } else {
+                            item["isChecked"] = false;
+                        }
+
+                        collectionList.push(item);
+                    });
+
+                bogos[pushIndex].customer_list = collectionList;
+                setState({
+                    ...state,
+                    customers: data.products,
+                    bogo: bogos,
+                    isFetching: false,
+                    loading: false
+                });
+            })
+            .catch(err => {
+                console.log(err);
+                setState({
+                    ...state,
+                    isFetching: false,
+                    loading: false
+                });
+            });
+    };
     useEffect(() => {
         let param_id = props.match.params.id;
 
@@ -179,7 +377,23 @@ const Bogo = props => {
         if (customerModalOpen) {
             getCustomers();
         }
-    }, [customerModalOpen]);
+        if (customerGroupModalOpen) {
+            getCustomerGroups();
+        }
+        if (BuyCollectionsModalOpen || GetCollectionsModalOpen) {
+            getCollections();
+        }
+        if (BuyProductsModalOpen || GetProductsModalOpen) {
+            getProducts();
+        }
+    }, [
+        customerModalOpen,
+        customerGroupModalOpen,
+        BuyCollectionsModalOpen,
+        GetCollectionsModalOpen,
+        BuyProductsModalOpen,
+        GetProductsModalOpen
+    ]);
 
     const buysOptions = [
         {
@@ -220,9 +434,10 @@ const Bogo = props => {
     //Step form
     // Proceed to next step
     const nextStep = () => {
-        if (handleValidations()) {
-            setStep(step + 1);
-        }
+        // if (handleValidations()) {
+        //     setStep(step + 1);
+        // }
+        setStep(step + 1);
     };
 
     // Go back to prev step
@@ -232,6 +447,38 @@ const Bogo = props => {
 
     //on change
 
+    const handleCampignNameChange = value => {
+        setState({
+            ...state,
+            campaign_name: value
+        });
+    };
+
+    const handleStartDateChange = (date, dateString) => {
+        setState({
+            ...state,
+            start_date: dateString
+        });
+    };
+    const handleEndDateChange = (date, dateString) => {
+        setState({
+            ...state,
+            end_date: dateString
+        });
+    };
+    const handleStartTimeChange = (time, timeString) => {
+        setState({
+            ...state,
+            start_time: timeString
+        });
+    };
+    const handleEndTimeChange = (time, timeString) => {
+        setState({
+            ...state,
+            end_time: timeString
+        });
+    };
+
     //handle select
     const handleSelectChange = (e, i) => {
         console.log(e, i);
@@ -240,7 +487,8 @@ const Bogo = props => {
         bogos[i] = { ...bogos[i], [name]: value };
         setState({
             ...state,
-            bogo: bogos
+            bogo: bogos,
+            pushIndex: i
         });
     };
 
@@ -299,16 +547,15 @@ const Bogo = props => {
 
     /*****Modal *****/
 
-    const handleModalOpen = name => {
-        setState({
-            ...state,
-            [name]: !state.name
-        });
-    };
     const handleModalClose = () => {
         setState({
             ...state,
             customerModalOpen: false,
+            customerGroupModalOpen: false,
+            BuyCollectionsModalOpen: false,
+            BuyProductsModalOpen: false,
+            GetCollectionsModalOpen: false,
+            GetProductsModalOpen: false,
             isFetching: false,
             loading: false,
             page: 1,
@@ -323,14 +570,19 @@ const Bogo = props => {
         let bogos = [...bogo];
         bogos[i] = { ...bogos[i], [name]: value };
 
-        let customerModalOpen = false;
+        let customerModalOpen = false,
+            customerGroupModalOpen = false;
         if (value === "specific_customer") {
             customerModalOpen = true;
+        }
+        if (value === "specific_group_customer") {
+            customerGroupModalOpen = true;
         }
         setState({
             ...state,
             bogo: bogos,
             customerModalOpen,
+            customerGroupModalOpen,
             pushIndex: i
         });
     };
@@ -342,14 +594,36 @@ const Bogo = props => {
         setSearchCustomer(value);
 
         setTimeout(() => {
-            getCustomers(value);
+            if (customerModalOpen) {
+                getCustomers(value);
+            }
+            if (customerGroupModalOpen) {
+                getCustomerGroups(value);
+            }
+            if (BuyCollectionsModalOpen || GetCollectionsModalOpen) {
+                getCollections(value);
+            }
+            if (BuyProductsModalOpen || GetProductsModalOpen) {
+                fetchProducts(value);
+            }
         }, 1000);
     };
 
     const handleScrollBottom = () => {
         const { next_page_url } = customers;
         if (next_page_url) {
-            fetchCustomers();
+            if (customerModalOpen) {
+                fetchCustomers();
+            }
+            if (customerGroupModalOpen) {
+                fetchCustomerGroups();
+            }
+            if (BuyCollectionsModalOpen || GetCollectionsModalOpen) {
+                fetchCollections();
+            }
+            if (BuyProductsModalOpen || GetProductsModalOpen) {
+                fetchProducts();
+            }
         }
     };
 
@@ -392,7 +666,41 @@ const Bogo = props => {
         setState({
             ...state,
             bogo: bogos,
-            customerModalOpen: false
+            customerModalOpen: false,
+            customerGroupModalOpen: false
+        });
+    };
+
+    //Add Collections
+
+    const addCollections = () => {
+        let bogos = [...bogo];
+        if (BuyCollectionsModalOpen || BuyProductsModalOpen) {
+            bogos[pushIndex] = {
+                ...bogos[pushIndex],
+                buy_ids: bogo[pushIndex].customer_list.filter(item =>
+                    item.isChecked ? item.id : ""
+                )
+            };
+        }
+        if (GetCollectionsModalOpen || GetProductsModalOpen) {
+            bogos[pushIndex] = {
+                ...bogos[pushIndex],
+                get_ids: bogo[pushIndex].customer_list.filter(item =>
+                    item.isChecked ? item.id : ""
+                )
+            };
+        }
+
+        setState({
+            ...state,
+            bogo: bogos,
+            customerModalOpen: false,
+            customerGroupModalOpen: false,
+            BuyCollectionsModalOpen: false,
+            BuyProductsModalOpen: false,
+            GetCollectionsModalOpen: false,
+            GetProductsModalOpen: false
         });
     };
 
@@ -403,6 +711,26 @@ const Bogo = props => {
             idx
         ].customer_ids_eligible.filter(item => item.id !== id);
         console.log(bogos);
+
+        setState({
+            ...state,
+            bogo: bogos
+        });
+    };
+
+    //Remove selected collections
+    const removeBuyIds = (idx, id) => {
+        let bogos = [...bogo];
+        bogos[idx].buy_ids = bogos[idx].buy_ids.filter(item => item.id !== id);
+
+        setState({
+            ...state,
+            bogo: bogos
+        });
+    };
+    const removeGetIds = (idx, id) => {
+        let bogos = [...bogo];
+        bogos[idx].get_ids = bogos[idx].get_ids.filter(item => item.id !== id);
 
         setState({
             ...state,
@@ -471,6 +799,249 @@ const Bogo = props => {
             });
     };
 
+    const fetchCustomerGroups = () => {
+        let bogos = [...bogo];
+        setState({
+            ...state,
+            page: state.page + 1,
+            isFetching: true
+        });
+
+        let params = {
+            page: page
+        };
+        if (searchCustomer) {
+            params.searchTerm = searchCustomer;
+        }
+        axios
+            .get("/customer/groups", { params: params })
+            .then(res => {
+                let data = res.data;
+                console.log(data);
+
+                data.customer_groups.data &&
+                    data.customer_groups.data.length > 0 &&
+                    data.customer_groups.data.map(item => {
+                        if (bogos[pushIndex].customer_ids_eligible) {
+                            bogos[pushIndex].customer_ids_eligible.map(el => {
+                                if (el.id === item.id) {
+                                    item["isChecked"] = true;
+                                }
+                            });
+                        } else {
+                            item["isChecked"] = false;
+                        }
+                    });
+
+                console.log("fetch", data.customer_groups.data);
+
+                bogos[pushIndex].customer_list = bogos[
+                    pushIndex
+                ].customer_list.concat(data.customer_groups.data);
+                console.log(bogos);
+
+                setState({
+                    ...state,
+                    customers: data.customer_groups,
+                    isFetching: false,
+                    bogo: bogos,
+                    customerList: state.customerList.concat(
+                        data.customer_groups.data
+                    )
+                });
+            })
+            .catch(err => {
+                console.log(err);
+                setState({
+                    ...state,
+
+                    isFetching: false
+                });
+            });
+    };
+
+    const fetchCollections = () => {
+        let bogos = [...bogo];
+        setState({
+            ...state,
+            page: state.page + 1,
+            isFetching: true
+        });
+
+        let params = {
+            page: page
+        };
+        if (searchCustomer) {
+            params.searchTerm = searchCustomer;
+        }
+        axios
+            .get("/customer/groups", { params: params })
+            .then(res => {
+                let data = res.data;
+                console.log(data);
+
+                data.collections.data &&
+                    data.collections.data.length > 0 &&
+                    data.collections.data.map(item => {
+                        if (BuyCollectionsModalOpen) {
+                            if (bogos[pushIndex].buy_ids) {
+                                bogos[pushIndex].buy_ids.map(el => {
+                                    if (el.id === item.id) {
+                                        item["isChecked"] = true;
+                                    }
+                                });
+                            }
+                        } else if (GetCollectionsModalOpen) {
+                            if (bogos[pushIndex].get_ids) {
+                                bogos[pushIndex].get_ids.map(el => {
+                                    if (el.id === item.id) {
+                                        item["isChecked"] = true;
+                                    }
+                                });
+                            }
+                        } else {
+                            item["isChecked"] = false;
+                        }
+                    });
+
+                console.log("fetch", data.collections.data);
+
+                bogos[pushIndex].customer_list = bogos[
+                    pushIndex
+                ].customer_list.concat(data.collections.data);
+                console.log(bogos);
+
+                setState({
+                    ...state,
+                    customers: data.collections,
+                    isFetching: false,
+                    bogo: bogos,
+                    customerList: state.customerList.concat(
+                        data.collections.data
+                    )
+                });
+            })
+            .catch(err => {
+                console.log(err);
+                setState({
+                    ...state,
+
+                    isFetching: false
+                });
+            });
+    };
+
+    const fetchProducts = () => {
+        let bogos = [...bogo];
+        setState({
+            ...state,
+            page: state.page + 1,
+            isFetching: true
+        });
+
+        let params = {
+            page: page
+        };
+        if (searchCustomer) {
+            params.searchTerm = searchCustomer;
+        }
+        axios
+            .get("/product", { params: params })
+            .then(res => {
+                let data = res.data;
+                console.log(data);
+
+                data.products.data &&
+                    data.products.data.length > 0 &&
+                    data.products.data.map(item => {
+                        if (BuyProductsModalOpen) {
+                            if (bogos[pushIndex].buy_ids) {
+                                bogos[pushIndex].buy_ids.map(el => {
+                                    if (el.id === item.id) {
+                                        item["isChecked"] = true;
+                                    }
+                                });
+                            }
+                        } else if (GetProductsModalOpen) {
+                            if (bogos[pushIndex].get_ids) {
+                                bogos[pushIndex].get_ids.map(el => {
+                                    if (el.id === item.id) {
+                                        item["isChecked"] = true;
+                                    }
+                                });
+                            }
+                        } else {
+                            item["isChecked"] = false;
+                        }
+                    });
+
+                console.log("fetch", data.collections.data);
+
+                bogos[pushIndex].customer_list = bogos[
+                    pushIndex
+                ].customer_list.concat(data.collections.data);
+                console.log(bogos);
+
+                setState({
+                    ...state,
+                    customers: data.collections,
+                    isFetching: false,
+                    bogo: bogos,
+                    customerList: state.customerList.concat(
+                        data.collections.data
+                    )
+                });
+            })
+            .catch(err => {
+                console.log(err);
+                setState({
+                    ...state,
+
+                    isFetching: false
+                });
+            });
+    };
+    /* ******************** Buys Modal ........... */
+    //collections and products
+
+    const handleBuysModalOpen = i => {
+        let BuyCollectionsModalOpen = false,
+            BuyProductsModalOpen = false;
+        if (bogo[i].buy_type === "specific_collections") {
+            BuyCollectionsModalOpen = true;
+            BuyProductsModalOpen = false;
+        }
+        if (bogo[i].buy_type === "specific_product") {
+            BuyCollectionsModalOpen = false;
+            BuyProductsModalOpen = true;
+        }
+
+        setState({
+            ...state,
+            BuyCollectionsModalOpen,
+            BuyProductsModalOpen
+        });
+    };
+
+    const handleGetsModalOpen = i => {
+        console.log(i);
+        let GetCollectionsModalOpen = false,
+            GetProductsModalOpen = false;
+        if (bogo[i].get_type === "specific_collections") {
+            GetCollectionsModalOpen = true;
+            GetProductsModalOpen = false;
+        }
+        if (bogo[i].get_type === "specific_product") {
+            GetCollectionsModalOpen = false;
+            GetProductsModalOpen = true;
+        }
+
+        setState({
+            ...state,
+            GetCollectionsModalOpen,
+            GetProductsModalOpen
+        });
+    };
     /* ******************** Validations ........... */
 
     const handleValidations = () => {
@@ -515,6 +1086,8 @@ const Bogo = props => {
             buy_quantity: "",
             customer_ids_eligible: "",
             customer_list: "",
+            collection_list: "",
+            product_list: "",
             customer_eligible: "",
             get_type: "",
             get_ids: "",
@@ -549,6 +1122,51 @@ const Bogo = props => {
             ...state,
             bogo: bogos
         });
+    };
+
+    //Launch  Campaign
+    const launchCampaign = () => {
+        let bogoArry = [];
+        let sendObj = {
+            campaign_name: campaign_name,
+            start_date: `${start_date} ${start_time}`,
+            end_date: `${end_date} ${end_time}`,
+            discount_type: "Single",
+            BOGO: bogoArry
+        };
+
+        bogo.map(el => {
+            let buyIds = el.buy_ids.map(buy => buy.id);
+            let getIds = el.get_ids.map(get => get.id);
+            let customerIds = el.customer_ids_eligible.map(
+                customer => customer.id
+            );
+            return bogoArry.push({
+                name: el.name,
+                buy_type: el.buy_type,
+                buy_ids: buyIds,
+                buy_quantity: el.buy_quantity,
+                customer_ids_eligible: customerIds,
+                get_type: el.get_type,
+                get_ids: getIds,
+                get_quantity: el.get_quantity,
+                discount_type: el.get_quantity,
+                discount_value: el.discount_value,
+                max_use_per_order: el.max_use_per_order,
+                limit_to_one_use_per_customer: el.limit_to_one_use_per_customer
+            });
+        });
+
+        axios
+            .post("/campaign", sendObj)
+            .then(res => {
+                console.log(res);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
+        console.log(sendObj);
     };
 
     return (
@@ -606,32 +1224,71 @@ const Bogo = props => {
                                     {el.isOpen && (
                                         <div className="see_more">
                                             <div className="flex__wrapper">
-                                                <div className="flex__item flex__item-wrapper">
-                                                    <div className="flex_one">
-                                                        <SelectField
-                                                            options={
-                                                                buysOptions
-                                                            }
-                                                            onChange={e =>
-                                                                handleSelectChange(
-                                                                    e,
-                                                                    idx
-                                                                )
-                                                            }
-                                                            value={el.buy_type}
-                                                            name="buy_type"
-                                                            label="Customer buys"
-                                                            error={
-                                                                el.error
-                                                                    .buy_type &&
-                                                                el.error
-                                                                    .buy_type
-                                                            }
-                                                        />
+                                                <div className="flex__item ">
+                                                    <div className="flex__item-wrapper">
+                                                        <div className="flex_one">
+                                                            <SelectField
+                                                                options={
+                                                                    buysOptions
+                                                                }
+                                                                onChange={e =>
+                                                                    handleSelectChange(
+                                                                        e,
+                                                                        idx
+                                                                    )
+                                                                }
+                                                                value={
+                                                                    el.buy_type
+                                                                }
+                                                                name="buy_type"
+                                                                label="Customer buys"
+                                                                error={
+                                                                    el.error
+                                                                        .buy_type &&
+                                                                    el.error
+                                                                        .buy_type
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Button
+                                                                onClick={() =>
+                                                                    handleBuysModalOpen(
+                                                                        idx
+                                                                    )
+                                                                }
+                                                            >
+                                                                Browse
+                                                            </Button>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <Button>Browse</Button>
-                                                    </div>
+                                                    {el.buy_ids &&
+                                                    el.buy_ids.length > 0
+                                                        ? el.buy_ids.map(el => (
+                                                              <div className="customer__checked-list">
+                                                                  <div className="name">
+                                                                      {el.title}
+                                                                  </div>
+
+                                                                  <div className="remove__btn">
+                                                                      <button
+                                                                          onClick={() =>
+                                                                              removeBuyIds(
+                                                                                  idx,
+                                                                                  el.id
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          <Icon
+                                                                              source={
+                                                                                  CancelSmallMinor
+                                                                              }
+                                                                          />
+                                                                      </button>
+                                                                  </div>
+                                                              </div>
+                                                          ))
+                                                        : ""}
                                                 </div>
                                                 <div className="flex__item">
                                                     <div className="field__item">
@@ -692,13 +1349,14 @@ const Bogo = props => {
                                                                       el => (
                                                                           <div className="customer__checked-list">
                                                                               <div className="name">
-                                                                                  {
-                                                                                      el.first_name
-                                                                                  }{" "}
-                                                                                  {
-                                                                                      el.last_name
-                                                                                  }
+                                                                                  {el.first_name &&
+                                                                                      el.first_name}{" "}
+                                                                                  {el.last_name &&
+                                                                                      el.last_name}
+                                                                                  {el.name &&
+                                                                                      el.name}
                                                                               </div>
+
                                                                               <div className="remove__btn">
                                                                                   <button
                                                                                       onClick={() =>
@@ -724,32 +1382,72 @@ const Bogo = props => {
                                                 </div>
                                             </div>
                                             <div className="flex__wrapper">
-                                                <div className="flex__item flex__item-wrapper">
-                                                    <div className="flex_one">
-                                                        <SelectField
-                                                            name="get_type"
-                                                            options={
-                                                                getsOptions
-                                                            }
-                                                            value={el.get_type}
-                                                            onChange={e =>
-                                                                handleSelectChange(
-                                                                    e,
-                                                                    idx
-                                                                )
-                                                            }
-                                                            label="Customer gets"
-                                                            error={
-                                                                el.error
-                                                                    .get_type &&
-                                                                el.error
-                                                                    .get_type
-                                                            }
-                                                        />
+                                                <div className="flex__item ">
+                                                    <div className="flex__item-wrapper">
+                                                        <div className="flex_one">
+                                                            <SelectField
+                                                                name="get_type"
+                                                                options={
+                                                                    getsOptions
+                                                                }
+                                                                value={
+                                                                    el.get_type
+                                                                }
+                                                                onChange={e =>
+                                                                    handleSelectChange(
+                                                                        e,
+                                                                        idx
+                                                                    )
+                                                                }
+                                                                label="Customer gets"
+                                                                error={
+                                                                    el.error
+                                                                        .get_type &&
+                                                                    el.error
+                                                                        .get_type
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <Button
+                                                                onClick={() =>
+                                                                    handleGetsModalOpen(
+                                                                        idx
+                                                                    )
+                                                                }
+                                                            >
+                                                                Browse
+                                                            </Button>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <Button>Browse</Button>
-                                                    </div>
+
+                                                    {el.get_ids &&
+                                                    el.get_ids.length > 0
+                                                        ? el.get_ids.map(el => (
+                                                              <div className="customer__checked-list">
+                                                                  <div className="name">
+                                                                      {el.title}
+                                                                  </div>
+
+                                                                  <div className="remove__btn">
+                                                                      <button
+                                                                          onClick={() =>
+                                                                              removeGetIds(
+                                                                                  idx,
+                                                                                  el.id
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          <Icon
+                                                                              source={
+                                                                                  CancelSmallMinor
+                                                                              }
+                                                                          />
+                                                                      </button>
+                                                                  </div>
+                                                              </div>
+                                                          ))
+                                                        : ""}
                                                 </div>
                                                 <div className="flex__item">
                                                     <div className="field__item">
@@ -935,52 +1633,216 @@ const Bogo = props => {
                 </div>
             )}
 
-            {step === 2 && <LunchPage />}
+            {step === 2 && (
+                <LunchPage
+                    discount_name="Discount Name"
+                    back={prevStep}
+                    onInputChange={handleCampignNameChange}
+                    campaign_name={campaign_name}
+                    start_date={start_date}
+                    end_date={end_date}
+                    start_time={start_time}
+                    end_time={end_time}
+                    handleStartDateChange={handleStartDateChange}
+                    handleEndDateChange={handleEndDateChange}
+                    handleStartTimeChange={handleStartTimeChange}
+                    handleEndTimeChange={handleEndTimeChange}
+                    launchCampaign={launchCampaign}
+                />
+            )}
 
             {/* Customer Modal */}
-
-            <CustomModal
-                open={customerModalOpen}
-                onClose={handleModalClose}
-                titleOne="Add"
-                titleTwo="Cancel"
-                handleSave={addCustomers}
-                onScrolledToBottom={handleScrollBottom}
-                disabled={false}
-                heading="Add Customers"
-                placeholder="search Customers"
-                searchText={searchCustomer}
-                handleSearch={handleCustomerSearch}
-            >
-                <Fragment>
-                    {loading && <Spinner />}
-                    <div className="result__list">
-                        {bogo[pushIndex].customer_list &&
-                        bogo[pushIndex].customer_list.length > 0
-                            ? bogo[pushIndex].customer_list.map(item => (
-                                  <div className="list" key={item.id}>
-                                      <div className="left__item">
-                                          <Checkbox
-                                              checked={item.isChecked}
-                                              id={item.id}
-                                              onChange={handleCustomerCheckbox}
-                                          />
+            {customerModalOpen && (
+                <CustomModal
+                    open={customerModalOpen}
+                    onClose={handleModalClose}
+                    titleOne="Add"
+                    titleTwo="Cancel"
+                    handleSave={addCustomers}
+                    onScrolledToBottom={handleScrollBottom}
+                    disabled={false}
+                    heading="Add customers"
+                    placeholder="Search customers"
+                    searchText={searchCustomer}
+                    handleSearch={handleCustomerSearch}
+                >
+                    <Fragment>
+                        {loading && <Spinner />}
+                        <div className="result__list">
+                            {bogo[pushIndex].customer_list &&
+                            bogo[pushIndex].customer_list.length > 0
+                                ? bogo[pushIndex].customer_list.map(item => (
+                                      <div className="list" key={item.id}>
+                                          <div className="left__item">
+                                              <Checkbox
+                                                  checked={item.isChecked}
+                                                  id={item.id}
+                                                  onChange={
+                                                      handleCustomerCheckbox
+                                                  }
+                                              />
+                                          </div>
+                                          <div className="right__item">
+                                              <p className="primary_name">
+                                                  {item.first_name}{" "}
+                                                  {item.last_name}
+                                              </p>
+                                          </div>
                                       </div>
-                                      <div className="right__item">
-                                          <p className="primary_name">
-                                              {item.first_name} {item.last_name}
-                                          </p>
-                                      </div>
-                                  </div>
-                              ))
-                            : ""}
+                                  ))
+                                : ""}
 
-                        {isFetching && (
-                            <p className="text-center">loading...</p>
-                        )}
-                    </div>
-                </Fragment>
-            </CustomModal>
+                            {isFetching && (
+                                <p className="text-center">loading...</p>
+                            )}
+                        </div>
+                    </Fragment>
+                </CustomModal>
+            )}
+
+            {/* Customer Group Modal */}
+            {customerGroupModalOpen && (
+                <CustomModal
+                    open={customerGroupModalOpen}
+                    onClose={handleModalClose}
+                    titleOne="Add"
+                    titleTwo="Cancel"
+                    handleSave={addCustomers}
+                    onScrolledToBottom={handleScrollBottom}
+                    disabled={false}
+                    heading="Add customers groups"
+                    placeholder="search customers groups"
+                    searchText={searchCustomer}
+                    handleSearch={handleCustomerSearch}
+                >
+                    <Fragment>
+                        {loading && <Spinner />}
+                        <div className="result__list">
+                            {bogo[pushIndex].customer_list &&
+                            bogo[pushIndex].customer_list.length > 0
+                                ? bogo[pushIndex].customer_list.map(item => (
+                                      <div className="list" key={item.id}>
+                                          <div className="left__item">
+                                              <Checkbox
+                                                  checked={item.isChecked}
+                                                  id={item.id}
+                                                  onChange={
+                                                      handleCustomerCheckbox
+                                                  }
+                                              />
+                                          </div>
+                                          <div className="right__item">
+                                              <p className="primary_name">
+                                                  {item.name}
+                                              </p>
+                                          </div>
+                                      </div>
+                                  ))
+                                : ""}
+
+                            {isFetching && (
+                                <p className="text-center">loading...</p>
+                            )}
+                        </div>
+                    </Fragment>
+                </CustomModal>
+            )}
+
+            {/* Collections Modal */}
+            {(BuyCollectionsModalOpen || GetCollectionsModalOpen) && (
+                <CustomModal
+                    open={BuyCollectionsModalOpen || GetCollectionsModalOpen}
+                    onClose={handleModalClose}
+                    titleOne="Add"
+                    titleTwo="Cancel"
+                    handleSave={addCollections}
+                    onScrolledToBottom={handleScrollBottom}
+                    disabled={false}
+                    heading="Add collections"
+                    placeholder="search collections"
+                    searchText={searchCustomer}
+                    handleSearch={handleCustomerSearch}
+                >
+                    <Fragment>
+                        {loading && <Spinner />}
+                        <div className="result__list">
+                            {bogo[pushIndex].customer_list &&
+                            bogo[pushIndex].customer_list.length > 0
+                                ? bogo[pushIndex].customer_list.map(item => (
+                                      <div className="list" key={item.id}>
+                                          <div className="left__item">
+                                              <Checkbox
+                                                  checked={item.isChecked}
+                                                  id={item.id}
+                                                  onChange={
+                                                      handleCustomerCheckbox
+                                                  }
+                                              />
+                                          </div>
+                                          <div className="right__item">
+                                              <p className="primary_name">
+                                                  {item.title}
+                                              </p>
+                                          </div>
+                                      </div>
+                                  ))
+                                : ""}
+
+                            {isFetching && (
+                                <p className="text-center">loading...</p>
+                            )}
+                        </div>
+                    </Fragment>
+                </CustomModal>
+            )}
+
+            {/* Products Modal */}
+            {(BuyProductsModalOpen || GetProductsModalOpen) && (
+                <CustomModal
+                    open={BuyProductsModalOpen || GetProductsModalOpen}
+                    onClose={handleModalClose}
+                    titleOne="Add"
+                    titleTwo="Cancel"
+                    handleSave={addCollections}
+                    onScrolledToBottom={handleScrollBottom}
+                    disabled={false}
+                    heading="Add products"
+                    placeholder="search products"
+                    searchText={searchCustomer}
+                    handleSearch={handleCustomerSearch}
+                >
+                    <Fragment>
+                        {loading && <Spinner />}
+                        <div className="result__list">
+                            {bogo[pushIndex].customer_list &&
+                            bogo[pushIndex].customer_list.length > 0
+                                ? bogo[pushIndex].customer_list.map(item => (
+                                      <div className="list" key={item.id}>
+                                          <div className="left__item">
+                                              <Checkbox
+                                                  checked={item.isChecked}
+                                                  id={item.id}
+                                                  onChange={
+                                                      handleCustomerCheckbox
+                                                  }
+                                              />
+                                          </div>
+                                          <div className="right__item">
+                                              <p className="primary_name">
+                                                  {item.title}
+                                              </p>
+                                          </div>
+                                      </div>
+                                  ))
+                                : ""}
+
+                            {isFetching && (
+                                <p className="text-center">loading...</p>
+                            )}
+                        </div>
+                    </Fragment>
+                </CustomModal>
+            )}
         </Fragment>
     );
 };
