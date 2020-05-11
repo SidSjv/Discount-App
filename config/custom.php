@@ -9,6 +9,7 @@
         'client_secret' => env('CLIENTSECRET', '4N0Vsl2IKOgPlYLNWAnerBB88XWXB7bhiC0eSGnV'),
         'default_pagination_count' => 25,
         'product_pagination_count' => 25,
-        'customer_pagination_count' => 25
+        'customer_pagination_count' => 25,
+        'collection_pagination_count' => 25
     ];
 ?>

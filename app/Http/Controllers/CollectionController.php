@@ -11,13 +11,15 @@ use Illuminate\Support\Facades\Auth;
 class CollectionController extends Controller {
     public function __construct() {
         $this->middleware('auth:api');
+        $this->pagination_count = config('custom.collection_pagination_count');
     }
 
     public function index(Request $request) {
+        
         return response()->json(
             [
                 'status' => true, 
-                'collections' => Collections::where('store_id', Auth::user()->store_id)->get(), 
+                'collections' => Collections::where('store_id', Auth::user()->store_id)->paginate($this->pagination_count), 
             ]
         , 200);
     }

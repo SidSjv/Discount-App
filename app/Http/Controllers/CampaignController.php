@@ -80,12 +80,8 @@ class CampaignController extends Controller {
         try{
         $request = $request->all();
         DB::beginTransaction();
-        $exists = Campaign::where('name', $request['campaign_name'])->where('store_id', Auth::user()->store_id)->exists();
-        $message = $exists ? 'Updated' : 'Created';
-        $campaign_row = Campaign::updateOrCreate([
-            'name' => $request['campaign_name'],
-            'store_id' => Auth::user()->store_id    
-        ],[
+        $message = 'Created';
+        $campaign_row = Campaign::create([
             'name' => $request['campaign_name'],
             'store_id' => Auth::user()->store_id    
         ]);
