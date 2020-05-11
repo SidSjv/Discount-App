@@ -9,6 +9,7 @@ import {
     useLocation,
     withRouter
 } from "react-router-dom";
+import "antd/es/date-picker/style/css";
 import "@shopify/polaris/styles.css";
 import "../../sass/app.scss";
 import Dashboard from "./Dashboard/Dashboard";
