@@ -537,6 +537,18 @@ ul {
   margin-bottom: 4rem !important;
 }
 
+.ml-1 {
+  margin-left: 1rem !important;
+}
+
+.ml-2 {
+  margin-left: 2rem !important;
+}
+
+.mr-1 {
+  margin-right: 1rem !important;
+}
+
 .text-center {
   text-align: center;
 }
@@ -767,6 +779,7 @@ ul {
 .campaign__layout .flex__wrapper .flex__item-wrapper {
   display: flex;
   align-items: flex-end;
+  margin-bottom: 1rem;
 }
 
 .campaign__layout .flex__wrapper .flex__item-wrapper .flex_one {
@@ -801,12 +814,35 @@ ul {
   padding-bottom: 7px;
 }
 
-.campaign__layout .flex__row-equal {
+.flex__row-equal {
   display: flex;
   align-items: flex-end;
 }
 
-.campaign__layout .flex__row-equal .flex__row-item {
+.flex__row-equal .flex__row-item {
   width: 50%;
+}
+
+/*********** Lunch Page   *********/
+
+.lunch__page {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.lunch__page .form__group .form__field {
+  margin-bottom: 1.6rem;
+}
+
+.lunch__page .ant-picker {
+  width: 100%;
+}
+
+.lunch__btn {
+  display: flex;
+  -moz-justify-content: flex-end;
+  -ms-justify-content: flex-end;
+  justify-content: flex-end;
+  -ms-flex-pack: flex-end;
 }
 

@@ -20,7 +20,6 @@ const Breadcumb = ({ pathname, breadcumb, title }) => {
                         </div>
                     </div>
                 </div>
-                {/* <h1 className="title"> {title} </h1> */}
             </div>
         </Fragment>
     );
