@@ -30,7 +30,7 @@ class StoreController extends Controller {
         try{
             //Products::dispatchNow($id);
             //Customers::dispatchNow($id);
-            //Collections::dispatch(Auth::user()->store_id);
+            Collections::dispatch(Auth::user()->store_id);
             CustomerGroups::dispatch(Auth::user()->store_id);
             return response()->json(['status' => true, 'message' => 'Completed !'], 200);
         } catch(Exception $e) {
