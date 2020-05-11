@@ -193,6 +193,9 @@ table {
 .Polaris-Modal-Header {
     padding: 0 !important;
 }
+.Polaris-InlineError__Icon .Polaris-Icon__Svg {
+    fill: var(--p-text-critical, #bf0711) !important;
+}
 
 //Modal title
 .modal__title {

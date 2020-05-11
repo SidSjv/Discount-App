@@ -75,6 +75,11 @@
             border: 0.2rem solid #5c6ac4;
         }
     }
+
+    .select__error {
+        background-color: #fbeae5;
+        border-color: #bf0711;
+    }
 }
 
 //Text Field
@@ -85,7 +90,7 @@
     .Polaris-InlineError {
         .Polaris-Icon {
             .Polaris-Icon__Svg {
-                fill: var(--p-text-critical, #bf0711);
+                fill: var(--p-text-critical, #bf0711) !important;
             }
         }
     }

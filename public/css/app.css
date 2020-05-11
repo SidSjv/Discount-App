@@ -263,6 +263,10 @@ table .td__overflow {
   padding: 0 !important;
 }
 
+.Polaris-InlineError__Icon .Polaris-Icon__Svg {
+  fill: var(--p-text-critical, #bf0711) !important;
+}
+
 .modal__title .header__title {
   padding: 1.6rem 2rem;
   border-bottom: var(--p-thin-border-subdued, 0.1rem solid var(--p-border-subdued, #dfe3e8));
