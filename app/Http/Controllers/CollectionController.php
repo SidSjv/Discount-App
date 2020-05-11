@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Collections;
 use App\Models\CustomCollections;
 use App\Models\SmartCollections;
 use Illuminate\Http\Request;
@@ -16,8 +17,7 @@ class CollectionController extends Controller {
         return response()->json(
             [
                 'status' => true, 
-                'smart_collections' => SmartCollections::where('store_id', Auth::user()->store_id)->get(),
-                'custom_collections' => CustomCollections::where('store_id', Auth::user()->store_id)->get() 
+                'collections' => Collections::where('store_id', Auth::user()->store_id)->get(), 
             ]
         , 200);
     }
@@ -26,8 +26,7 @@ class CollectionController extends Controller {
         return response()->json(
             [
                 'status' => true, 
-                'smart_collections' => SmartCollections::where('id', $id)->first()->toArray(),
-                'custom_collections' => CustomCollections::where('id', $id)->first()->toArray() 
+                'smart_collections' => Collections::where('id', $id)->first()->toArray(),
             ]
         , 200);
     }

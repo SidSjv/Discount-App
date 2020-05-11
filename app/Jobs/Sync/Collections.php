@@ -2,7 +2,7 @@
 
 namespace App\Jobs\Sync;
 
-use App\Models\SmartCollections;
+use App\Models\Collections as StoreCollections;
 use App\Models\Store;
 use App\Traits\RequestTrait;
 use Illuminate\Bus\Queueable;
@@ -44,10 +44,10 @@ class Collections implements ShouldQueue {
             $response = json_decode($this->makeAGETCallToShopify($endpoint, [], getShopifyHeadersForStore($store_details->access_token, 'GET')), true);
             if($response !== NULL && isset($response['smart_collections']) && count($response['smart_collections']) > 0) {
                 foreach($response['smart_collections'] as $row) {
-                    $payload = ['store_id' => $this->store_id];
+                    $payload = ['store_id' => $this->store_id, 'type' => 'Smart'];
                     foreach($row as $key => $value)
                         $payload[$key] = is_array($value) ? json_encode($value) : $value; 
-                    SmartCollections::updateOrCreate(['id' => $row['id']], $payload);
+                    StoreCollections::updateOrCreate(['id' => $row['id']], $payload);
                     $since_id = $row['id'];
                 }
             } else break;
@@ -62,10 +62,10 @@ class Collections implements ShouldQueue {
             $response = json_decode($this->makeAGETCallToShopify($endpoint, [], getShopifyHeadersForStore($store_details->access_token, 'GET')), true);
             if($response !== NULL && isset($response['custom_collections']) && count($response['custom_collections']) > 0) {
                 foreach($response['custom_collections'] as $row) {
-                    $payload = ['store_id' => $this->store_id];
+                    $payload = ['store_id' => $this->store_id, 'type' => 'Custom'];
                     foreach($row as $key => $value)
                         $payload[$key] = is_array($value) ? json_encode($value) : $value; 
-                    SmartCollections::updateOrCreate(['id' => $row['id']], $payload);
+                    StoreCollections::updateOrCreate(['id' => $row['id']], $payload);
                     $since_id = $row['id'];
                 }
             } else break;

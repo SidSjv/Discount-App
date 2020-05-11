@@ -10,6 +10,7 @@ use App\Models\Store;
 use App\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StoreController extends Controller {
     public function __construct() {
@@ -24,11 +25,11 @@ class StoreController extends Controller {
         }
     }
 
-    public function syncStoreData($id){
+    public function syncStoreData(){
         try{
-            Products::dispatchNow($id);
-            Customers::dispatchNow($id);
-            Collections::dispatch($id);
+            //Products::dispatchNow($id);
+            //Customers::dispatchNow($id);
+            Collections::dispatch(Auth::user()->store_id);
             return response()->json(['status' => true, 'message' => 'Completed !'], 200);
         } catch(Exception $e) {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 200);
