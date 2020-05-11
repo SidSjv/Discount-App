@@ -15,13 +15,21 @@ class CollectionController extends Controller {
     }
 
     public function index(Request $request) {
-        
+        $collections = $this->filterCollections(Collections::where('store_id', Auth::user()->store_id), $request->all());
         return response()->json(
             [
                 'status' => true, 
-                'collections' => Collections::where('store_id', Auth::user()->store_id)->paginate($this->pagination_count), 
+                'collections' => $collections, 
             ]
         , 200);
+    }
+
+    private function filterCollections($collections, $request) {
+        if(isset($request['type']) && ($request['type'] == 'Smart' || $request['type'] == 'Custom'))
+            $collections = $collections->where('type', $request['type']);
+        if(isset($request['title'])) 
+            $collections = $collections->where('title', 'LIKE', '%'.$request['title'].'%');
+        return $collections->paginate($this->pagination_count);
     }
 
     public function show($id) {
