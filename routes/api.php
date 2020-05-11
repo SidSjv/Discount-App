@@ -17,6 +17,7 @@ Route::middleware('authenticateAPI')->group(function() {
     Route::get('home', 'StoreController@index');
     Route::middleware('auth:api')->group(function () {
         Route::resource('campaign', 'CampaignController');
+        Route::get('customer/groups', 'CustomerController@getCustomerGroups');
         Route::resource('customer', 'CustomerController');
         Route::resource('product', 'ProductsController');
         Route::resource('collection', 'CollectionController');

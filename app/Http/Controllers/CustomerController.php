@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CustomerGroups;
 use App\Models\Customers;
 use App\Models\Store;
 use Illuminate\Http\Request;
@@ -33,5 +34,16 @@ class CustomerController extends Controller {
 
     public function show($id) {
         return response()->json(['status' => true, 'customer' => Customers::where('id', $id)->first()->toArray()], 200);
+    }
+
+    public function getCustomerGroups(Request $request) {
+        $customer_groups = $this->filterCustomerGroups(CustomerGroups::where('store_id', Auth::user()->store_id), $request->all());
+        return response()->json(['status' => true, 'customer_groups' => $customer_groups], 200);
+    }
+
+    private function filterCustomerGroups($customer_groups, $request) {
+        if(isset($request->searchBy) && isset($request->searchTerm))
+            $customer_groups = $customer_groups->where($request->searchBy, 'LIKE', '%'.$request->searchTerm.'%');
+        return $customer_groups->select(['id', 'name', 'query', 'created_at', 'updated_at'])->paginate($this->pagination_count);    
     }
 }
