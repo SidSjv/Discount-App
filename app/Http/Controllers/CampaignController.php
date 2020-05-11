@@ -84,9 +84,9 @@ class CampaignController extends Controller {
         $campaign_row = Campaign::create([
             'name' => $request['campaign_name'],
             'store_id' => Auth::user()->store_id,
-            'start_date' => date('Y-m-d h:i:s', strtotime($request->start_date)),
-            'end_date' => date('Y-m-d h:i:s', strtotime($request->end_date)),
-            'discount_type' => $request->discount_type,
+            'start_date' => date('Y-m-d h:i:s', strtotime($request['start_date'])),
+            'end_date' => date('Y-m-d h:i:s', strtotime($request['end_date'])),
+            'discount_type' => $request['discount_type'],
             'valid' => 'Active',
             'status' => 'Active',
             'times_used' => 0
@@ -98,7 +98,7 @@ class CampaignController extends Controller {
                 $bundle_payload[] = $bundle_item;
             }
             if(count($bundle_payload) > 0) 
-            BundleCampaign::create($bundle_payload);
+            BundleCampaign::insert($bundle_payload);
         }
         if(isset($request['BOGO'])) {
             $bogo_payload = [];
@@ -106,8 +106,9 @@ class CampaignController extends Controller {
                 $bogo_item['campaign_id'] = $campaign_row->id;
                 $bogo_payload[] = $bogo_item;
             }
+            //dd($bogo_payload);
             if(count($bogo_payload) > 0)
-                BOGOCampaign::create($bogo_payload);
+                BOGOCampaign::insert($bogo_payload);
         }
         if(isset($request['Discount'])) {
             $discount_payload = [];
@@ -116,7 +117,7 @@ class CampaignController extends Controller {
                 $discount_payload[] = $discount_item;
             }
             if(count($discount_payload) > 0) 
-                DiscountCampaigns::create($discount_payload);
+                DiscountCampaigns::insert($discount_payload);
         }
         if(isset($request['Bulk'])) {
             $bulk_payload = [];
@@ -125,13 +126,13 @@ class CampaignController extends Controller {
                 $bulk_payload[] = $bulk_item;
             }
             if(count($bulk_payload) > 0)
-            BulkCampaigns::create($bulk_payload);
+            BulkCampaigns::insert($bulk_payload);
         }
         DB::commit();
         return response()->json(['status' => true, 'message' => 'Campaign '.$message.' Successfully !'], 200);
         } catch(Exception $e) {
             DB::rollBack();
-            return response()->json(['status' => false, 'message' => $e->getMessage()], 501);
+            return response()->json(['status' => false, 'message' => $e->getMessage(), 'trace' => $e->getTrace()], 501);
         }
     }
 }
