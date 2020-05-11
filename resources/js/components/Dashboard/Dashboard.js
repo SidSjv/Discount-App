@@ -78,16 +78,19 @@ const Dashboard = () => {
                 let description = [];
                 obj.description = description;
                 if (i.bogo && i.bogo.length > 0) {
-                    // obj.description = i.bogo;
-                    description.push(i.bogo);
+                    i.bogo.map(item => {
+                        description.push(item);
+                    });
                 }
                 if (i.bulk && i.bulk.length > 0) {
-                    //obj.description = i.bulk;
-                    description.push(i.bulk);
+                    i.bulk.map(item => {
+                        description.push(item);
+                    });
                 }
                 if (i.discount && i.discount.length > 0) {
-                    //obj.description = i.discount;
-                    description.push(i.discount);
+                    i.discount.map(item => {
+                        description.push(item);
+                    });
                 }
 
                 return obj;
@@ -607,7 +610,7 @@ function renderItem(item, _, index) {
                 <tbody>
                     <tr>
                         <td style={{ width: "50%" }}>
-                            <p>{name}</p>
+                            <p className="text__bold">{name}</p>
                             {description &&
                                 description.length > 0 &&
                                 description.map((item, idx) => (

@@ -285,3 +285,30 @@ ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner,
 .ant-picker-cell-in-view.ant-picker-cell-range-end:not(.ant-picker-cell-range-end-single)::before {
     background: #b3bcf5 !important;
 }
+
+//Antd css override
+p {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+html,
+body {
+    font-size: 1.5rem;
+    font-weight: 400;
+    line-height: 2rem;
+    text-transform: initial;
+    letter-spacing: initial;
+    font-weight: 400;
+    color: var(--p-text, #212b36) !important;
+    font-family: sans-serif !important;
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    -ms-overflow-style: scrollbar;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+html {
+    font-size: 62.5%;
+}
