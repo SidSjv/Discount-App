@@ -83,35 +83,49 @@ class CampaignController extends Controller {
         $message = 'Created';
         $campaign_row = Campaign::create([
             'name' => $request['campaign_name'],
-            'store_id' => Auth::user()->store_id    
+            'store_id' => Auth::user()->store_id,
+            'start_date' => date('Y-m-d h:i:s', strtotime($request->start_date)),
+            'end_date' => date('Y-m-d h:i:s', strtotime($request->end_date)),
+            'discount_type' => $request->discount_type,
+            'valid' => 'Active',
+            'status' => 'Active',
+            'times_used' => 0
         ]);
         if(isset($request['Bundle'])) {
+            $bundle_payload = [];
             foreach($request['Bundle'] as $bundle_item) {
                 $bundle_item['campaign_id'] = $campaign_row->id;
-                if(isset($bundle_item['id']) && $bundle_item['id'] !== null) BundleCampaign::where('id', $bundle_item['id'])->update($bundle_item);
-                else BundleCampaign::create($bundle_item);
+                $bundle_payload[] = $bundle_item;
             }
+            if(count($bundle_payload) > 0) 
+            BundleCampaign::create($bundle_payload);
         }
         if(isset($request['BOGO'])) {
+            $bogo_payload = [];
             foreach($request['BOGO'] as $bogo_item) {
                 $bogo_item['campaign_id'] = $campaign_row->id;
-                if(isset($bogo_item['id']) && $bogo_item['id'] !== null) BOGOCampaign::where('id', $bogo_item['id'])->update($bogo_item);
-                else BOGOCampaign::create($bogo_item);
+                $bogo_payload[] = $bogo_item;
             }
+            if(count($bogo_payload) > 0)
+                BOGOCampaign::create($bogo_payload);
         }
         if(isset($request['Discount'])) {
+            $discount_payload = [];
             foreach($request['Discount'] as $discount_item) {
                 $discount_item['campaign_id'] = $campaign_row->id;
-                if(isset($discount_item['id']) && $discount_item['id'] !== null) DiscountCampaigns::where('id', $discount_item['id'])->update($discount_item);
-                else DiscountCampaigns::create($discount_item);
+                $discount_payload[] = $discount_item;
             }
+            if(count($discount_payload) > 0) 
+                DiscountCampaigns::create($discount_payload);
         }
         if(isset($request['Bulk'])) {
+            $bulk_payload = [];
             foreach($request['Bulk'] as $bulk_item) {
                 $bulk_item['campaign_id'] = $campaign_row->id;
-                if(isset($bulk_item['id']) && $bulk_item['id'] !== null) BulkCampaigns::where('id', $bulk_item['id'])->update($bulk_item);
-                else BulkCampaigns::create($bulk_item);
+                $bulk_payload[] = $bulk_item;
             }
+            if(count($bulk_payload) > 0)
+            BulkCampaigns::create($bulk_payload);
         }
         DB::commit();
         return response()->json(['status' => true, 'message' => 'Campaign '.$message.' Successfully !'], 200);
