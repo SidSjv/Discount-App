@@ -95,6 +95,7 @@ class CampaignController extends Controller {
             $bundle_payload = [];
             foreach($request['Bundle'] as $bundle_item) {
                 $bundle_item['campaign_id'] = $campaign_row->id;
+                $bundle_item['get_ids'] = implode($bundle_item['get_ids']);
                 $bundle_payload[] = $bundle_item;
             }
             if(count($bundle_payload) > 0) 
@@ -104,6 +105,9 @@ class CampaignController extends Controller {
             $bogo_payload = [];
             foreach($request['BOGO'] as $bogo_item) {
                 $bogo_item['campaign_id'] = $campaign_row->id;
+                if(is_array($bogo_item['get_ids'])) $bogo_item['get_ids'] = implode(',', $bogo_item['get_ids']);
+                if(is_array($bogo_item['buy_ids'])) $bogo_item['buy_ids'] = implode(',', $bogo_item['buy_ids']);
+                if(is_array($bogo_item['customer_ids_eligible'])) $bogo_item['customer_ids_eligible'] = implode(',', $bogo_item['customer_ids_eligible']);
                 $bogo_payload[] = $bogo_item;
             }
             //dd($bogo_payload);
