@@ -28,8 +28,7 @@ class CreateCustomerGroupsTable extends Migration {
      *
      * @return void
      */
-    public function down()
-    {
+    public function down() {
         Schema::dropIfExists('customer_groups');
     }
 }

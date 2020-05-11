@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\Sync\Collections;
+use App\Jobs\Sync\CustomerGroups;
 use App\Jobs\Sync\Customers;
 use App\Jobs\Sync\Products;
 use App\Models\DiscountTypes;
@@ -29,7 +30,8 @@ class StoreController extends Controller {
         try{
             //Products::dispatchNow($id);
             //Customers::dispatchNow($id);
-            Collections::dispatch(Auth::user()->store_id);
+            //Collections::dispatch(Auth::user()->store_id);
+            CustomerGroups::dispatch(Auth::user()->store_id);
             return response()->json(['status' => true, 'message' => 'Completed !'], 200);
         } catch(Exception $e) {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 200);
