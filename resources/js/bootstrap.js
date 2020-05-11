@@ -20,9 +20,17 @@ try {
  */
 
 window.axios = require("axios");
-window.axios.defaults.baseURL = "https://discount.appsdart.com/api";
+if (process.env.NODE_ENV === "production") {
+    window.axios.defaults.baseURL = "https://discount.appsdart.com/api";
+} else {
+    window.axios.defaults.baseURL =
+        "http://localhost/discountappphp/public/api";
+}
+
 if (localStorage.discountapp_token) {
     //    console.log("sent token", localStorage.discountapp_token);
+
+    //localhost/discountappphp/public/api
     window.axios.defaults.headers.common[
         "Authorization"
     ] = `Bearer ${localStorage.discountapp_token}`;
