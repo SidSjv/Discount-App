@@ -10,6 +10,7 @@
         'default_pagination_count' => 25,
         'product_pagination_count' => 25,
         'customer_pagination_count' => 25,
-        'collection_pagination_count' => 25
+        'collection_pagination_count' => 25,
+        'countries_pagination_count' => 25
     ];
 ?>

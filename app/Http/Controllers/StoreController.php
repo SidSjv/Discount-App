@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\Sync\Collections;
+use App\Jobs\Sync\Countries;
 use App\Jobs\Sync\CustomerGroups;
 use App\Jobs\Sync\Customers;
 use App\Jobs\Sync\Products;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 
 class StoreController extends Controller {
     public function __construct() {
-        
+        //$this->middleware('auth:api');
     }
 
     public function index(Request $request) {
@@ -28,10 +29,11 @@ class StoreController extends Controller {
 
     public function syncStoreData(){
         try{
+            Countries::dispatch(Auth::user()->store_id);
             //Products::dispatchNow($id);
             //Customers::dispatchNow($id);
-            Collections::dispatch(Auth::user()->store_id);
-            CustomerGroups::dispatch(Auth::user()->store_id);
+            //Collections::dispatch(Auth::user()->store_id);
+            //CustomerGroups::dispatch(Auth::user()->store_id);
             return response()->json(['status' => true, 'message' => 'Completed !'], 200);
         } catch(Exception $e) {
             return response()->json(['status' => false, 'message' => $e->getMessage()], 200);
