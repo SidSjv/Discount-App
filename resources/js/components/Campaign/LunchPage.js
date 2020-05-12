@@ -1,10 +1,15 @@
 import React from "react";
 import { ChevronLeftMinor } from "@shopify/polaris-icons";
-import { Icon, TextField, Card, Button } from "@shopify/polaris";
+import { Icon, TextField, Card, Button, InlineError } from "@shopify/polaris";
 import { DatePicker, TimePicker } from "antd";
+import moment from "moment";
 //import moment from "moment";
 
 const LunchPage = ({
+    start_date,
+    start_time,
+    end_date,
+    end_time,
     discount_name,
     back,
     campaign_name,
@@ -13,8 +18,11 @@ const LunchPage = ({
     handleEndDateChange,
     handleStartTimeChange,
     handleEndTimeChange,
-    launchCampaign
+    launchCampaign,
+    error
 }) => {
+    let dateFormat = "YYYY-MM-DD";
+    let timeFormat = "HH:mm:ss";
     return (
         <div className="lunch__page">
             <div className="title__bar-wrapper mb-3">
@@ -40,6 +48,9 @@ const LunchPage = ({
                                 value={campaign_name}
                                 onChange={onInputChange}
                                 placeholder="Type here .."
+                                error={
+                                    error.campaign_name && error.campaign_name
+                                }
                             />
                         </div>
                         <div className="form__field ">
@@ -52,6 +63,15 @@ const LunchPage = ({
                                     </label>
                                     <DatePicker
                                         onChange={handleStartDateChange}
+                                        defaultValue={moment(
+                                            start_date,
+                                            dateFormat
+                                        )}
+                                    />
+                                    <InlineError
+                                        message={
+                                            error.start_date && error.start_date
+                                        }
                                     />
                                 </div>
                                 <div className="flex__row-item">
@@ -60,6 +80,15 @@ const LunchPage = ({
                                     </label>
                                     <TimePicker
                                         onChange={handleStartTimeChange}
+                                        defaultValue={moment(
+                                            start_time,
+                                            timeFormat
+                                        )}
+                                    />
+                                    <InlineError
+                                        message={
+                                            error.start_time && error.start_time
+                                        }
                                     />
                                 </div>
                             </div>
@@ -70,6 +99,15 @@ const LunchPage = ({
                                     </label>
                                     <DatePicker
                                         onChange={handleEndDateChange}
+                                        defaultValue={moment(
+                                            end_date,
+                                            dateFormat
+                                        )}
+                                    />
+                                    <InlineError
+                                        message={
+                                            error.end_date && error.end_date
+                                        }
                                     />
                                 </div>
                                 <div className="flex__row-item">
@@ -78,6 +116,15 @@ const LunchPage = ({
                                     </label>
                                     <TimePicker
                                         onChange={handleEndTimeChange}
+                                        defaultValue={moment(
+                                            end_time,
+                                            timeFormat
+                                        )}
+                                    />
+                                    <InlineError
+                                        message={
+                                            error.end_time && error.end_time
+                                        }
                                     />
                                 </div>
                             </div>

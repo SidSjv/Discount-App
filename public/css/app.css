@@ -739,7 +739,7 @@ ul {
 
 .campaign__layout .form__layout .form__group {
   display: flex;
-  align-items: flex-end;
+  align-items: baseline;
   justify-content: space-between;
   margin-bottom: 1.3rem;
 }
@@ -778,12 +778,19 @@ ul {
 
 .campaign__layout .flex__wrapper .flex__item-wrapper {
   display: flex;
-  align-items: flex-end;
   margin-bottom: 1rem;
 }
 
 .campaign__layout .flex__wrapper .flex__item-wrapper .flex_one {
   flex: 1;
+}
+
+.campaign__layout .flex__wrapper .flex__item-wrapper .browse__btn div {
+  height: 100%;
+}
+
+.campaign__layout .flex__wrapper .flex__item-wrapper .browse__btn div .Polaris-Button {
+  margin-top: 2.3rem;
 }
 
 .campaign__layout .field__item {
