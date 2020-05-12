@@ -110,7 +110,6 @@ class CampaignController extends Controller {
                 if(is_array($bogo_item['customer_ids_eligible'])) $bogo_item['customer_ids_eligible'] = implode(',', $bogo_item['customer_ids_eligible']);
                 $bogo_payload[] = $bogo_item;
             }
-            //dd($bogo_payload);
             if(count($bogo_payload) > 0)
                 BOGOCampaign::insert($bogo_payload);
         }
@@ -119,7 +118,7 @@ class CampaignController extends Controller {
             foreach($request['Discount'] as $discount_item) {
                 $discount_item['campaign_id'] = $campaign_row->id;
                 if(is_array($discount_item['get_ids'])) $discount_item['get_ids'] = implode(',', $discount_item['get_ids']);
-                if(is_array($discount_item['buy_ids'])) $discount_item['buy_ids'] = implode(',', $discount_item['buy_ids']);
+                if(is_array($discount_item['applied_ids'])) $discount_item['applied_ids'] = implode(',', $discount_item['applied_ids']);
                 if(is_array($discount_item['customer_ids_eligible'])) $discount_item['customer_ids_eligible'] = implode(',', $discount_item['customer_ids_eligible']);
                 $discount_payload[] = $discount_item;
             }

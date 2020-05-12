@@ -20,6 +20,7 @@ Route::middleware('authenticateAPI')->group(function() {
         Route::get('customer/groups', 'CustomerController@getCustomerGroups');
         Route::resource('customer', 'CustomerController');
         Route::resource('product', 'ProductsController');
+        Route::resource('countries', 'CountriesController');
         Route::resource('collection', 'CollectionController');
         Route::get('syncStoreData', 'StoreController@syncStoreData');
         Route::get('discount_types', 'StoreController@discount_types');
