@@ -5,11 +5,11 @@ import {
     TextField,
     Icon,
     Button,
-    Popover,
-    OptionList,
     Checkbox,
-    Modal,
-    Spinner
+    Spinner,
+    InlineError,
+    Frame,
+    Toast
 } from "@shopify/polaris";
 import Breadcumb from "../../UI/Breadcumb";
 import { Link } from "react-router-dom";
@@ -21,15 +21,19 @@ import SelectField from "../../UI/SelectField";
 import InputField from "../../UI/InputField";
 import CustomModal from "./../../UI/CustomModal";
 import LunchPage from "./../LunchPage";
+import { getCurrentTime } from "../../Utils";
+
 import "../campaign.scss";
 
 const Bogo = props => {
     let initData = {
+        store_id: "",
         campaign_name: "",
-        start_date: "",
-        start_time: "",
-        end_date: "",
-        end_time: "",
+        start_date: new Date(),
+        start_time: getCurrentTime(),
+        end_date: new Date(),
+        end_time: getCurrentTime(),
+        lunchErr: {},
         selected: "",
         selectedBuys: "",
         param_id: "",
@@ -76,6 +80,9 @@ const Bogo = props => {
     const [state, setState] = useState(initData);
     const [searchCustomer, setSearchCustomer] = useState("");
     const [step, setStep] = useState(1);
+    const [toast, setToast] = useState(false);
+    const [toastMsg, setToastMsg] = useState("");
+    const [toastErr, setToastErr] = useState(false);
 
     //Desctruct the state
     const {
@@ -100,7 +107,9 @@ const Bogo = props => {
         page,
         customers,
         pushIndex,
-        param_id
+        param_id,
+        lunchErr,
+        store_id
     } = state;
 
     // Get customers
@@ -372,7 +381,8 @@ const Bogo = props => {
         setState({
             ...state,
             bogo: new_bogo,
-            param_id
+            param_id,
+            store_id: localStorage.discountapp_storeId
         });
         if (customerModalOpen) {
             getCustomers();
@@ -428,16 +438,18 @@ const Bogo = props => {
     ];
     const discountValueOptions = [
         { label: "Percentage", value: "percentage" },
-        { label: "Free", value: "free" }
+        { label: "Fixed Price", value: "fixed_price" }
     ];
 
+    //toast
+    const toggleActive = useCallback(() => setToast(toast => !toast), []);
     //Step form
     // Proceed to next step
     const nextStep = () => {
-        // if (handleValidations()) {
-        //     setStep(step + 1);
-        // }
-        setStep(step + 1);
+        if (handleValidations()) {
+            setStep(step + 1);
+        }
+        //setStep(step + 1);
     };
 
     // Go back to prev step
@@ -1054,19 +1066,55 @@ const Bogo = props => {
                 item.error.name = "Required";
             }
             if (item.buy_type === "") {
-                (isValid = false), (item.error.buy_type = "Required");
+                isValid = false;
+                item.error.buy_type = "Required";
             }
             if (item.buy_quantity === "") {
-                (isValid = false), (item.error.buy_quantity = "Required");
+                isValid = false;
+                item.error.buy_quantity = "Required";
             }
             if (item.get_quantity === "") {
-                (isValid = false), (item.error.get_quantity = "Required");
+                isValid = false;
+                item.error.get_quantity = "Required";
             }
             if (item.discount_type === "") {
-                (isValid = false), (item.error.discount_type = "Required");
+                isValid = false;
+                item.error.discount_type = "Required";
             }
             if (item.discount_value === "") {
-                (isValid = false), (item.error.discount_value = "Required");
+                isValid = false;
+                item.error.discount_value = "Required";
+            }
+            if (item.max_use_per_order === "") {
+                isValid = false;
+                item.error.max_use_per_order = "Required";
+            }
+            if (item.min_use_per_order === "") {
+                isValid = false;
+                item.error.min_use_per_order = "Required";
+            }
+
+            if (
+                item.buy_ids === "" ||
+                (item.buy_ids && item.buy_ids.length < 1)
+            ) {
+                isValid = false;
+                item.error.buy_ids = "Required";
+            }
+            if (
+                item.get_ids === "" ||
+                (item.get_ids && item.get_ids.length < 1)
+            ) {
+                isValid = false;
+                item.error.get_ids = "Required";
+            }
+            if (
+                item.customer_eligible !== "everyone" &&
+                item.customer_ids_eligible &&
+                item.customer_ids_eligible.length < 1
+            ) {
+                isValid = false;
+                item.error.customer_eligible = "Required";
             }
         });
 
@@ -1124,362 +1172,178 @@ const Bogo = props => {
         });
     };
 
+    //Submit validations
+
+    const handleSubmitValidations = () => {
+        let isValid = true;
+        let lunchErr = {};
+        if (campaign_name === "") {
+            isValid = false;
+            lunchErr.campaign_name = "Required";
+        }
+        if (start_date === "") {
+            isValid = false;
+            lunchErr.start_date = "Required";
+        }
+        if (end_date === "") {
+            isValid = false;
+            lunchErr.end_date = "Required";
+        }
+        if (start_time === "") {
+            isValid = false;
+            lunchErr.start_time = "Required";
+        }
+        if (end_time === "") {
+            isValid = false;
+            lunchErr.end_time = "Required";
+        }
+
+        setState({
+            ...state,
+            lunchErr
+        });
+        return isValid;
+    };
+
     //Launch  Campaign
     const launchCampaign = () => {
-        let bogoArry = [];
-        let sendObj = {
-            campaign_name: campaign_name,
-            start_date: `${start_date} ${start_time}`,
-            end_date: `${end_date} ${end_time}`,
-            discount_type: "Single",
-            BOGO: bogoArry
-        };
+        if (handleSubmitValidations()) {
+            let bogoArry = [];
+            let sendObj = {
+                campaign_name: campaign_name,
+                start_date: `${start_date} ${start_time}`,
+                end_date: `${end_date} ${end_time}`,
+                discount_type: "Single",
+                BOGO: bogoArry
+            };
 
-        bogo.map(el => {
-            let buyIds = el.buy_ids.map(buy => buy.id);
-            let getIds = el.get_ids.map(get => get.id);
-            let customerIds = el.customer_ids_eligible.map(
-                customer => customer.id
-            );
-            return bogoArry.push({
-                name: el.name,
-                buy_type: el.buy_type,
-                buy_ids: buyIds,
-                buy_quantity: el.buy_quantity,
-                customer_ids_eligible: customerIds,
-                get_type: el.get_type,
-                get_ids: getIds,
-                get_quantity: el.get_quantity,
-                discount_type: el.get_quantity,
-                discount_value: el.discount_value,
-                max_use_per_order: el.max_use_per_order,
-                limit_to_one_use_per_customer: el.limit_to_one_use_per_customer
-            });
-        });
+            bogo.map(el => {
+                let buyIds = el.buy_ids.map(buy => buy.id);
+                let getIds = el.get_ids.map(get => get.id);
+                let customerIds;
+                if (el.customer_eligible !== "everyone") {
+                    customerIds = el.customer_ids_eligible.map(
+                        customer => customer.id
+                    );
+                }
 
-        axios
-            .post("/campaign", sendObj)
-            .then(res => {
-                console.log(res);
-            })
-            .catch(err => {
-                console.log(err);
+                return bogoArry.push({
+                    name: el.name,
+                    buy_type: el.buy_type,
+                    buy_ids: buyIds,
+                    buy_quantity: el.buy_quantity,
+                    customer_ids_eligible: customerIds,
+                    get_type: el.get_type,
+                    get_ids: getIds,
+                    get_quantity: el.get_quantity,
+                    discount_type: el.get_quantity,
+                    discount_value: el.discount_value,
+                    max_use_per_order: el.max_use_per_order,
+                    min_use_per_order: el.min_use_per_order,
+                    limit_to_one_use_per_customer:
+                        el.limit_to_one_use_per_customer
+                });
             });
 
-        console.log(sendObj);
+            axios
+                .post("/campaign", sendObj)
+                .then(res => {
+                    console.log(res);
+                    let data = res.data;
+                    if (data.status === true) {
+                        setToastMsg("Campaign Created Successfully!");
+                        setToastErr(false);
+                        setToast(true);
+                    }
+
+                    setTimeout(() => {
+                        window.location.href = `/home?store_id=${store_id}`;
+                    }, 2000);
+                })
+                .catch(err => {
+                    setToast(true);
+                    setToastErr(true);
+                    setToastMsg("Something went wrong, please try again later");
+                    console.log(err);
+                });
+
+            console.log(sendObj);
+        }
     };
+
+    const toastMarkup = toast ? (
+        <Toast content={toastMsg} error={toastErr} onDismiss={toggleActive} />
+    ) : null;
 
     return (
         <Fragment>
-            {step === 1 && (
-                <div className="bogo">
-                    <div className="mb-3">
-                        <Breadcumb breadcumb="Back" pathname={`/campaign`} />
-                    </div>
+            <Frame>
+                {toastMarkup}
+                {step === 1 && (
+                    <div className="bogo">
+                        <div className="mb-3">
+                            <Breadcumb
+                                breadcumb="Back"
+                                pathname={`/campaign`}
+                            />
+                        </div>
 
-                    <div className="campaign__layout">
-                        {bogo.map((el, idx) => (
-                            <Card sectioned key={idx}>
-                                <div className="form__layout">
-                                    <div className="form__group">
-                                        <div className="form__field ">
-                                            <InputField
-                                                type="text"
-                                                label="Rule name"
-                                                value={el.name}
-                                                placeholder="e.g. SPRINGSALES"
-                                                name="name"
-                                                onChange={e =>
-                                                    handleInputChange(e, idx)
-                                                }
-                                                error={
-                                                    el.error.name &&
-                                                    el.error.name
-                                                }
-                                            />
-                                        </div>
-                                        <div className="form__field">
-                                            <div className="form__field-wrapper">
-                                                <TextField
+                        <div className="campaign__layout">
+                            {bogo.map((el, idx) => (
+                                <Card sectioned key={idx}>
+                                    <div className="form__layout">
+                                        <div className="form__group">
+                                            <div className="form__field ">
+                                                <InputField
                                                     type="text"
-                                                    label="Rule type"
-                                                    value="BOGO"
-                                                />
-                                                <button
-                                                    className="icon link__btn"
-                                                    onClick={() =>
-                                                        removeClick(idx)
+                                                    label="Rule name"
+                                                    value={el.name}
+                                                    placeholder="e.g. SPRINGSALES"
+                                                    name="name"
+                                                    onChange={e =>
+                                                        handleInputChange(
+                                                            e,
+                                                            idx
+                                                        )
                                                     }
-                                                >
-                                                    <Icon
-                                                        source={
-                                                            DeleteMajorMonotone
-                                                        }
+                                                    error={
+                                                        el.error.name &&
+                                                        el.error.name
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="form__field">
+                                                <div className="form__field-wrapper">
+                                                    <TextField
+                                                        type="text"
+                                                        label="Rule type"
+                                                        value="BOGO"
                                                     />
-                                                </button>
+                                                    <button
+                                                        className="icon link__btn"
+                                                        onClick={() =>
+                                                            removeClick(idx)
+                                                        }
+                                                    >
+                                                        <Icon
+                                                            source={
+                                                                DeleteMajorMonotone
+                                                            }
+                                                        />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    {el.isOpen && (
-                                        <div className="see_more">
-                                            <div className="flex__wrapper">
-                                                <div className="flex__item ">
-                                                    <div className="flex__item-wrapper">
-                                                        <div className="flex_one">
-                                                            <SelectField
-                                                                options={
-                                                                    buysOptions
-                                                                }
-                                                                onChange={e =>
-                                                                    handleSelectChange(
-                                                                        e,
-                                                                        idx
-                                                                    )
-                                                                }
-                                                                value={
-                                                                    el.buy_type
-                                                                }
-                                                                name="buy_type"
-                                                                label="Customer buys"
-                                                                error={
-                                                                    el.error
-                                                                        .buy_type &&
-                                                                    el.error
-                                                                        .buy_type
-                                                                }
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <Button
-                                                                onClick={() =>
-                                                                    handleBuysModalOpen(
-                                                                        idx
-                                                                    )
-                                                                }
-                                                            >
-                                                                Browse
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                    {el.buy_ids &&
-                                                    el.buy_ids.length > 0
-                                                        ? el.buy_ids.map(el => (
-                                                              <div className="customer__checked-list">
-                                                                  <div className="name">
-                                                                      {el.title}
-                                                                  </div>
-
-                                                                  <div className="remove__btn">
-                                                                      <button
-                                                                          onClick={() =>
-                                                                              removeBuyIds(
-                                                                                  idx,
-                                                                                  el.id
-                                                                              )
-                                                                          }
-                                                                      >
-                                                                          <Icon
-                                                                              source={
-                                                                                  CancelSmallMinor
-                                                                              }
-                                                                          />
-                                                                      </button>
-                                                                  </div>
-                                                              </div>
-                                                          ))
-                                                        : ""}
-                                                </div>
-                                                <div className="flex__item">
-                                                    <div className="field__item">
-                                                        <InputField
-                                                            label="Quantity"
-                                                            type="number"
-                                                            placeholder="e.g. 0-9"
-                                                            value={
-                                                                el.buy_quantity
-                                                            }
-                                                            name="buy_quantity"
-                                                            onChange={e =>
-                                                                handleInputChange(
-                                                                    e,
-                                                                    idx
-                                                                )
-                                                            }
-                                                            error={
-                                                                el.error
-                                                                    .buy_quantity &&
-                                                                el.error
-                                                                    .buy_quantity
-                                                            }
-                                                        />
-                                                    </div>
-                                                    <div className="field__item">
-                                                        <SelectField
-                                                            name="select"
-                                                            options={
-                                                                customerEligibilityOptions
-                                                            }
-                                                            name="customer_eligible"
-                                                            value={
-                                                                el.customer_eligible
-                                                            }
-                                                            onChange={e => {
-                                                                handleCustomerSelect(
-                                                                    e,
-                                                                    idx
-                                                                );
-                                                            }}
-                                                            label="Customer eligibility"
-                                                            error={
-                                                                el.error
-                                                                    .customer_eligible &&
-                                                                el.error
-                                                                    .customer_eligible
-                                                            }
-                                                        />
-                                                    </div>
-                                                    {el.customer_ids_eligible && (
-                                                        <div className="field__item">
-                                                            {el.customer_ids_eligible &&
-                                                            el
-                                                                .customer_ids_eligible
-                                                                .length > 0
-                                                                ? el.customer_ids_eligible.map(
-                                                                      el => (
-                                                                          <div className="customer__checked-list">
-                                                                              <div className="name">
-                                                                                  {el.first_name &&
-                                                                                      el.first_name}{" "}
-                                                                                  {el.last_name &&
-                                                                                      el.last_name}
-                                                                                  {el.name &&
-                                                                                      el.name}
-                                                                              </div>
-
-                                                                              <div className="remove__btn">
-                                                                                  <button
-                                                                                      onClick={() =>
-                                                                                          removeSelectedCustomer(
-                                                                                              idx,
-                                                                                              el.id
-                                                                                          )
-                                                                                      }
-                                                                                  >
-                                                                                      <Icon
-                                                                                          source={
-                                                                                              CancelSmallMinor
-                                                                                          }
-                                                                                      />
-                                                                                  </button>
-                                                                              </div>
-                                                                          </div>
-                                                                      )
-                                                                  )
-                                                                : ""}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="flex__wrapper">
-                                                <div className="flex__item ">
-                                                    <div className="flex__item-wrapper">
-                                                        <div className="flex_one">
-                                                            <SelectField
-                                                                name="get_type"
-                                                                options={
-                                                                    getsOptions
-                                                                }
-                                                                value={
-                                                                    el.get_type
-                                                                }
-                                                                onChange={e =>
-                                                                    handleSelectChange(
-                                                                        e,
-                                                                        idx
-                                                                    )
-                                                                }
-                                                                label="Customer gets"
-                                                                error={
-                                                                    el.error
-                                                                        .get_type &&
-                                                                    el.error
-                                                                        .get_type
-                                                                }
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <Button
-                                                                onClick={() =>
-                                                                    handleGetsModalOpen(
-                                                                        idx
-                                                                    )
-                                                                }
-                                                            >
-                                                                Browse
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-
-                                                    {el.get_ids &&
-                                                    el.get_ids.length > 0
-                                                        ? el.get_ids.map(el => (
-                                                              <div className="customer__checked-list">
-                                                                  <div className="name">
-                                                                      {el.title}
-                                                                  </div>
-
-                                                                  <div className="remove__btn">
-                                                                      <button
-                                                                          onClick={() =>
-                                                                              removeGetIds(
-                                                                                  idx,
-                                                                                  el.id
-                                                                              )
-                                                                          }
-                                                                      >
-                                                                          <Icon
-                                                                              source={
-                                                                                  CancelSmallMinor
-                                                                              }
-                                                                          />
-                                                                      </button>
-                                                                  </div>
-                                                              </div>
-                                                          ))
-                                                        : ""}
-                                                </div>
-                                                <div className="flex__item">
-                                                    <div className="field__item">
-                                                        <InputField
-                                                            label="Quantity"
-                                                            type="number"
-                                                            placeholder="e.g. 0-9"
-                                                            value={
-                                                                el.get_quantity
-                                                            }
-                                                            name="get_quantity"
-                                                            onChange={e =>
-                                                                handleInputChange(
-                                                                    e,
-                                                                    idx
-                                                                )
-                                                            }
-                                                            error={
-                                                                el.error
-                                                                    .get_quantity &&
-                                                                el.error
-                                                                    .get_quantity
-                                                            }
-                                                        />
-                                                    </div>
-                                                    <div className="field__item">
-                                                        <div className="flex__row-equal">
-                                                            <div className="flex__row-item">
+                                        {el.isOpen && (
+                                            <div className="see_more">
+                                                <div className="flex__wrapper">
+                                                    <div className="flex__item ">
+                                                        <div className="flex__item-wrapper">
+                                                            <div className="flex_one">
                                                                 <SelectField
-                                                                    name="discount_type"
                                                                     options={
-                                                                        discountValueOptions
+                                                                        buysOptions
                                                                     }
                                                                     onChange={e =>
                                                                         handleSelectChange(
@@ -1488,361 +1352,681 @@ const Bogo = props => {
                                                                         )
                                                                     }
                                                                     value={
-                                                                        el.discount_type
+                                                                        el.buy_type
                                                                     }
-                                                                    label="At discount value"
+                                                                    name="buy_type"
+                                                                    label="Customer buys"
                                                                     error={
                                                                         el.error
-                                                                            .discount_type &&
+                                                                            .buy_type &&
                                                                         el.error
-                                                                            .discount_type
+                                                                            .buy_type
+                                                                    }
+                                                                    error={
+                                                                        el.error
+                                                                            .buy_ids
                                                                     }
                                                                 />
                                                             </div>
-                                                            <div className="flex__row-item">
-                                                                <InputField
-                                                                    type="number"
-                                                                    suffix="%"
-                                                                    value={
-                                                                        el.discount_value
+                                                            <div className="browse__btn">
+                                                                <div>
+                                                                    <Button
+                                                                        onClick={() =>
+                                                                            handleBuysModalOpen(
+                                                                                idx
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        Browse
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {el.buy_ids &&
+                                                        el.buy_ids.length > 0
+                                                            ? el.buy_ids.map(
+                                                                  el => (
+                                                                      <div className="customer__checked-list">
+                                                                          <div className="name">
+                                                                              {
+                                                                                  el.title
+                                                                              }
+                                                                          </div>
+
+                                                                          <div className="remove__btn">
+                                                                              <button
+                                                                                  onClick={() =>
+                                                                                      removeBuyIds(
+                                                                                          idx,
+                                                                                          el.id
+                                                                                      )
+                                                                                  }
+                                                                              >
+                                                                                  <Icon
+                                                                                      source={
+                                                                                          CancelSmallMinor
+                                                                                      }
+                                                                                  />
+                                                                              </button>
+                                                                          </div>
+                                                                      </div>
+                                                                  )
+                                                              )
+                                                            : ""}
+                                                    </div>
+                                                    <div className="flex__item">
+                                                        <div className="field__item">
+                                                            <InputField
+                                                                label="Quantity"
+                                                                type="number"
+                                                                placeholder="e.g. 0-9"
+                                                                value={
+                                                                    el.buy_quantity
+                                                                }
+                                                                name="buy_quantity"
+                                                                onChange={e =>
+                                                                    handleInputChange(
+                                                                        e,
+                                                                        idx
+                                                                    )
+                                                                }
+                                                                error={
+                                                                    el.error
+                                                                        .buy_quantity &&
+                                                                    el.error
+                                                                        .buy_quantity
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div className="field__item">
+                                                            <SelectField
+                                                                name="select"
+                                                                options={
+                                                                    customerEligibilityOptions
+                                                                }
+                                                                name="customer_eligible"
+                                                                value={
+                                                                    el.customer_eligible
+                                                                }
+                                                                onChange={e => {
+                                                                    handleCustomerSelect(
+                                                                        e,
+                                                                        idx
+                                                                    );
+                                                                }}
+                                                                label="Customer eligibility"
+                                                                error={
+                                                                    el.error
+                                                                        .customer_eligible &&
+                                                                    el.error
+                                                                        .customer_eligible
+                                                                }
+                                                            />
+                                                        </div>
+                                                        {el.customer_ids_eligible && (
+                                                            <div className="field__item">
+                                                                {el.customer_ids_eligible &&
+                                                                el
+                                                                    .customer_ids_eligible
+                                                                    .length > 0
+                                                                    ? el.customer_ids_eligible.map(
+                                                                          el => (
+                                                                              <div className="customer__checked-list">
+                                                                                  <div className="name">
+                                                                                      {el.first_name &&
+                                                                                          el.first_name}{" "}
+                                                                                      {el.last_name &&
+                                                                                          el.last_name}
+                                                                                      {el.name &&
+                                                                                          el.name}
+                                                                                  </div>
+
+                                                                                  <div className="remove__btn">
+                                                                                      <button
+                                                                                          onClick={() =>
+                                                                                              removeSelectedCustomer(
+                                                                                                  idx,
+                                                                                                  el.id
+                                                                                              )
+                                                                                          }
+                                                                                      >
+                                                                                          <Icon
+                                                                                              source={
+                                                                                                  CancelSmallMinor
+                                                                                              }
+                                                                                          />
+                                                                                      </button>
+                                                                                  </div>
+                                                                              </div>
+                                                                          )
+                                                                      )
+                                                                    : ""}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="flex__wrapper">
+                                                    <div className="flex__item ">
+                                                        <div className="flex__item-wrapper">
+                                                            <div className="flex_one">
+                                                                <SelectField
+                                                                    name="get_type"
+                                                                    options={
+                                                                        getsOptions
                                                                     }
-                                                                    name="discount_value"
+                                                                    value={
+                                                                        el.get_type
+                                                                    }
                                                                     onChange={e =>
-                                                                        handleInputChange(
+                                                                        handleSelectChange(
                                                                             e,
                                                                             idx
                                                                         )
                                                                     }
+                                                                    label="Customer gets"
                                                                     error={
                                                                         el.error
-                                                                            .discount_value &&
+                                                                            .get_ids &&
                                                                         el.error
-                                                                            .discount_value
+                                                                            .get_ids
+                                                                    }
+                                                                />
+                                                            </div>
+                                                            <div className="browse__btn">
+                                                                <div>
+                                                                    <Button
+                                                                        onClick={() =>
+                                                                            handleGetsModalOpen(
+                                                                                idx
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        Browse
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        {el.get_ids &&
+                                                        el.get_ids.length > 0
+                                                            ? el.get_ids.map(
+                                                                  el => (
+                                                                      <div className="customer__checked-list">
+                                                                          <div className="name">
+                                                                              {
+                                                                                  el.title
+                                                                              }
+                                                                          </div>
+
+                                                                          <div className="remove__btn">
+                                                                              <button
+                                                                                  onClick={() =>
+                                                                                      removeGetIds(
+                                                                                          idx,
+                                                                                          el.id
+                                                                                      )
+                                                                                  }
+                                                                              >
+                                                                                  <Icon
+                                                                                      source={
+                                                                                          CancelSmallMinor
+                                                                                      }
+                                                                                  />
+                                                                              </button>
+                                                                          </div>
+                                                                      </div>
+                                                                  )
+                                                              )
+                                                            : ""}
+                                                    </div>
+                                                    <div className="flex__item">
+                                                        <div className="field__item">
+                                                            <InputField
+                                                                label="Quantity"
+                                                                type="number"
+                                                                placeholder="e.g. 0-9"
+                                                                value={
+                                                                    el.get_quantity
+                                                                }
+                                                                name="get_quantity"
+                                                                onChange={e =>
+                                                                    handleInputChange(
+                                                                        e,
+                                                                        idx
+                                                                    )
+                                                                }
+                                                                error={
+                                                                    el.error
+                                                                        .get_quantity &&
+                                                                    el.error
+                                                                        .get_quantity
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div className="field__item">
+                                                            <div className="flex__row-equal">
+                                                                <div className="flex__row-item">
+                                                                    <SelectField
+                                                                        name="discount_type"
+                                                                        options={
+                                                                            discountValueOptions
+                                                                        }
+                                                                        onChange={e =>
+                                                                            handleSelectChange(
+                                                                                e,
+                                                                                idx
+                                                                            )
+                                                                        }
+                                                                        value={
+                                                                            el.discount_type
+                                                                        }
+                                                                        label="At discount value"
+                                                                        error={
+                                                                            el
+                                                                                .error
+                                                                                .discount_type &&
+                                                                            el
+                                                                                .error
+                                                                                .discount_type
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                                <div className="flex__row-item">
+                                                                    <InputField
+                                                                        type="number"
+                                                                        suffix="%"
+                                                                        value={
+                                                                            el.discount_value
+                                                                        }
+                                                                        name="discount_value"
+                                                                        onChange={e =>
+                                                                            handleInputChange(
+                                                                                e,
+                                                                                idx
+                                                                            )
+                                                                        }
+                                                                        error={
+                                                                            el
+                                                                                .error
+                                                                                .discount_value &&
+                                                                            el
+                                                                                .error
+                                                                                .discount_value
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="field__item">
+                                                            <div className="checkbox__item">
+                                                                <Checkbox
+                                                                    label="Set maximum number of users per order"
+                                                                    checked={
+                                                                        el.max_user
+                                                                    }
+                                                                    onChange={e =>
+                                                                        handleMaxUser(
+                                                                            e,
+                                                                            idx
+                                                                        )
+                                                                    }
+                                                                />
+                                                                {el.max_user && (
+                                                                    <div className="col-5">
+                                                                        <InputField
+                                                                            type="text"
+                                                                            value={
+                                                                                el.max_use_per_order
+                                                                            }
+                                                                            name="max_use_per_order"
+                                                                            onChange={e =>
+                                                                                handleInputChange(
+                                                                                    e,
+                                                                                    idx
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </div>
+                                                                )}
+
+                                                                <InlineError
+                                                                    message={
+                                                                        el.error
+                                                                            .max_use_per_order &&
+                                                                        el.error
+                                                                            .max_use_per_order
+                                                                    }
+                                                                />
+                                                            </div>
+                                                            <div className="checkbox__item">
+                                                                <Checkbox
+                                                                    label="Limit number of times this discount can be used in total"
+                                                                    checked={
+                                                                        el.min_user
+                                                                    }
+                                                                    onChange={e =>
+                                                                        handleMinUser(
+                                                                            e,
+                                                                            idx
+                                                                        )
+                                                                    }
+                                                                />
+                                                                {el.min_user && (
+                                                                    <div className="col-5">
+                                                                        <InputField
+                                                                            type="text"
+                                                                            value={
+                                                                                el.min_use_per_order
+                                                                            }
+                                                                            name="min_use_per_order"
+                                                                            onChange={e =>
+                                                                                handleInputChange(
+                                                                                    e,
+                                                                                    idx
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </div>
+                                                                )}
+
+                                                                <InlineError
+                                                                    message={
+                                                                        el.error
+                                                                            .min_use_per_order &&
+                                                                        el.error
+                                                                            .min_use_per_order
+                                                                    }
+                                                                />
+                                                            </div>
+                                                            <div className="checkbox__item">
+                                                                <Checkbox
+                                                                    label="Limit to one use per customer"
+                                                                    checked={
+                                                                        el.limit_to_one_use_per_customer
+                                                                    }
+                                                                    onChange={e =>
+                                                                        handleLimitUser(
+                                                                            e,
+                                                                            idx
+                                                                        )
                                                                     }
                                                                 />
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="field__item">
-                                                        <div className="checkbox__item">
-                                                            <Checkbox
-                                                                label="Set maximum number of users per order"
-                                                                checked={
-                                                                    el.max_user
-                                                                }
-                                                                onChange={e =>
-                                                                    handleMaxUser(
-                                                                        e,
-                                                                        idx
-                                                                    )
-                                                                }
-                                                            />
-                                                            {el.max_user && (
-                                                                <div className="col-5">
-                                                                    <InputField
-                                                                        type="text"
-                                                                        value={
-                                                                            el.max_use_per_order
-                                                                        }
-                                                                        name="max_use_per_order"
-                                                                        onChange={e =>
-                                                                            handleInputChange(
-                                                                                e,
-                                                                                idx
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div className="checkbox__item">
-                                                            <Checkbox
-                                                                label="Limit number of times this discount can be used in total"
-                                                                checked={
-                                                                    el.min_user
-                                                                }
-                                                                onChange={e =>
-                                                                    handleMinUser(
-                                                                        e,
-                                                                        idx
-                                                                    )
-                                                                }
-                                                            />
-                                                            {el.min_user && (
-                                                                <div className="col-5">
-                                                                    <InputField
-                                                                        type="text"
-                                                                        value={
-                                                                            el.min_use_per_order
-                                                                        }
-                                                                        name="min_use_per_order"
-                                                                        onChange={e =>
-                                                                            handleInputChange(
-                                                                                e,
-                                                                                idx
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div className="checkbox__item">
-                                                            <Checkbox
-                                                                label="Limit to one use per customer"
-                                                                checked={
-                                                                    el.limit_to_one_use_per_customer
-                                                                }
-                                                                onChange={e =>
-                                                                    handleLimitUser(
-                                                                        e,
-                                                                        idx
-                                                                    )
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
                                                 </div>
                                             </div>
+                                        )}
+
+                                        <div className="text-center">
+                                            <SeeMoreButton
+                                                seeMoreText="set rule"
+                                                seeLessText="hide"
+                                                isOpen={el.isOpen}
+                                                click={() => handleSeeMore(idx)}
+                                            />
                                         </div>
-                                    )}
-
-                                    <div className="text-center">
-                                        <SeeMoreButton
-                                            seeMoreText="set rule"
-                                            seeLessText="hide"
-                                            isOpen={el.isOpen}
-                                            click={() => handleSeeMore(idx)}
-                                        />
                                     </div>
-                                </div>
-                            </Card>
-                        ))}
+                                </Card>
+                            ))}
 
-                        <div className="add_rule separator text-center mt-3">
-                            <Button onClick={addClick}>
-                                {" "}
-                                + Add Rule Below
-                            </Button>
-                        </div>
-                        <div className="pull__right mt-3">
-                            <Button primary onClick={nextStep}>
-                                Continue
-                            </Button>
+                            <div className="add_rule separator text-center mt-3">
+                                <Button onClick={addClick}>
+                                    {" "}
+                                    + Add Rule Below
+                                </Button>
+                            </div>
+                            <div className="pull__right mt-3">
+                                <Button primary onClick={nextStep}>
+                                    Continue
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {step === 2 && (
-                <LunchPage
-                    discount_name="Discount Name"
-                    back={prevStep}
-                    onInputChange={handleCampignNameChange}
-                    campaign_name={campaign_name}
-                    start_date={start_date}
-                    end_date={end_date}
-                    start_time={start_time}
-                    end_time={end_time}
-                    handleStartDateChange={handleStartDateChange}
-                    handleEndDateChange={handleEndDateChange}
-                    handleStartTimeChange={handleStartTimeChange}
-                    handleEndTimeChange={handleEndTimeChange}
-                    launchCampaign={launchCampaign}
-                />
-            )}
+                {step === 2 && (
+                    <LunchPage
+                        discount_name="Discount Name"
+                        back={prevStep}
+                        onInputChange={handleCampignNameChange}
+                        campaign_name={campaign_name}
+                        start_date={start_date}
+                        end_date={end_date}
+                        start_time={start_time}
+                        end_time={end_time}
+                        handleStartDateChange={handleStartDateChange}
+                        handleEndDateChange={handleEndDateChange}
+                        handleStartTimeChange={handleStartTimeChange}
+                        handleEndTimeChange={handleEndTimeChange}
+                        launchCampaign={launchCampaign}
+                        error={lunchErr}
+                    />
+                )}
 
-            {/* Customer Modal */}
-            {customerModalOpen && (
-                <CustomModal
-                    open={customerModalOpen}
-                    onClose={handleModalClose}
-                    titleOne="Add"
-                    titleTwo="Cancel"
-                    handleSave={addCustomers}
-                    onScrolledToBottom={handleScrollBottom}
-                    disabled={false}
-                    heading="Add customers"
-                    placeholder="Search customers"
-                    searchText={searchCustomer}
-                    handleSearch={handleCustomerSearch}
-                >
-                    <Fragment>
-                        {loading && <Spinner />}
-                        <div className="result__list">
-                            {bogo[pushIndex].customer_list &&
-                            bogo[pushIndex].customer_list.length > 0
-                                ? bogo[pushIndex].customer_list.map(item => (
-                                      <div className="list" key={item.id}>
-                                          <div className="left__item">
-                                              <Checkbox
-                                                  checked={item.isChecked}
-                                                  id={item.id}
-                                                  onChange={
-                                                      handleCustomerCheckbox
-                                                  }
-                                              />
-                                          </div>
-                                          <div className="right__item">
-                                              <p className="primary_name">
-                                                  {item.first_name}{" "}
-                                                  {item.last_name}
-                                              </p>
-                                          </div>
-                                      </div>
-                                  ))
-                                : ""}
+                {/* Customer Modal */}
+                {customerModalOpen && (
+                    <CustomModal
+                        open={customerModalOpen}
+                        onClose={handleModalClose}
+                        titleOne="Add"
+                        titleTwo="Cancel"
+                        handleSave={addCustomers}
+                        onScrolledToBottom={handleScrollBottom}
+                        disabled={false}
+                        heading="Add customers"
+                        placeholder="Search customers"
+                        searchText={searchCustomer}
+                        handleSearch={handleCustomerSearch}
+                    >
+                        <Fragment>
+                            {loading && <Spinner />}
+                            <div className="result__list">
+                                {bogo[pushIndex].customer_list &&
+                                bogo[pushIndex].customer_list.length > 0
+                                    ? bogo[pushIndex].customer_list.map(
+                                          item => (
+                                              <div
+                                                  className="list"
+                                                  key={item.id}
+                                              >
+                                                  <div className="left__item">
+                                                      <Checkbox
+                                                          checked={
+                                                              item.isChecked
+                                                          }
+                                                          id={item.id}
+                                                          onChange={
+                                                              handleCustomerCheckbox
+                                                          }
+                                                      />
+                                                  </div>
+                                                  <div className="right__item">
+                                                      <p className="primary_name">
+                                                          {item.first_name}{" "}
+                                                          {item.last_name}
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                          )
+                                      )
+                                    : ""}
 
-                            {isFetching && (
-                                <p className="text-center">loading...</p>
-                            )}
-                        </div>
-                    </Fragment>
-                </CustomModal>
-            )}
+                                {isFetching && (
+                                    <p className="text-center">loading...</p>
+                                )}
+                            </div>
+                        </Fragment>
+                    </CustomModal>
+                )}
 
-            {/* Customer Group Modal */}
-            {customerGroupModalOpen && (
-                <CustomModal
-                    open={customerGroupModalOpen}
-                    onClose={handleModalClose}
-                    titleOne="Add"
-                    titleTwo="Cancel"
-                    handleSave={addCustomers}
-                    onScrolledToBottom={handleScrollBottom}
-                    disabled={false}
-                    heading="Add customers groups"
-                    placeholder="search customers groups"
-                    searchText={searchCustomer}
-                    handleSearch={handleCustomerSearch}
-                >
-                    <Fragment>
-                        {loading && <Spinner />}
-                        <div className="result__list">
-                            {bogo[pushIndex].customer_list &&
-                            bogo[pushIndex].customer_list.length > 0
-                                ? bogo[pushIndex].customer_list.map(item => (
-                                      <div className="list" key={item.id}>
-                                          <div className="left__item">
-                                              <Checkbox
-                                                  checked={item.isChecked}
-                                                  id={item.id}
-                                                  onChange={
-                                                      handleCustomerCheckbox
-                                                  }
-                                              />
-                                          </div>
-                                          <div className="right__item">
-                                              <p className="primary_name">
-                                                  {item.name}
-                                              </p>
-                                          </div>
-                                      </div>
-                                  ))
-                                : ""}
+                {/* Customer Group Modal */}
+                {customerGroupModalOpen && (
+                    <CustomModal
+                        open={customerGroupModalOpen}
+                        onClose={handleModalClose}
+                        titleOne="Add"
+                        titleTwo="Cancel"
+                        handleSave={addCustomers}
+                        onScrolledToBottom={handleScrollBottom}
+                        disabled={false}
+                        heading="Add customers groups"
+                        placeholder="search customers groups"
+                        searchText={searchCustomer}
+                        handleSearch={handleCustomerSearch}
+                    >
+                        <Fragment>
+                            {loading && <Spinner />}
+                            <div className="result__list">
+                                {bogo[pushIndex].customer_list &&
+                                bogo[pushIndex].customer_list.length > 0
+                                    ? bogo[pushIndex].customer_list.map(
+                                          item => (
+                                              <div
+                                                  className="list"
+                                                  key={item.id}
+                                              >
+                                                  <div className="left__item">
+                                                      <Checkbox
+                                                          checked={
+                                                              item.isChecked
+                                                          }
+                                                          id={item.id}
+                                                          onChange={
+                                                              handleCustomerCheckbox
+                                                          }
+                                                      />
+                                                  </div>
+                                                  <div className="right__item">
+                                                      <p className="primary_name">
+                                                          {item.name}
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                          )
+                                      )
+                                    : ""}
 
-                            {isFetching && (
-                                <p className="text-center">loading...</p>
-                            )}
-                        </div>
-                    </Fragment>
-                </CustomModal>
-            )}
+                                {isFetching && (
+                                    <p className="text-center">loading...</p>
+                                )}
+                            </div>
+                        </Fragment>
+                    </CustomModal>
+                )}
 
-            {/* Collections Modal */}
-            {(BuyCollectionsModalOpen || GetCollectionsModalOpen) && (
-                <CustomModal
-                    open={BuyCollectionsModalOpen || GetCollectionsModalOpen}
-                    onClose={handleModalClose}
-                    titleOne="Add"
-                    titleTwo="Cancel"
-                    handleSave={addCollections}
-                    onScrolledToBottom={handleScrollBottom}
-                    disabled={false}
-                    heading="Add collections"
-                    placeholder="search collections"
-                    searchText={searchCustomer}
-                    handleSearch={handleCustomerSearch}
-                >
-                    <Fragment>
-                        {loading && <Spinner />}
-                        <div className="result__list">
-                            {bogo[pushIndex].customer_list &&
-                            bogo[pushIndex].customer_list.length > 0
-                                ? bogo[pushIndex].customer_list.map(item => (
-                                      <div className="list" key={item.id}>
-                                          <div className="left__item">
-                                              <Checkbox
-                                                  checked={item.isChecked}
-                                                  id={item.id}
-                                                  onChange={
-                                                      handleCustomerCheckbox
-                                                  }
-                                              />
-                                          </div>
-                                          <div className="right__item">
-                                              <p className="primary_name">
-                                                  {item.title}
-                                              </p>
-                                          </div>
-                                      </div>
-                                  ))
-                                : ""}
+                {/* Collections Modal */}
+                {(BuyCollectionsModalOpen || GetCollectionsModalOpen) && (
+                    <CustomModal
+                        open={
+                            BuyCollectionsModalOpen || GetCollectionsModalOpen
+                        }
+                        onClose={handleModalClose}
+                        titleOne="Add"
+                        titleTwo="Cancel"
+                        handleSave={addCollections}
+                        onScrolledToBottom={handleScrollBottom}
+                        disabled={false}
+                        heading="Add collections"
+                        placeholder="search collections"
+                        searchText={searchCustomer}
+                        handleSearch={handleCustomerSearch}
+                    >
+                        <Fragment>
+                            {loading && <Spinner />}
+                            <div className="result__list">
+                                {bogo[pushIndex].customer_list &&
+                                bogo[pushIndex].customer_list.length > 0
+                                    ? bogo[pushIndex].customer_list.map(
+                                          item => (
+                                              <div
+                                                  className="list"
+                                                  key={item.id}
+                                              >
+                                                  <div className="left__item">
+                                                      <Checkbox
+                                                          checked={
+                                                              item.isChecked
+                                                          }
+                                                          id={item.id}
+                                                          onChange={
+                                                              handleCustomerCheckbox
+                                                          }
+                                                      />
+                                                  </div>
+                                                  <div className="right__item">
+                                                      <p className="primary_name">
+                                                          {item.title}
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                          )
+                                      )
+                                    : ""}
 
-                            {isFetching && (
-                                <p className="text-center">loading...</p>
-                            )}
-                        </div>
-                    </Fragment>
-                </CustomModal>
-            )}
+                                {isFetching && (
+                                    <p className="text-center">loading...</p>
+                                )}
+                            </div>
+                        </Fragment>
+                    </CustomModal>
+                )}
 
-            {/* Products Modal */}
-            {(BuyProductsModalOpen || GetProductsModalOpen) && (
-                <CustomModal
-                    open={BuyProductsModalOpen || GetProductsModalOpen}
-                    onClose={handleModalClose}
-                    titleOne="Add"
-                    titleTwo="Cancel"
-                    handleSave={addCollections}
-                    onScrolledToBottom={handleScrollBottom}
-                    disabled={false}
-                    heading="Add products"
-                    placeholder="search products"
-                    searchText={searchCustomer}
-                    handleSearch={handleCustomerSearch}
-                >
-                    <Fragment>
-                        {loading && <Spinner />}
-                        <div className="result__list">
-                            {bogo[pushIndex].customer_list &&
-                            bogo[pushIndex].customer_list.length > 0
-                                ? bogo[pushIndex].customer_list.map(item => (
-                                      <div className="list" key={item.id}>
-                                          <div className="left__item">
-                                              <Checkbox
-                                                  checked={item.isChecked}
-                                                  id={item.id}
-                                                  onChange={
-                                                      handleCustomerCheckbox
-                                                  }
-                                              />
-                                          </div>
-                                          <div className="right__item">
-                                              <p className="primary_name">
-                                                  {item.title}
-                                              </p>
-                                          </div>
-                                      </div>
-                                  ))
-                                : ""}
+                {/* Products Modal */}
+                {(BuyProductsModalOpen || GetProductsModalOpen) && (
+                    <CustomModal
+                        open={BuyProductsModalOpen || GetProductsModalOpen}
+                        onClose={handleModalClose}
+                        titleOne="Add"
+                        titleTwo="Cancel"
+                        handleSave={addCollections}
+                        onScrolledToBottom={handleScrollBottom}
+                        disabled={false}
+                        heading="Add products"
+                        placeholder="search products"
+                        searchText={searchCustomer}
+                        handleSearch={handleCustomerSearch}
+                    >
+                        <Fragment>
+                            {loading && <Spinner />}
+                            <div className="result__list">
+                                {bogo[pushIndex].customer_list &&
+                                bogo[pushIndex].customer_list.length > 0
+                                    ? bogo[pushIndex].customer_list.map(
+                                          item => (
+                                              <div
+                                                  className="list"
+                                                  key={item.id}
+                                              >
+                                                  <div className="left__item">
+                                                      <Checkbox
+                                                          checked={
+                                                              item.isChecked
+                                                          }
+                                                          id={item.id}
+                                                          onChange={
+                                                              handleCustomerCheckbox
+                                                          }
+                                                      />
+                                                  </div>
+                                                  <div className="right__item">
+                                                      <p className="primary_name">
+                                                          {item.title}
+                                                      </p>
+                                                  </div>
+                                              </div>
+                                          )
+                                      )
+                                    : ""}
 
-                            {isFetching && (
-                                <p className="text-center">loading...</p>
-                            )}
-                        </div>
-                    </Fragment>
-                </CustomModal>
-            )}
+                                {isFetching && (
+                                    <p className="text-center">loading...</p>
+                                )}
+                            </div>
+                        </Fragment>
+                    </CustomModal>
+                )}
+            </Frame>
         </Fragment>
     );
 };

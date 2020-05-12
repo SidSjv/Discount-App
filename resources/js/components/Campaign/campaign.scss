@@ -46,7 +46,7 @@
     .form__layout {
         .form__group {
             @include flexbox();
-            align-items: flex-end;
+            align-items: baseline;
             justify-content: space-between;
             margin-bottom: 1.3rem;
             .form__field {
@@ -80,10 +80,22 @@
             margin-bottom: 1.3rem;
             &-wrapper {
                 @include flexbox();
-                align-items: flex-end;
+
                 margin-bottom: 1rem;
                 .flex_one {
                     flex: 1;
+                }
+
+                .browse__btn {
+                    // @include flexbox();
+                    // @include align-items(center);
+                    div {
+                        height: 100%;
+
+                        .Polaris-Button {
+                            margin-top: 2.3rem;
+                        }
+                    }
                 }
             }
         }
