@@ -139,6 +139,16 @@
     }
 }
 
+.flex__row {
+    @include flexbox();
+    .select {
+        flex: 1;
+    }
+    .min__value {
+        max-width: 12rem;
+    }
+}
+
 /*********** Lunch Page   *********/
 
 .lunch__page {

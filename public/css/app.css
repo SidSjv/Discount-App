@@ -830,6 +830,18 @@ ul {
   width: 50%;
 }
 
+.flex__row {
+  display: flex;
+}
+
+.flex__row .select {
+  flex: 1;
+}
+
+.flex__row .min__value {
+  max-width: 12rem;
+}
+
 /*********** Lunch Page   *********/
 
 .lunch__page {

@@ -147,7 +147,7 @@ const Dashboard = () => {
             params.sortBy = sortBy;
             params.sortOrder = sortOrder;
         }
-        if (searchTerm) {
+        if (searchTerm.length > 1) {
             if (filter) {
                 if (filter === "status") {
                     params.status = searchTerm;
@@ -186,7 +186,10 @@ const Dashboard = () => {
         }
 
         if (from) {
-            params.starts = from;
+            params.start_date = from;
+        }
+        if (to) {
+            params.end_date = to;
         }
         setState({
             ...state,
@@ -195,7 +198,7 @@ const Dashboard = () => {
         axios
             .get("/campaign", { params: params })
             .then(res => {
-                console.log(res);
+                //console.log(res);
                 let data = res.data;
                 setState({
                     ...state,

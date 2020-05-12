@@ -9,7 +9,8 @@ const InputField = ({
     value,
     placeholder,
     error,
-    suffix
+    suffix,
+    prefix
 }) => {
     return (
         <div className="input_field">
@@ -25,6 +26,14 @@ const InputField = ({
                         error ? "Polaris-TextField--error" : ""
                     }`}
                 >
+                    {prefix && (
+                        <div
+                            className="Polaris-TextField__Prefix"
+                            id="PolarisTextField4Prefix"
+                        >
+                            {prefix}
+                        </div>
+                    )}
                     <input
                         type={type}
                         name={name}
