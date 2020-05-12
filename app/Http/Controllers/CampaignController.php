@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CampaignCreate;
+use App\Http\Requests\MarkCampaign;
 use App\Models\BOGOCampaign;
 use App\Models\BulkCampaigns;
 use App\Models\BundleCampaign;
@@ -140,5 +141,16 @@ class CampaignController extends Controller {
             DB::rollBack();
             return response()->json(['status' => false, 'message' => $e->getMessage(), 'trace' => $e->getTrace()], 501);
         }
+    }
+
+    public function markCampaigns(MarkCampaign $request) {
+        $campaigns = Campaign::whereIn('id', $request->campaign_ids);
+        if(isset($request->status)) 
+            $campaigns->update(['status' => $request->status]);
+        if(isset($request->favorite))    
+            $campaigns->update(['favorite' => 'true']);
+        if(isset($request->delete)) 
+            $campaigns->update(['valid' => 'Inactive']);
+        return response()->json(['status' => true, 'message' => 'Updated Successfully !'], 200);
     }
 }

@@ -24,5 +24,6 @@ Route::middleware('authenticateAPI')->group(function() {
         Route::resource('collection', 'CollectionController');
         Route::get('syncStoreData', 'StoreController@syncStoreData');
         Route::get('discount_types', 'StoreController@discount_types');
+        Route::post('campaign/mark', 'CampaignController@markCampaigns');
     });
 });
