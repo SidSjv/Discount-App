@@ -15,13 +15,13 @@ class ProductsController extends Controller {
 
     public function index(Request $request) {
         $products = Products::where('store_id', Auth::user()->id);
-        $products = $this->filterProducts($products, $request);
+        $products = $this->filterProducts($products, $request->all());
         return response()->json(['status' => true, 'products' => $products], 200);
     }
 
     private function filterProducts($products, $request) {
-        if(isset($request->searchTerm) && isset($request->searchBy)) 
-            $products = $products->where($request->searchBy, 'LIKE', '%'.$request->searchTerm.'%');
+        if(isset($request['searchTerm']) && isset($request['searchBy'])) 
+            $products = $products->where($request['searchBy'], 'LIKE', '%'.$request['searchTerm'].'%');
         return $products->select(['id', 'title', 'vendor', 'handle'])->paginate($this->pagination_count);    
     }
 

@@ -27,8 +27,8 @@ class CollectionController extends Controller {
     private function filterCollections($collections, $request) {
         if(isset($request['type']) && ($request['type'] == 'Smart' || $request['type'] == 'Custom'))
             $collections = $collections->where('type', $request['type']);
-        if(isset($request['title'])) 
-            $collections = $collections->where('title', 'LIKE', '%'.$request['title'].'%');
+        if(isset($request['searchTerm']) && isset($request['searchBy'])) 
+            $collections = $collections->where($request['searchBy'], 'LIKE', '%'.$request['searchTerm'].'%');
         return $collections->paginate($this->pagination_count);
     }
 
