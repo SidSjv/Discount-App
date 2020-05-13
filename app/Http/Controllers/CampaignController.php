@@ -68,7 +68,9 @@ class CampaignController extends Controller {
             if(isset($request->times_used)) 
                 $campaigns = $campaigns->where('times_used', $request->times_used);
             if(isset($request->discount_type)) 
-                $campaigns = $campaigns->where('discount_type', 'LIKE', '%'.$request->discount_type.'%');    
+                $campaigns = $campaigns->where('discount_type', 'LIKE', '%'.$request->discount_type.'%');
+            if(isset($request->favorite)) 
+                $campaigns = $campaigns->where('favorite', $request->favorite);   
             if(isset($request->sortBy) && isset($request->sortOrder))
                 $campaigns = $campaigns->orderBy($request->sortBy, $request->sortOrder);
             if(isset($request->limit))
