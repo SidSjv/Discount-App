@@ -58,7 +58,7 @@ class CampaignController extends Controller {
     private function filterCampaigns($campaigns, $request) {
         if(isset($request->tab)) {
             if($request->tab !== 'all')
-                $campaigns = $campaigns->where('status', 'LIKE', '%'.$request->tab.'%');
+                $campaigns = $campaigns->where('status', $request->tab);
             if(isset($request->searchTerm))
                 $campaigns = $campaigns->where('name', 'LIKE', '%'.$request->searchTerm.'%');
             if(isset($request->start_date)) 
@@ -145,12 +145,19 @@ class CampaignController extends Controller {
 
     public function markCampaigns(MarkCampaign $request) {
         $campaigns = Campaign::whereIn('id', $request->campaign_ids);
-        if(isset($request->status)) 
+        $message = '';
+        if(isset($request->status)) {
             $campaigns->update(['status' => $request->status]);
-        if(isset($request->favorite))    
+            $message = 'Marked '.$request->status;
+        }    
+        if(isset($request->favorite)){    
             $campaigns->update(['favorite' => 'true']);
-        if(isset($request->delete)) 
+            $message = 'Marked Favorite';
+        }
+        if(isset($request->delete)) {
             $campaigns->update(['valid' => 'Inactive']);
-        return response()->json(['status' => true, 'message' => 'Updated Successfully !'], 200);
+            $message = 'Deleted';
+        }
+        return response()->json(['status' => true, 'message' => 'Campaigns '.$message.' Successfully !'], 200);
     }
 }
