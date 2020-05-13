@@ -20,15 +20,17 @@ class CustomerController extends Controller {
         if($request->expectsJson()) {
             if($store !== NULL && $store->count() > 0) {
                 $customers = Customers::where('store_id', Auth::user()->store_id);
-                $customers = $this->filterCustomers($customers, $request);
+                $customers = $this->filterCustomers($customers, $request->all());
                 return response()->json(['status' => true, 'customers' => $customers], 200);
             } else return response()->json(['status' => false, 'message' => 'Store Not Found !'], 200);
         }
     }
 
     private function filterCustomers($customers, $request) {
-        if(isset($request->searchBy) && isset($request->searchTerm))
-            $customers = $customers->where($request->searchBy, 'LIKE', '%'.$request->searchTerm.'%');
+        if(isset($request['searchBy']) && isset($request['searchTerm']))
+            if($request['searchBy'] == 'name')
+                $customers = $customers->where('first_name', 'LIKE', '%'.$request['searchTerm'].'%')->orWhere('last_name', 'LIKE', '%'.$request['searchTerm'].'%');
+            else $customers = $customers->where($request['searchBy'], 'LIKE', '%'.$request['searchTerm'].'%');
         return $customers->select(['id', 'first_name', 'last_name'])->paginate($this->pagination_count);    
     }
 
@@ -43,9 +45,7 @@ class CustomerController extends Controller {
 
     private function filterCustomerGroups($customer_groups, $request) {
         if(isset($request['searchBy']) && isset($request['searchTerm']))
-            if($request['searchBy'] == 'name')
-                $customer_groups = $customer_groups->where('first_name', 'LIKE', '%'.$request['searchTerm'].'%')->orWhere('last_name', 'LIKE', '%'.$request['searchTerm'].'%');
-            else $customer_groups = $customer_groups->where($request['searchBy'], 'LIKE', '%'.$request['searchTerm'].'%');
+            $customer_groups = $customer_groups->where($request['searchBy'], 'LIKE', '%'.$request['searchTerm'].'%');
         return $customer_groups->select(['id', 'name', 'query', 'created_at', 'updated_at'])->paginate($this->pagination_count);    
     }
 }
