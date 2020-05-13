@@ -39,7 +39,7 @@ class CampaignController extends Controller {
                         'discount_type' => $campaign->discount_type,
                         'times_used' => $campaign->times_used,
                         'created_at' => date('Y-m-d h:i:s', strtotime($campaign->created_at)),
-                        'favorite' => $campaign->favorite
+                        'favourite' => $campaign->favorite
                     ];
                     $temp['bogo'] = BOGOCampaign::where('campaign_id', $campaign->id)->get()->pluck('name');
                     $temp['discount'] = DiscountCampaigns::where('campaign_id', $campaign->id)->get()->pluck('name');
@@ -59,7 +59,7 @@ class CampaignController extends Controller {
     private function filterCampaigns($campaigns, $request) {
         if(isset($request->tab)) {
             if($request->tab !== 'all')
-                $campaigns = $request->tab == 'favorite' ? $campaigns->where($request->tab, 'true') : $campaigns->where('status', $request->tab);
+                $campaigns = $request->tab == 'favourite' ? $campaigns->where($request->tab, 'true') : $campaigns->where('status', $request->tab);
             if(isset($request->searchTerm))
                 $campaigns = $campaigns->where('name', 'LIKE', '%'.$request->searchTerm.'%');
             if(isset($request->start_date)) 
@@ -151,9 +151,9 @@ class CampaignController extends Controller {
             $campaigns->update(['status' => $request->status]);
             $message = 'Marked '.$request->status;
         }    
-        if(isset($request->favorite)){    
+        if(isset($request->favourite)){    
             $campaigns->update(['favorite' => 'true']);
-            $message = 'Marked Favorite';
+            $message = 'Marked Favourite';
         }
         if(isset($request->delete)) {
             $campaigns->update(['valid' => 'Inactive']);
