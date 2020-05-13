@@ -377,6 +377,8 @@ const Bogo = props => {
                 obj.get_quantity = 1;
                 return obj;
             });
+        } else {
+            new_bogo = bogo;
         }
         setState({
             ...state,
@@ -545,8 +547,8 @@ const Bogo = props => {
             bogo: bogos
         });
     };
-    //Handle seeMore seeLess
 
+    //Handle seeMore seeLess
     const handleSeeMore = i => {
         let bogos = [...bogo];
         bogos[i].isOpen = !bogos[i].isOpen;
@@ -1634,7 +1636,12 @@ const Bogo = props => {
                                                                 <div className="flex__row-item">
                                                                     <InputField
                                                                         type="number"
-                                                                        suffix="%"
+                                                                        suffix={
+                                                                            el.discount_type ===
+                                                                            "percentage"
+                                                                                ? "%"
+                                                                                : null
+                                                                        }
                                                                         value={
                                                                             el.discount_value
                                                                         }
