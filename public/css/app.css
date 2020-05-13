@@ -309,6 +309,10 @@ table .td__overflow {
   margin-left: 1.6rem;
 }
 
+.result__list .no__result {
+  padding: 1.6rem 1.6rem;
+}
+
 .ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
   border: 1px solid #5c6ac4 !important;
 }

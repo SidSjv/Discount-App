@@ -32,7 +32,7 @@ const Dashboard = () => {
         isFetched: false,
         items: [],
         tab: "",
-        placeholder: "Search discount code",
+        placeholder: "Search campaign",
         inputType: "text"
     };
 
@@ -271,19 +271,16 @@ const Dashboard = () => {
         }
         if (value === "discount_type") {
             inputType = "text";
-            placeholder = "Search by discount code type";
+            placeholder = "Search by campaign type";
         }
-        if (value === "status") {
-            inputType = "text";
-            placeholder = "Search by status";
-        }
+
         if (value === "starts") {
             inputType = "date";
             placeholder = "Search discount code";
         }
         if (value === "") {
             inputType = "text";
-            placeholder = "Search discount code";
+            placeholder = "Search campaign";
         }
 
         setState({
@@ -376,7 +373,6 @@ const Dashboard = () => {
         }
     ];
     const filter_options = [
-        { label: "Filter", value: "" },
         {
             label: "Campaign type",
             value: "discount_type"
@@ -440,38 +436,77 @@ const Dashboard = () => {
 
     //Actions
 
+    const setActions = obj => {
+        setState({
+            ...state,
+            loading: true
+        });
+        axios
+            .post("/campaign/mark", obj)
+            .then(res => {
+                let data = res.data;
+                if (data.status) {
+                    setState({
+                        ...state,
+                        loading: false
+                    });
+                    setToastMsg(data.message);
+                    setToastErr(false);
+                    setToast(true);
+                    window.location.reload();
+                }
+            })
+            .catch(err => {
+                setState({
+                    ...state,
+                    loading: false
+                });
+                setToast(true);
+                setToastErr(true);
+                setToastMsg("Something went wrong, please try again later");
+            });
+    };
+
     const bulkActions = [
         {
             content: "Enable campaign",
             onAction: () => {
-                setState({
-                    ...state,
-                    loading: true
-                });
-
                 let sendObj = {
                     campaign_ids: selectedItems,
                     status: "Active"
                 };
-                axios
-                    .post("/campaign/mark", sendObj)
-                    .then(res => {
-                        console.log(res);
-                    })
-                    .catch(err => {});
+                setActions(sendObj);
             }
         },
         {
             content: "Disable campaign",
-            onAction: () => console.log("Todo: implement bulk remove tags")
+            onAction: () => {
+                let sendObj = {
+                    campaign_ids: selectedItems,
+                    status: "Inactive"
+                };
+                setActions(sendObj);
+            }
         },
         {
             content: "Delete campaign",
-            onAction: () => console.log("Todo: implement bulk delete")
+            onAction: () => {
+                let sendObj = {
+                    campaign_ids: selectedItems,
+                    delete: true
+                };
+                setActions(sendObj);
+            }
         },
         {
             content: "Make favourite",
-            onAction: () => console.log("Todo: implement bulk delete")
+            onAction: () => {
+                let sendObj = {
+                    campaign_ids: selectedItems,
+                    favorite: true
+                };
+                setActions(sendObj);
+            }
         }
     ];
 
@@ -517,6 +552,7 @@ const Dashboard = () => {
                                                 onChange={handleFilterChange}
                                                 value={filter}
                                                 id="filter"
+                                                placeholder="Filter"
                                             />
                                         </div>
                                         <div className="search_filter">

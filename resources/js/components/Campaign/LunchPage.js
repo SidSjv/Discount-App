@@ -140,7 +140,7 @@ const LunchPage = ({
                 </div>
 
                 <Button primary onClick={launchCampaign}>
-                    Lunch
+                    Launch
                 </Button>
             </div>
         </div>
