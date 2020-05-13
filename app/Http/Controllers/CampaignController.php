@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CampaignCreate;
+use App\Http\Requests\MarkCampaign;
 use App\Models\BOGOCampaign;
 use App\Models\BulkCampaigns;
 use App\Models\BundleCampaign;
@@ -37,7 +38,7 @@ class CampaignController extends Controller {
                         'end_date' => $campaign->end_date,
                         'discount_type' => $campaign->discount_type,
                         'times_used' => $campaign->times_used,
-                        'created_at' => $campaign->created_at
+                        'created_at' => date('Y-m-d h:i:s', strtotime($campaign->created_at))
                     ];
                     $temp['bogo'] = BOGOCampaign::where('campaign_id', $campaign->id)->get()->pluck('name');
                     $temp['discount'] = DiscountCampaigns::where('campaign_id', $campaign->id)->get()->pluck('name');
@@ -72,7 +73,7 @@ class CampaignController extends Controller {
                 $campaigns = $campaigns->orderBy($request->sortBy, $request->sortOrder);
             if(isset($request->limit))
                 $campaigns = $campaigns->limit($request->limit);
-        }
+        } else $campaigns = $campaigns->orderBy('created_at', 'desc');
         return $campaigns->paginate($this->pagination_count);
     }
 
@@ -140,5 +141,16 @@ class CampaignController extends Controller {
             DB::rollBack();
             return response()->json(['status' => false, 'message' => $e->getMessage(), 'trace' => $e->getTrace()], 501);
         }
+    }
+
+    public function markCampaigns(MarkCampaign $request) {
+        $campaigns = Campaign::whereIn('id', $request->campaign_ids);
+        if(isset($request->status)) 
+            $campaigns->update(['status' => $request->status]);
+        if(isset($request->favorite))    
+            $campaigns->update(['favorite' => 'true']);
+        if(isset($request->delete)) 
+            $campaigns->update(['valid' => 'Inactive']);
+        return response()->json(['status' => true, 'message' => 'Updated Successfully !'], 200);
     }
 }

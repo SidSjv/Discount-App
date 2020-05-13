@@ -20,6 +20,7 @@ class CreateCampaignsTable extends Migration {
             $table->string('status')->nullable();
             $table->enum('valid', ['Active', 'Inactive'])->default('Active');
             $table->integer('times_used')->default(0);
+            $table->string('favorite')->default('false');
             $table->timestamps();
         });
     }
