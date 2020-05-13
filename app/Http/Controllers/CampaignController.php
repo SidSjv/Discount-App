@@ -59,7 +59,7 @@ class CampaignController extends Controller {
     private function filterCampaigns($campaigns, $request) {
         if(isset($request->tab)) {
             if($request->tab !== 'all')
-                $campaigns = $campaigns->where('status', $request->tab);
+                $campaigns = $request->tab == 'favorite' ? $campaigns->where($request->tab, 'true') : $campaigns->where('status', $request->tab);
             if(isset($request->searchTerm))
                 $campaigns = $campaigns->where('name', 'LIKE', '%'.$request->searchTerm.'%');
             if(isset($request->start_date)) 
@@ -70,8 +70,6 @@ class CampaignController extends Controller {
                 $campaigns = $campaigns->where('times_used', $request->times_used);
             if(isset($request->discount_type)) 
                 $campaigns = $campaigns->where('discount_type', 'LIKE', '%'.$request->discount_type.'%');
-            if(isset($request->favorite)) 
-                $campaigns = $campaigns->where('favorite', $request->favorite);   
             if(isset($request->sortBy) && isset($request->sortOrder))
                 $campaigns = $campaigns->orderBy($request->sortBy, $request->sortOrder);
             if(isset($request->limit))
