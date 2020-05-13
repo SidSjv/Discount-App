@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('authenticateAPI')->group(function() {
     Route::get('home', 'StoreController@index');
     Route::middleware('auth:api')->group(function () {
+        Route::post('campaign/mark', 'CampaignController@markCampaigns');
         Route::resource('campaign', 'CampaignController');
         Route::get('customer/groups', 'CustomerController@getCustomerGroups');
         Route::resource('customer', 'CustomerController');
@@ -24,6 +25,5 @@ Route::middleware('authenticateAPI')->group(function() {
         Route::resource('collection', 'CollectionController');
         Route::get('syncStoreData', 'StoreController@syncStoreData');
         Route::get('discount_types', 'StoreController@discount_types');
-        Route::post('campaign/mark', 'CampaignController@markCampaigns');
     });
 });

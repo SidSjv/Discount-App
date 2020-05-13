@@ -38,7 +38,7 @@ class CampaignController extends Controller {
                         'end_date' => $campaign->end_date,
                         'discount_type' => $campaign->discount_type,
                         'times_used' => $campaign->times_used,
-                        'created_at' => $campaign->created_at
+                        'created_at' => date('Y-m-d h:i:s', strtotime($campaign->created_at))
                     ];
                     $temp['bogo'] = BOGOCampaign::where('campaign_id', $campaign->id)->get()->pluck('name');
                     $temp['discount'] = DiscountCampaigns::where('campaign_id', $campaign->id)->get()->pluck('name');
