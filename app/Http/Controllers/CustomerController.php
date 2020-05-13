@@ -43,7 +43,9 @@ class CustomerController extends Controller {
 
     private function filterCustomerGroups($customer_groups, $request) {
         if(isset($request['searchBy']) && isset($request['searchTerm']))
-            $customer_groups = $customer_groups->where($request['searchBy'], 'LIKE', '%'.$request['searchTerm'].'%');
+            if($request['searchBy'] == 'name')
+                $customer_groups = $customer_groups->where('first_name', 'LIKE', '%'.$request['searchTerm'].'%')->orWhere('last_name', 'LIKE', '%'.$request['searchTerm'].'%');
+            else $customer_groups = $customer_groups->where($request['searchBy'], 'LIKE', '%'.$request['searchTerm'].'%');
         return $customer_groups->select(['id', 'name', 'query', 'created_at', 'updated_at'])->paginate($this->pagination_count);    
     }
 }
