@@ -73,7 +73,7 @@ class CampaignController extends Controller {
                 $campaigns = $campaigns->orderBy($request->sortBy, $request->sortOrder);
             if(isset($request->limit))
                 $campaigns = $campaigns->limit($request->limit);
-        }
+        } else $campaigns = $campaigns->orderBy('created_at', 'desc');
         return $campaigns->paginate($this->pagination_count);
     }
 
