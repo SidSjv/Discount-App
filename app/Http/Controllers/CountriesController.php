@@ -19,8 +19,8 @@ class CountriesController extends Controller {
     }
 
     private function filterCountries($countries, $request) {
-        if(isset($request['name'])) 
-            $countries = $countries->where('name', 'LIKE', '%'.$request['name'].'%');
+        if(isset($request['searchBy']) && isset($request['searchTerm'])) 
+            $countries = $countries->where($request['searchBy'], 'LIKE', '%'.$request['searchTerm'].'%');
         return $countries->select('id','name', 'code')->paginate($this->pagination_count);    
     }
 }
