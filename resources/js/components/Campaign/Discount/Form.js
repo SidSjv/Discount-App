@@ -28,6 +28,7 @@ const Form = ({
     idx,
     handleInputChange,
     handleSelectChange,
+    handleCustomerSelect,
     handleMaxUses,
     handleLimitUser,
     removeClick,
@@ -69,6 +70,13 @@ const Form = ({
         {
             label: "Specific  customers",
             value: "specific_customer"
+        }
+    ];
+    const countriesOptions = [
+        { label: "All countries", value: "*" },
+        {
+            label: "Specific countries",
+            value: "specific_countries"
         }
     ];
 
@@ -128,22 +136,20 @@ const Form = ({
                                         <Fragment>
                                             <div className="field__item">
                                                 <SelectField
-                                                    name="discount_type"
-                                                    options={
-                                                        discountValueOptions
-                                                    }
+                                                    name="select_country"
+                                                    options={countriesOptions}
                                                     onChange={e =>
                                                         handleSelectChange(
                                                             e,
                                                             idx
                                                         )
                                                     }
-                                                    value={el.discount_type}
+                                                    value={el.select_country}
                                                     label="At discount value"
                                                     error={
                                                         el.error
-                                                            .discount_type &&
-                                                        el.error.discount_type
+                                                            .select_country &&
+                                                        el.error.select_country
                                                     }
                                                 />
                                             </div>
@@ -253,7 +259,7 @@ const Form = ({
                                             name="customer_eligibility"
                                             options={customerEligibilityOptions}
                                             onChange={e =>
-                                                handleSelectChange(e, idx)
+                                                handleCustomerSelect(e, idx)
                                             }
                                             value={el.customer_eligibility}
                                             label="Customer eligibility"
