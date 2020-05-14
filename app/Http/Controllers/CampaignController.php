@@ -119,9 +119,8 @@ class CampaignController extends Controller {
             $discount_payload = [];
             foreach($request['Discount'] as $discount_item) {
                 $discount_item['campaign_id'] = $campaign_row->id;
-                if(is_array($discount_item['get_ids'])) $discount_item['get_ids'] = implode(',', $discount_item['get_ids']);
                 if(is_array($discount_item['applied_ids'])) $discount_item['applied_ids'] = implode(',', $discount_item['applied_ids']);
-                if(is_array($discount_item['customer_ids_eligible'])) $discount_item['customer_ids_eligible'] = implode(',', $discount_item['customer_ids_eligible']);
+                if(is_array($discount_item['eligible_customers'])) $discount_item['eligible_customers'] = implode(',', $discount_item['eligible_customers']);
                 $discount_payload[] = $discount_item;
             }
             if(count($discount_payload) > 0) 
