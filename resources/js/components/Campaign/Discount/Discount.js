@@ -1079,6 +1079,55 @@ const Discount = () => {
         });
     };
 
+    //O click of Browse  button open the specific modal
+
+    const handleModalOpenOnClick = (i, modalName) => {
+        //console.log(i, modalName);
+        let customerModalOpen = false,
+            customerGroupModalOpen = false,
+            countryModalOpen = false,
+            collectionsModalOpen = false,
+            productsModalOpen = false;
+
+        //For country modal
+        if (modalName === "country") {
+            if (discount[i].select_country === "specific_countries") {
+                countryModalOpen = true;
+            }
+        }
+
+        //Customer modal open
+        if (modalName === "customer") {
+            if (
+                discount[i].customer_eligibility === "specific_group_customer"
+            ) {
+                customerGroupModalOpen = true;
+            }
+            if (discount[i].customer_eligibility === "specific_customer") {
+                customerModalOpen = true;
+            }
+        }
+
+        //Collections and products
+        if (modalName === "collection") {
+            if (discount[i].applies_to === "specific_collections") {
+                collectionsModalOpen = true;
+            }
+            if (discount[i].applies_to === "specific_product") {
+                collectionsModalOpen = true;
+            }
+        }
+
+        setState({
+            ...state,
+            countryModalOpen,
+            customerGroupModalOpen,
+            customerModalOpen,
+            collectionsModalOpen,
+            productsModalOpen
+        });
+    };
+
     /* ******************** Validations ........... */
 
     const handleValidations = () => {
@@ -1346,6 +1395,9 @@ const Discount = () => {
                                     addClick={addClick}
                                     removeClick={removeClick}
                                     handleSeeMore={handleSeeMore}
+                                    handleModalOpenOnClick={
+                                        handleModalOpenOnClick
+                                    }
                                 />
                             ))}
 

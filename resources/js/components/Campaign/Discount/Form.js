@@ -35,7 +35,8 @@ const Form = ({
     handleMaxUses,
     handleLimitUser,
     removeClick,
-    handleSeeMore
+    handleSeeMore,
+    handleModalOpenOnClick
 }) => {
     const discountValueOptions = [
         { label: "Percentage", value: "percentage" },
@@ -138,20 +139,46 @@ const Form = ({
                                     {el.discount_type === "free_shipping" && (
                                         <Fragment>
                                             <div className="field__item">
-                                                <SelectField
-                                                    name="select_country"
-                                                    options={countriesOptions}
-                                                    onChange={e =>
-                                                        handleSelect(e, idx)
-                                                    }
-                                                    value={el.select_country}
-                                                    label="Countries"
-                                                    error={
-                                                        el.error
-                                                            .select_country &&
-                                                        el.error.select_country
-                                                    }
-                                                />
+                                                <div className="flex__item-wrapper">
+                                                    <div className="flex_one">
+                                                        <SelectField
+                                                            name="select_country"
+                                                            options={
+                                                                countriesOptions
+                                                            }
+                                                            onChange={e =>
+                                                                handleSelect(
+                                                                    e,
+                                                                    idx
+                                                                )
+                                                            }
+                                                            value={
+                                                                el.select_country
+                                                            }
+                                                            label="Countries"
+                                                            error={
+                                                                el.error
+                                                                    .select_country &&
+                                                                el.error
+                                                                    .select_country
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <div className="browse__btn">
+                                                        <div>
+                                                            <Button
+                                                                onClick={() =>
+                                                                    handleModalOpenOnClick(
+                                                                        idx,
+                                                                        "country"
+                                                                    )
+                                                                }
+                                                            >
+                                                                Browse
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div className="field__item">
                                                 {el.countries_applicable &&
@@ -224,17 +251,39 @@ const Form = ({
                                     )}
 
                                     <div className="field__item">
-                                        <SelectField
-                                            name="applies_to"
-                                            options={appliesValueOptions}
-                                            onChange={e => handleSelect(e, idx)}
-                                            value={el.applies_to}
-                                            label="Applies to"
-                                            error={
-                                                el.error.applies_to &&
-                                                el.error.applies_to
-                                            }
-                                        />
+                                        <div className="flex__item-wrapper">
+                                            <div className="flex_one">
+                                                <SelectField
+                                                    name="applies_to"
+                                                    options={
+                                                        appliesValueOptions
+                                                    }
+                                                    onChange={e =>
+                                                        handleSelect(e, idx)
+                                                    }
+                                                    value={el.applies_to}
+                                                    label="Applies to"
+                                                    error={
+                                                        el.error.applies_to &&
+                                                        el.error.applies_to
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="browse__btn">
+                                                <div>
+                                                    <Button
+                                                        onClick={() =>
+                                                            handleModalOpenOnClick(
+                                                                idx,
+                                                                "collection"
+                                                            )
+                                                        }
+                                                    >
+                                                        Browse
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="field__item">
                                         {el.applied_ids &&
@@ -314,17 +363,43 @@ const Form = ({
                                         </div>
                                     </div>
                                     <div className="field__item">
-                                        <SelectField
-                                            name="customer_eligibility"
-                                            options={customerEligibilityOptions}
-                                            onChange={e => handleSelect(e, idx)}
-                                            value={el.customer_eligibility}
-                                            label="Customer eligibility"
-                                            error={
-                                                el.error.customer_eligibility &&
-                                                el.error.customer_eligibility
-                                            }
-                                        />
+                                        <div className="flex__item-wrapper">
+                                            <div className="flex_one">
+                                                <SelectField
+                                                    name="customer_eligibility"
+                                                    options={
+                                                        customerEligibilityOptions
+                                                    }
+                                                    onChange={e =>
+                                                        handleSelect(e, idx)
+                                                    }
+                                                    value={
+                                                        el.customer_eligibility
+                                                    }
+                                                    label="Customer eligibility"
+                                                    error={
+                                                        el.error
+                                                            .customer_eligibility &&
+                                                        el.error
+                                                            .customer_eligibility
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="browse__btn">
+                                                <div>
+                                                    <Button
+                                                        onClick={() =>
+                                                            handleModalOpenOnClick(
+                                                                idx,
+                                                                "customer"
+                                                            )
+                                                        }
+                                                    >
+                                                        Browse
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="field__item">
                                         {el.eligible_customers &&

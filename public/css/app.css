@@ -794,7 +794,8 @@ ul {
 }
 
 .campaign__layout .flex__wrapper .flex__item-wrapper .browse__btn div .Polaris-Button {
-  margin-top: 2.3rem;
+  margin-top: 2.4rem;
+  border-left: 0;
 }
 
 .campaign__layout .field__item {
