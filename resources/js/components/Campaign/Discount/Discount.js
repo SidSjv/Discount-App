@@ -1082,7 +1082,7 @@ const Discount = () => {
     //O click of Browse  button open the specific modal
 
     const handleModalOpenOnClick = (i, modalName) => {
-        //console.log(i, modalName);
+        console.log(i, modalName);
         let customerModalOpen = false,
             customerGroupModalOpen = false,
             countryModalOpen = false,
