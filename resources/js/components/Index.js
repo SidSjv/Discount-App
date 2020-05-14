@@ -19,6 +19,7 @@ import Wizard from "./Campaign/Wizard";
 import Settings from "./Settings/Settings";
 import Bogo from "./Campaign/BOGO/Bogo";
 import Discount from "./Campaign/Discount/Discount";
+import Bulk from "./Campaign/Bulk/Bulk";
 
 const Index = props => {
     const [isFetched, setFetched] = useState(false);
@@ -68,6 +69,11 @@ const Index = props => {
                             exact
                             path="/campaign/discount/:id"
                             component={Discount}
+                        />
+                        <Route
+                            exact
+                            path="/campaign/bulk/:id"
+                            component={Bulk}
                         />
                         <Route exact path="/settings" component={Settings} />
                     </Switch>

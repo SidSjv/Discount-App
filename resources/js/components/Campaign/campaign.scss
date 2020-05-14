@@ -134,7 +134,7 @@
 }
 .flex__row-equal {
     @include flexbox();
-    align-items: flex-end;
+    //align-items: flex-end;
     .flex__row-item {
         width: 50%;
     }

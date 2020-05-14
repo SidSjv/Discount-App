@@ -129,6 +129,16 @@ const Wizard = () => {
                                                                                     Create{" "}
                                                                                 </Link>
                                                                             )}
+                                                                            {discount.name ===
+                                                                                "Bulk" && (
+                                                                                <Link
+                                                                                    to={`/campaign/bulk/${desc.id}`}
+                                                                                    className="link__text"
+                                                                                >
+                                                                                    {" "}
+                                                                                    Create{" "}
+                                                                                </Link>
+                                                                            )}
                                                                         </div>
                                                                     )
                                                                 )}

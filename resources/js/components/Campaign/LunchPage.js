@@ -19,7 +19,8 @@ const LunchPage = ({
     handleStartTimeChange,
     handleEndTimeChange,
     launchCampaign,
-    error
+    error,
+    loading
 }) => {
     let dateFormat = "YYYY-MM-DD";
     let timeFormat = "HH:mm:ss";
@@ -139,7 +140,7 @@ const LunchPage = ({
                     </Button>
                 </div>
 
-                <Button primary onClick={launchCampaign}>
+                <Button loading={loading} primary onClick={launchCampaign}>
                     Launch
                 </Button>
             </div>

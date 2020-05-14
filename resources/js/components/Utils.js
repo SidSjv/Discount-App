@@ -8,3 +8,9 @@ export const getCurrentTime = () => {
     let currentTime = `${h}:${m}:${s}`;
     return currentTime;
 };
+
+export const capitalize = s => {
+    if (typeof s !== "string") return "";
+    return s.charAt(0).toUpperCase() + s.slice(1);
+};
+//capitalize('flavio') //'Flavio'
