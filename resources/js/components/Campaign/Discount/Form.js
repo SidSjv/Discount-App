@@ -28,11 +28,15 @@ const Form = ({
     idx,
     handleInputChange,
     handleSelectChange,
-    handleCustomerSelect,
+    handleSelect,
+    removeSelectedCustomer,
+    removeSelectedAppliedIds,
+    removeSelectedCountry,
     handleMaxUses,
     handleLimitUser,
     removeClick,
-    handleSeeMore
+    handleSeeMore,
+    handleModalOpenOnClick
 }) => {
     const discountValueOptions = [
         { label: "Percentage", value: "percentage" },
@@ -135,23 +139,78 @@ const Form = ({
                                     {el.discount_type === "free_shipping" && (
                                         <Fragment>
                                             <div className="field__item">
-                                                <SelectField
-                                                    name="select_country"
-                                                    options={countriesOptions}
-                                                    onChange={e =>
-                                                        handleSelectChange(
-                                                            e,
-                                                            idx
-                                                        )
-                                                    }
-                                                    value={el.select_country}
-                                                    label="At discount value"
-                                                    error={
-                                                        el.error
-                                                            .select_country &&
-                                                        el.error.select_country
-                                                    }
-                                                />
+                                                <div className="flex__item-wrapper">
+                                                    <div className="flex_one">
+                                                        <SelectField
+                                                            name="select_country"
+                                                            options={
+                                                                countriesOptions
+                                                            }
+                                                            onChange={e =>
+                                                                handleSelect(
+                                                                    e,
+                                                                    idx
+                                                                )
+                                                            }
+                                                            value={
+                                                                el.select_country
+                                                            }
+                                                            label="Countries"
+                                                            error={
+                                                                el.error
+                                                                    .select_country &&
+                                                                el.error
+                                                                    .select_country
+                                                            }
+                                                        />
+                                                    </div>
+                                                    <div className="browse__btn">
+                                                        <div>
+                                                            <Button
+                                                                onClick={() =>
+                                                                    handleModalOpenOnClick(
+                                                                        idx,
+                                                                        "country"
+                                                                    )
+                                                                }
+                                                            >
+                                                                Browse
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="field__item">
+                                                {el.countries_applicable &&
+                                                el.countries_applicable.length >
+                                                    0
+                                                    ? el.countries_applicable.map(
+                                                          el => (
+                                                              <div className="customer__checked-list">
+                                                                  <div className="name">
+                                                                      {el.name}
+                                                                  </div>
+
+                                                                  <div className="remove__btn">
+                                                                      <button
+                                                                          onClick={() =>
+                                                                              removeSelectedCountry(
+                                                                                  idx,
+                                                                                  el.id
+                                                                              )
+                                                                          }
+                                                                      >
+                                                                          <Icon
+                                                                              source={
+                                                                                  CancelSmallMinor
+                                                                              }
+                                                                          />
+                                                                      </button>
+                                                                  </div>
+                                                              </div>
+                                                          )
+                                                      )
+                                                    : ""}
                                             </div>
                                             <div className="field__item">
                                                 <label className="Polaris-Label Polaris-Labelled__LabelWrapper">
@@ -192,19 +251,68 @@ const Form = ({
                                     )}
 
                                     <div className="field__item">
-                                        <SelectField
-                                            name="applies_to"
-                                            options={appliesValueOptions}
-                                            onChange={e =>
-                                                handleSelectChange(e, idx)
-                                            }
-                                            value={el.applies_to}
-                                            label="Applies to"
-                                            error={
-                                                el.error.applies_to &&
-                                                el.error.applies_to
-                                            }
-                                        />
+                                        <div className="flex__item-wrapper">
+                                            <div className="flex_one">
+                                                <SelectField
+                                                    name="applies_to"
+                                                    options={
+                                                        appliesValueOptions
+                                                    }
+                                                    onChange={e =>
+                                                        handleSelect(e, idx)
+                                                    }
+                                                    value={el.applies_to}
+                                                    label="Applies to"
+                                                    error={
+                                                        el.error.applies_to &&
+                                                        el.error.applies_to
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="browse__btn">
+                                                <div>
+                                                    <Button
+                                                        onClick={() =>
+                                                            handleModalOpenOnClick(
+                                                                idx,
+                                                                "collection"
+                                                            )
+                                                        }
+                                                    >
+                                                        Browse
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="field__item">
+                                        {el.applied_ids &&
+                                        el.applied_ids.length > 0
+                                            ? el.applied_ids.map(el => (
+                                                  <div className="customer__checked-list">
+                                                      <div className="name">
+                                                          {el.title}
+                                                      </div>
+
+                                                      <div className="remove__btn">
+                                                          <button
+                                                              onClick={() =>
+                                                                  removeSelectedAppliedIds(
+                                                                      idx,
+                                                                      el.id
+                                                                  )
+                                                              }
+                                                          >
+                                                              <Icon
+                                                                  source={
+                                                                      CancelSmallMinor
+                                                                  }
+                                                              />
+                                                          </button>
+                                                      </div>
+                                                  </div>
+                                              ))
+                                            : ""}
                                     </div>
                                     <div className="field__item">
                                         <div className="flex__row">
@@ -255,19 +363,76 @@ const Form = ({
                                         </div>
                                     </div>
                                     <div className="field__item">
-                                        <SelectField
-                                            name="customer_eligibility"
-                                            options={customerEligibilityOptions}
-                                            onChange={e =>
-                                                handleCustomerSelect(e, idx)
-                                            }
-                                            value={el.customer_eligibility}
-                                            label="Customer eligibility"
-                                            error={
-                                                el.error.customer_eligibility &&
-                                                el.error.customer_eligibility
-                                            }
-                                        />
+                                        <div className="flex__item-wrapper">
+                                            <div className="flex_one">
+                                                <SelectField
+                                                    name="customer_eligibility"
+                                                    options={
+                                                        customerEligibilityOptions
+                                                    }
+                                                    onChange={e =>
+                                                        handleSelect(e, idx)
+                                                    }
+                                                    value={
+                                                        el.customer_eligibility
+                                                    }
+                                                    label="Customer eligibility"
+                                                    error={
+                                                        el.error
+                                                            .customer_eligibility &&
+                                                        el.error
+                                                            .customer_eligibility
+                                                    }
+                                                />
+                                            </div>
+                                            <div className="browse__btn">
+                                                <div>
+                                                    <Button
+                                                        onClick={() =>
+                                                            handleModalOpenOnClick(
+                                                                idx,
+                                                                "customer"
+                                                            )
+                                                        }
+                                                    >
+                                                        Browse
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="field__item">
+                                        {el.eligible_customers &&
+                                        el.eligible_customers.length > 0
+                                            ? el.eligible_customers.map(el => (
+                                                  <div className="customer__checked-list">
+                                                      <div className="name">
+                                                          {el.first_name &&
+                                                              el.first_name}{" "}
+                                                          {el.last_name &&
+                                                              el.last_name}
+                                                          {el.name && el.name}
+                                                      </div>
+
+                                                      <div className="remove__btn">
+                                                          <button
+                                                              onClick={() =>
+                                                                  removeSelectedCustomer(
+                                                                      idx,
+                                                                      el.id
+                                                                  )
+                                                              }
+                                                          >
+                                                              <Icon
+                                                                  source={
+                                                                      CancelSmallMinor
+                                                                  }
+                                                              />
+                                                          </button>
+                                                      </div>
+                                                  </div>
+                                              ))
+                                            : ""}
                                     </div>
                                     <div className="field__item">
                                         <Checkbox
@@ -317,7 +482,7 @@ const Form = ({
                     <div className="text-center">
                         <SeeMoreButton
                             seeMoreText="set rule"
-                            seeLessText="hide"
+                            seeLessText="hide rule"
                             isOpen={el.isOpen}
                             click={() => handleSeeMore(idx)}
                         />
