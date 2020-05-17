@@ -846,6 +846,19 @@ ul {
   max-width: 12rem;
 }
 
+.add__level .input_field {
+  flex: 1;
+}
+
+.add__level .icon {
+  min-height: 3.6rem;
+  max-height: 3.6rem;
+  padding: 0 1rem;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  align-self: flex-end;
+}
+
 /*********** Lunch Page   *********/
 
 .lunch__page {

@@ -35,22 +35,25 @@ const Bulk = () => {
         start_time: getCurrentTime(),
         end_date: moment(new Date()).format("YYYY-MM-DD"),
         end_time: getCurrentTime(),
-        discount: [
+        bulk: [
             {
                 data_list: "",
                 name: "",
-                discount_type: "percentage",
-                discount_value: "",
-                applies_to: "*",
-                applied_ids: "",
-                countries_applicable: "",
-                select_country: "*",
-                min_requirements: "none",
-                min_req_value: "",
+                discount_levels: [
+                    {
+                        quantity: "",
+                        discount_type: "percentage",
+                        discount_value: ""
+                    }
+                ],
+                buy_type: "specific_collections",
+                buy_ids: "",
                 eligible_customers: "",
                 customer_eligibility: "*",
-                max_no_of_uses: "",
                 max_uses: false,
+                max_uses_per_order: "",
+                min_uses: false,
+                min_use_per_order: "",
                 limit_to_one_use_per_customer: false,
                 error: {},
                 isOpen: true
@@ -61,7 +64,6 @@ const Bulk = () => {
         customerGroupModalOpen: false,
         collectionsModalOpen: false,
         productsModalOpen: false,
-        countryModalOpen: false,
         pushIndex: 0,
         page: 1,
         isFetching: false,
@@ -84,13 +86,12 @@ const Bulk = () => {
         start_time,
         end_date,
         end_time,
-        discount,
+        bulk,
         isFetching,
         isFetched,
         loading,
         customerModalOpen,
         customerGroupModalOpen,
-        countryModalOpen,
         collectionsModalOpen,
         productsModalOpen,
         fetchData,
@@ -105,7 +106,7 @@ const Bulk = () => {
     //Fetch Data
     // Get customers
     const getCustomers = (searchText, name) => {
-        let discounts = [...discount];
+        let bulks = [...bulk];
         let params = {
             page: page
         };
@@ -132,8 +133,8 @@ const Bulk = () => {
                 data.customers.data &&
                     data.customers.data.length > 0 &&
                     data.customers.data.map(item => {
-                        if (discounts[pushIndex].eligible_customers) {
-                            discounts[pushIndex].eligible_customers.map(el => {
+                        if (bulks[pushIndex].eligible_customers) {
+                            bulks[pushIndex].eligible_customers.map(el => {
                                 if (el.id === item.id) {
                                     item["isChecked"] = true;
                                 }
@@ -145,11 +146,11 @@ const Bulk = () => {
                         list.push(item);
                     });
 
-                discounts[pushIndex].data_list = list;
+                bulks[pushIndex].data_list = list;
                 setState({
                     ...state,
                     fetchData: data.customers,
-                    discount: discounts,
+                    bulk: bulks,
                     isFetching: false,
                     loading: false,
                     isFetched: true
@@ -168,7 +169,7 @@ const Bulk = () => {
 
     // Get customers groups
     const getCustomerGroups = (searchText, name) => {
-        let discounts = [...discount];
+        let bulks = [...bulk];
         let params = {
             page: page
         };
@@ -196,8 +197,8 @@ const Bulk = () => {
                 data.customer_groups.data &&
                     data.customer_groups.data.length > 0 &&
                     data.customer_groups.data.map(item => {
-                        if (discounts[pushIndex].eligible_customers) {
-                            discounts[pushIndex].eligible_customers.map(el => {
+                        if (bulks[pushIndex].eligible_customers) {
+                            bulks[pushIndex].eligible_customers.map(el => {
                                 if (el.id === item.id) {
                                     item["isChecked"] = true;
                                 }
@@ -209,11 +210,11 @@ const Bulk = () => {
                         list.push(item);
                     });
 
-                discounts[pushIndex].data_list = list;
+                bulks[pushIndex].data_list = list;
                 setState({
                     ...state,
                     fetchData: data.customer_groups,
-                    discount: discounts,
+                    bulk: bulks,
                     isFetching: false,
                     loading: false,
                     isFetched: true
@@ -232,7 +233,7 @@ const Bulk = () => {
 
     // Get Collections
     const getCollections = (searchText, name) => {
-        let discounts = [...discount];
+        let bulks = [...bulk];
         let params = {
             page: page
         };
@@ -260,8 +261,8 @@ const Bulk = () => {
                 data.collections.data &&
                     data.collections.data.length > 0 &&
                     data.collections.data.map(item => {
-                        if (discounts[pushIndex].applied_ids) {
-                            discounts[pushIndex].applied_ids.map(el => {
+                        if (bulks[pushIndex].buy_ids) {
+                            bulks[pushIndex].buy_ids.map(el => {
                                 if (el.id === item.id) {
                                     item["isChecked"] = true;
                                 }
@@ -273,11 +274,11 @@ const Bulk = () => {
                         list.push(item);
                     });
 
-                discounts[pushIndex].data_list = list;
+                bulks[pushIndex].data_list = list;
                 setState({
                     ...state,
                     fetchData: data.collections,
-                    discount: discounts,
+                    bulk: bulks,
                     isFetching: false,
                     loading: false,
                     isFetched: true
@@ -296,7 +297,7 @@ const Bulk = () => {
 
     // Get Collections
     const getProducts = (searchText, name) => {
-        let discounts = [...discount];
+        let bulks = [...bulk];
         let params = {
             page: page
         };
@@ -324,8 +325,8 @@ const Bulk = () => {
                 data.products.data &&
                     data.products.data.length > 0 &&
                     data.products.data.map(item => {
-                        if (discounts[pushIndex].applied_ids) {
-                            discounts[pushIndex].applied_ids.map(el => {
+                        if (bulks[pushIndex].buy_ids) {
+                            bulks[pushIndex].buy_ids.map(el => {
                                 if (el.id === item.id) {
                                     item["isChecked"] = true;
                                 }
@@ -337,75 +338,11 @@ const Bulk = () => {
                         list.push(item);
                     });
 
-                discounts[pushIndex].data_list = list;
+                bulks[pushIndex].data_list = list;
                 setState({
                     ...state,
                     fetchData: data.products,
-                    discount: discounts,
-                    isFetching: false,
-                    loading: false,
-                    isFetched: true
-                });
-            })
-            .catch(err => {
-                console.log(err);
-                setState({
-                    ...state,
-                    isFetching: false,
-                    loading: false,
-                    isFetched: true
-                });
-            });
-    };
-
-    const getCountries = (searchText, name) => {
-        let discounts = [...discount];
-        let params = {
-            page: page
-        };
-        if (searchText) {
-            params.searchTerm = searchText;
-        }
-
-        if (name) {
-            params.searchBy = "name";
-        }
-
-        setState({
-            ...state,
-            loading: true,
-            isFetched: false
-        });
-
-        axios
-            .get("/countries", { params: params })
-            .then(res => {
-                let data = res.data;
-                console.log("get countries", data);
-                let list = [];
-                data.countries.data &&
-                    data.countries.data.length > 0 &&
-                    data.countries.data.map(item => {
-                        if (discounts[pushIndex].countries_applicable) {
-                            discounts[pushIndex].countries_applicable.map(
-                                el => {
-                                    if (el.id === item.id) {
-                                        item["isChecked"] = true;
-                                    }
-                                }
-                            );
-                        } else {
-                            item["isChecked"] = false;
-                        }
-
-                        list.push(item);
-                    });
-
-                discounts[pushIndex].data_list = list;
-                setState({
-                    ...state,
-                    fetchData: data.countries,
-                    discount: discounts,
+                    discount: bulks,
                     isFetching: false,
                     loading: false,
                     isFetched: true
@@ -443,15 +380,11 @@ const Bulk = () => {
         if (productsModalOpen) {
             getProducts();
         }
-        if (countryModalOpen) {
-            getCountries();
-        }
     }, [
         customerModalOpen,
         customerGroupModalOpen,
         collectionsModalOpen,
-        productsModalOpen,
-        countryModalOpen
+        productsModalOpen
     ]);
 
     /****** On Chnage Handlers *******/
@@ -459,10 +392,10 @@ const Bulk = () => {
     const toggleActive = useCallback(() => setToast(toast => !toast), []);
     //Step form
     const nextStep = () => {
-        if (handleValidations()) {
-            setStep(step + 1);
-        }
-        //setStep(step + 1);
+        // if (handleValidations()) {
+        //     setStep(step + 1);
+        // }
+        setStep(step + 1);
     };
     const prevStep = () => {
         setStep(step - 1);
@@ -472,49 +405,63 @@ const Bulk = () => {
 
     const handleInputChange = (e, i) => {
         const { name, value } = e.target;
-        let discounts = [...discount];
-        discounts[i] = {
-            ...discounts[i],
+        let bulks = [...bulk];
+        bulks[i] = {
+            ...bulks[i],
             [name]: value,
-            error: { ...discounts[i].error, [name]: "" }
+            error: { ...bulks[i].error, [name]: "" }
         };
         setState({
             ...state,
-            discount: discounts
+            bulk: bulks
         });
     };
     //handle select
     const handleSelectChange = (e, i) => {
         //console.log(e, i);
         const { value, name } = e.target;
-        let discounts = [...discount];
-        discounts[i] = {
-            ...discounts[i],
+        let bulks = [...bulk];
+        bulks[i] = {
+            ...bulks[i],
             [name]: value,
-            error: { ...discounts[i].error, [name]: "" }
+            error: { ...bulks[i].error, [name]: "" }
         };
         setState({
             ...state,
-            discount: discounts,
+            bulk: bulks,
             pushIndex: i
+        });
+    };
+
+    //const Handle Level change
+    const handleLevleChange = (e, idx, i) => {
+        const { value, name } = e.target;
+        let bulks = [...bulk];
+        let discountLevles = [...bulks[idx].discount_levels];
+        discountLevles[i] = { ...discountLevles[i], [name]: value };
+        bulks[idx] = { ...bulks[idx], discount_levels: discountLevles };
+        setState({
+            ...state,
+            bulk: bulks,
+            pushIndex: idx
         });
     };
 
     //Select handler to open the modal
     const handleSelect = (e, i) => {
         const { value, name } = e.target;
-        let discounts = [...discount];
-        discounts[i] = {
-            ...discounts[i],
+        let bulks = [...bulk];
+        bulks[i] = {
+            ...bulks[i],
             [name]: value,
-            error: { ...discounts[i].error, [name]: "" }
+            error: { ...bulks[i].error, [name]: "" }
         };
 
         let customerModalOpen = false,
             customerGroupModalOpen = false,
             collectionsModalOpen = false,
-            productsModalOpen = false,
-            countryModalOpen = false;
+            productsModalOpen = false;
+
         if (value === "specific_customer") {
             customerModalOpen = true;
         }
@@ -527,46 +474,51 @@ const Bulk = () => {
         if (value === "specific_product") {
             productsModalOpen = true;
         }
-        if (value === "specific_countries") {
-            countryModalOpen = true;
-        }
 
         setState({
             ...state,
-            discount: discounts,
+            bulk: bulks,
             customerModalOpen,
             customerGroupModalOpen,
             collectionsModalOpen,
             productsModalOpen,
-            countryModalOpen,
             pushIndex: i
         });
     };
 
     const handleMaxUses = (value, i) => {
-        let discounts = [...discount];
-        discounts[i] = { ...discounts[i], max_uses: value };
+        let bulks = [...bulk];
+        bulks[i] = { ...bulks[i], max_uses: value };
         setState({
             ...state,
-            discount: discounts
+            bulk: bulks
+        });
+    };
+
+    const handleMinUses = (value, i) => {
+        let bulks = [...bulk];
+        bulks[i] = { ...bulks[i], min_uses: value };
+        setState({
+            ...state,
+            bulk: bulks
         });
     };
 
     const handleLimitUser = (value, i) => {
-        let discounts = [...discount];
-        discounts[i] = {
-            ...discounts[i],
+        let bulks = [...bulk];
+        bulks[i] = {
+            ...bulks[i],
             limit_to_one_use_per_customer: value
         };
         setState({
             ...state,
-            discount: discounts
+            bulk: bulks
         });
     };
 
     /********* Fetch Data  ************/
     const fetchCustomers = () => {
-        let discounts = [...discount];
+        let bulks = [...bulk];
         setState({
             ...state,
             page: state.page + 1,
@@ -587,8 +539,8 @@ const Bulk = () => {
                 data.customers.data &&
                     data.customers.data.length > 0 &&
                     data.customers.data.map(item => {
-                        if (discounts[pushIndex].eligible_customers) {
-                            discounts[pushIndex].eligible_customers.map(el => {
+                        if (bulks[pushIndex].eligible_customers) {
+                            bulks[pushIndex].eligible_customers.map(el => {
                                 if (el.id === item.id) {
                                     item["isChecked"] = true;
                                 }
@@ -600,17 +552,17 @@ const Bulk = () => {
 
                 console.log("fetch", data.customers.data);
 
-                discounts[pushIndex].data_list = discounts[
-                    pushIndex
-                ].data_list.concat(data.customers.data);
-                console.log(discounts);
+                bulks[pushIndex].data_list = bulks[pushIndex].data_list.concat(
+                    data.customers.data
+                );
+                console.log(bulks);
 
                 setState({
                     ...state,
                     fetchData: data.customers,
                     isFetching: false,
                     isFetched: true,
-                    discount: discounts
+                    bulk: bulks
                 });
             })
             .catch(err => {
@@ -623,7 +575,7 @@ const Bulk = () => {
             });
     };
     const fetchCustomerGroups = () => {
-        let discounts = [...discount];
+        let bulks = [...bulk];
         setState({
             ...state,
             page: state.page + 1,
@@ -644,8 +596,8 @@ const Bulk = () => {
                 data.customer_groups.data &&
                     data.customer_groups.data.length > 0 &&
                     data.customer_groups.data.map(item => {
-                        if (discounts[pushIndex].eligible_customers) {
-                            discounts[pushIndex].eligible_customers.map(el => {
+                        if (bulks[pushIndex].eligible_customers) {
+                            bulks[pushIndex].eligible_customers.map(el => {
                                 if (el.id === item.id) {
                                     item["isChecked"] = true;
                                 }
@@ -657,17 +609,17 @@ const Bulk = () => {
 
                 console.log("fetch", data.customer_groups.data);
 
-                discounts[pushIndex].data_list = discounts[
-                    pushIndex
-                ].data_list.concat(data.customer_groups.data);
-                console.log(discounts);
+                bulks[pushIndex].data_list = bulks[pushIndex].data_list.concat(
+                    data.customer_groups.data
+                );
+                console.log(bulks);
 
                 setState({
                     ...state,
                     fetchData: data.customer_groups,
                     isFetching: false,
                     isFetched: true,
-                    discount: discounts
+                    bulk: bulks
                 });
             })
             .catch(err => {
@@ -681,7 +633,7 @@ const Bulk = () => {
     };
 
     const fetchCollections = () => {
-        let discounts = [...discount];
+        let bulks = [...bulk];
         setState({
             ...state,
             page: state.page + 1,
@@ -702,8 +654,8 @@ const Bulk = () => {
                 data.collections.data &&
                     data.collections.data.length > 0 &&
                     data.collections.data.map(item => {
-                        if (discounts[pushIndex].applied_ids) {
-                            discounts[pushIndex].applied_ids.map(el => {
+                        if (bulks[pushIndex].buy_ids) {
+                            bulks[pushIndex].buy_ids.map(el => {
                                 if (el.id === item.id) {
                                     item["isChecked"] = true;
                                 }
@@ -715,17 +667,17 @@ const Bulk = () => {
 
                 console.log("fetch", data.collections.data);
 
-                discounts[pushIndex].data_list = discounts[
-                    pushIndex
-                ].data_list.concat(data.collections.data);
-                console.log(discounts);
+                bulks[pushIndex].data_list = bulks[pushIndex].data_list.concat(
+                    data.collections.data
+                );
+                console.log(bulks);
 
                 setState({
                     ...state,
                     fetchData: data.collections,
                     isFetching: false,
                     isFetched: true,
-                    discount: discounts
+                    bulk: bulks
                 });
             })
             .catch(err => {
@@ -739,7 +691,7 @@ const Bulk = () => {
     };
 
     const fetchProducts = () => {
-        let discounts = [...discount];
+        let bulks = [...bulk];
         setState({
             ...state,
             page: state.page + 1,
@@ -760,8 +712,8 @@ const Bulk = () => {
                 data.products.data &&
                     data.products.data.length > 0 &&
                     data.products.data.map(item => {
-                        if (discounts[pushIndex].applied_ids) {
-                            discounts[pushIndex].applied_ids.map(el => {
+                        if (bulks[pushIndex].buy_ids) {
+                            bulks[pushIndex].buy_ids.map(el => {
                                 if (el.id === item.id) {
                                     item["isChecked"] = true;
                                 }
@@ -773,17 +725,17 @@ const Bulk = () => {
 
                 console.log("fetch", data.products.data);
 
-                discounts[pushIndex].data_list = discounts[
-                    pushIndex
-                ].data_list.concat(data.products.data);
-                console.log(discounts);
+                bulks[pushIndex].data_list = bulks[pushIndex].data_list.concat(
+                    data.products.data
+                );
+                console.log(bulks);
 
                 setState({
                     ...state,
                     fetchData: data.products,
                     isFetching: false,
                     isFetched: true,
-                    discount: discounts
+                    bulk: bulks
                 });
             })
             .catch(err => {
@@ -795,104 +747,44 @@ const Bulk = () => {
                 });
             });
     };
-    const fetchCountries = () => {
-        let discounts = [...discount];
-        setState({
-            ...state,
-            page: state.page + 1,
-            isFetching: true
-        });
 
-        let params = {
-            page: page
-        };
-        if (search) {
-            params.searchTerm = search;
-        }
-
-        axios
-            .get("/product", { params: params })
-            .then(res => {
-                let data = res.data;
-                data.countries.data &&
-                    data.countries.data.length > 0 &&
-                    data.countries.data.map(item => {
-                        if (discounts[pushIndex].countries_applicable) {
-                            discounts[pushIndex].countries_applicable.map(
-                                el => {
-                                    if (el.id === item.id) {
-                                        item["isChecked"] = true;
-                                    }
-                                }
-                            );
-                        } else {
-                            item["isChecked"] = false;
-                        }
-                    });
-
-                console.log("fetch", data.countries.data);
-
-                discounts[pushIndex].data_list = discounts[
-                    pushIndex
-                ].data_list.concat(data.countries.data);
-                console.log(discounts);
-
-                setState({
-                    ...state,
-                    fetchData: data.countries,
-                    isFetching: false,
-                    isFetched: true,
-                    discount: discounts
-                });
-            })
-            .catch(err => {
-                console.log(err);
-                setState({
-                    ...state,
-                    isFetching: false,
-                    isFetched: true
-                });
-            });
-    };
     /***** Customer Related Actions  *****/
 
     //Remove Selected customers
     const removeSelectedCustomer = (idx, id) => {
-        let discounts = [...discount];
-        discounts[idx].eligible_customers = discounts[
-            idx
-        ].eligible_customers.filter(item => item.id !== id);
-
-        setState({
-            ...state,
-            discount: discounts
-        });
-    };
-
-    /***** Collections and products Related Actions  *****/
-
-    const removeSelectedAppliedIds = (idx, id) => {
-        let discounts = [...discount];
-        discounts[idx].applied_ids = discounts[idx].applied_ids.filter(
+        let bulks = [...bulk];
+        bulks[idx].eligible_customers = bulks[idx].eligible_customers.filter(
             item => item.id !== id
         );
 
         setState({
             ...state,
-            discount: discounts
+            bulk: bulks
+        });
+    };
+
+    /***** Collections and products Related Actions  *****/
+
+    const removeSelectedBuyIds = (idx, id) => {
+        let bulks = [...bulk];
+        bulks[idx].buy_ids = bulks[idx].buy_ids.filter(item => item.id !== id);
+
+        setState({
+            ...state,
+            bulk: bulks
         });
     };
 
     /***** Countries  *****/
     const removeSelectedCountry = (idx, id) => {
-        let discounts = [...discount];
-        discounts[idx].countries_applicable = discounts[
+        let bulks = [...bulk];
+        bulks[idx].countries_applicable = bulks[
             idx
         ].countries_applicable.filter(item => item.id !== id);
 
         setState({
             ...state,
-            discount: discounts
+            bulk: bulks
         });
     };
 
@@ -912,9 +804,6 @@ const Bulk = () => {
             }
             if (productsModalOpen) {
                 fetchProducts();
-            }
-            if (countryModalOpen) {
-                fetchCountries();
             }
         }
     };
@@ -942,58 +831,45 @@ const Bulk = () => {
             if (productsModalOpen) {
                 getProducts(value, "title");
             }
-            if (countryModalOpen) {
-                getCountries(value, "name");
-            }
         }, 1000);
     };
 
     //Handle add id's to array
     const addData = () => {
-        let discounts = [...discount];
+        let bulks = [...bulk];
 
         //Add checked data to eligible_customers array
         if (customerModalOpen || customerGroupModalOpen) {
-            discounts[pushIndex] = {
-                ...discounts[pushIndex],
-                eligible_customers: discounts[
-                    pushIndex
-                ].data_list.filter(item => (item.isChecked ? item.id : ""))
+            bulks[pushIndex] = {
+                ...bulks[pushIndex],
+                eligible_customers: bulks[pushIndex].data_list.filter(item =>
+                    item.isChecked ? item.id : ""
+                )
             };
         }
         //Add checked data to eligible_customers array
         if (collectionsModalOpen || productsModalOpen) {
-            discounts[pushIndex] = {
-                ...discounts[pushIndex],
-                applied_ids: discounts[pushIndex].data_list.filter(item =>
+            bulks[pushIndex] = {
+                ...bulks[pushIndex],
+                buy_ids: bulks[pushIndex].data_list.filter(item =>
                     item.isChecked ? item.id : ""
                 )
             };
         }
 
-        //Add checked data to eligible_customers array
-        if (countryModalOpen) {
-            discounts[pushIndex] = {
-                ...discounts[pushIndex],
-                countries_applicable: discounts[
-                    pushIndex
-                ].data_list.filter(item => (item.isChecked ? item.id : ""))
-            };
-        }
         setState({
             ...state,
             customerModalOpen: false,
             customerGroupModalOpen: false,
             collectionsModalOpen: false,
             productsModalOpen: false,
-            countryModalOpen: false,
-            discount: discounts,
+            bulk: bulks,
             checkedId: []
         });
     };
 
     const handleCheckbox = (value, id) => {
-        discount[pushIndex].data_list.forEach(item => {
+        bulk[pushIndex].data_list.forEach(item => {
             if (item.id === id) {
                 item.isChecked = value;
             }
@@ -1008,26 +884,30 @@ const Bulk = () => {
         }
         setState({
             ...state,
-            discount,
+            bulk,
             checkedId: checkedIds
         });
     };
 
     const addClick = () => {
         let obj = {
+            data_list: "",
             name: "",
-            discount_type: "percentage",
-            discount_value: "",
-            applies_to: "",
-            applied_ids: "",
-            countries_applicable: "",
-            select_country: "*",
-            min_requirements: "",
-            min_req_value: "",
+            discount_levels: [
+                {
+                    quantity: "",
+                    discount_type: "percentage",
+                    discount_value: ""
+                }
+            ],
+            buy_type: "specific_collections",
+            buy_ids: "",
             eligible_customers: "",
-            customer_eligibility: "",
-            max_no_of_uses: "",
+            customer_eligibility: "*",
             max_uses: false,
+            max_uses_per_order: "",
+            min_uses: false,
+            min_use_per_order: "",
             limit_to_one_use_per_customer: false,
             error: {},
             isOpen: true
@@ -1035,31 +915,62 @@ const Bulk = () => {
 
         setState({
             ...state,
-            discount: [...discount, obj]
+            bulk: [...bulk, obj]
+        });
+    };
+
+    //Add lavel
+    const addLevel = i => {
+        let obj = {
+            quantity: "",
+            discount_type: "percentage",
+            discount_value: ""
+        };
+        let bulks = [...bulk];
+
+        bulks[i] = {
+            ...bulks[i],
+            discount_levels: [...bulks[i].discount_levels, obj]
+        };
+        setState({
+            ...state,
+            bulk: bulks
+        });
+    };
+
+    //Remove level
+    const removeLevelClick = (idx, i) => {
+        let bulks = [...bulk];
+        if (bulks[idx].discount_levels.length > 1) {
+            bulks[idx].discount_levels.splice(i, 1);
+        }
+        setState({
+            ...state,
+            bulk: bulks
         });
     };
 
     //Remove click
     const removeClick = i => {
-        let discounts = [...discount];
-        if (discounts.length > 1) {
-            discounts.splice(i, 1);
+        let bulks = [...bulk];
+        if (bulks.length > 1) {
+            bulks.splice(i, 1);
         }
         setState({
             ...state,
-            discount: discounts
+            bulk: bulks
         });
     };
 
     //Handle seeMore seeLess
     const handleSeeMore = i => {
-        let discounts = [...discount];
-        discounts[i].isOpen = !discounts[i].isOpen;
+        let bulks = [...bulk];
+        bulks[i].isOpen = !bulks[i].isOpen;
         setState({
             ...state,
-            discount: discounts
+            bulk: bulks
         });
-        console.log(discounts, i);
+        console.log(bulks, i);
     };
 
     //handleModalClose
@@ -1070,7 +981,6 @@ const Bulk = () => {
             customerGroupModalOpen: false,
             collectionsModalOpen: false,
             productsModalOpen: false,
-            countryModalOpen: false,
             isFetching: false,
             loading: false,
             page: 1,
@@ -1085,42 +995,31 @@ const Bulk = () => {
         console.log(i, modalName);
         let customerModalOpen = false,
             customerGroupModalOpen = false,
-            countryModalOpen = false,
             collectionsModalOpen = false,
             productsModalOpen = false;
 
-        //For country modal
-        if (modalName === "country") {
-            if (discount[i].select_country === "specific_countries") {
-                countryModalOpen = true;
-            }
-        }
-
         //Customer modal open
         if (modalName === "customer") {
-            if (
-                discount[i].customer_eligibility === "specific_group_customer"
-            ) {
+            if (bulk[i].customer_eligibility === "specific_group_customer") {
                 customerGroupModalOpen = true;
             }
-            if (discount[i].customer_eligibility === "specific_customer") {
+            if (bulk[i].customer_eligibility === "specific_customer") {
                 customerModalOpen = true;
             }
         }
 
         //Collections and products
         if (modalName === "collection") {
-            if (discount[i].applies_to === "specific_collections") {
+            if (bulk[i].buy_type === "specific_collections") {
                 collectionsModalOpen = true;
             }
-            if (discount[i].applies_to === "specific_product") {
-                collectionsModalOpen = true;
+            if (bulk[i].buy_type === "specific_product") {
+                productsModalOpen = true;
             }
         }
 
         setState({
             ...state,
-            countryModalOpen,
             customerGroupModalOpen,
             customerModalOpen,
             collectionsModalOpen,
@@ -1369,8 +1268,8 @@ const Bulk = () => {
 
     const notFound =
         isFetched &&
-        discount[pushIndex].data_list &&
-        discount[pushIndex].data_list.length < 1 ? (
+        bulk[pushIndex].data_list &&
+        bulk[pushIndex].data_list.length < 1 ? (
             <div className="no__result">No results found for "{search}"</div>
         ) : null;
     return (
@@ -1386,7 +1285,7 @@ const Bulk = () => {
                             />
                         </div>
                         <div className="campaign__layout">
-                            {discount.map((el, idx) => (
+                            {bulk.map((el, idx) => (
                                 <Form
                                     key={idx}
                                     idx={idx}
@@ -1397,20 +1296,24 @@ const Bulk = () => {
                                     removeSelectedCustomer={
                                         removeSelectedCustomer
                                     }
-                                    removeSelectedAppliedIds={
-                                        removeSelectedAppliedIds
-                                    }
+                                    removeSelectedBuyIds={removeSelectedBuyIds}
                                     removeSelectedCountry={
                                         removeSelectedCountry
                                     }
                                     handleMaxUses={handleMaxUses}
+                                    handleMinUses={handleMinUses}
                                     handleLimitUser={handleLimitUser}
                                     addClick={addClick}
+                                    addLevel={addLevel}
                                     removeClick={removeClick}
+                                    removeLevelClick={removeLevelClick}
                                     handleSeeMore={handleSeeMore}
                                     handleModalOpenOnClick={
                                         handleModalOpenOnClick
                                     }
+                                    handleLevleChange={handleLevleChange}
+                                    length={bulk && bulk.length}
+                                    levelLength={el.discount_levels.length}
                                 />
                             ))}
 
@@ -1468,9 +1371,9 @@ const Bulk = () => {
                         {loading && <Spinner />}
                         <div className="result__list">
                             {notFound}
-                            {discount[pushIndex].data_list &&
-                            discount[pushIndex].data_list.length > 0
-                                ? discount[pushIndex].data_list.map(item => (
+                            {bulk[pushIndex].data_list &&
+                            bulk[pushIndex].data_list.length > 0
+                                ? bulk[pushIndex].data_list.map(item => (
                                       <div className="list" key={item.id}>
                                           <div className="left__item">
                                               <Checkbox
@@ -1516,9 +1419,9 @@ const Bulk = () => {
                         {loading && <Spinner />}
                         <div className="result__list">
                             {notFound}
-                            {discount[pushIndex].data_list &&
-                            discount[pushIndex].data_list.length > 0
-                                ? discount[pushIndex].data_list.map(item => (
+                            {bulk[pushIndex].data_list &&
+                            bulk[pushIndex].data_list.length > 0
+                                ? bulk[pushIndex].data_list.map(item => (
                                       <div className="list" key={item.id}>
                                           <div className="left__item">
                                               <Checkbox
@@ -1563,9 +1466,9 @@ const Bulk = () => {
                         {loading && <Spinner />}
                         <div className="result__list">
                             {notFound}
-                            {discount[pushIndex].data_list &&
-                            discount[pushIndex].data_list.length > 0
-                                ? discount[pushIndex].data_list.map(item => (
+                            {bulk[pushIndex].data_list &&
+                            bulk[pushIndex].data_list.length > 0
+                                ? bulk[pushIndex].data_list.map(item => (
                                       <div className="list" key={item.id}>
                                           <div className="left__item">
                                               <Checkbox
@@ -1610,9 +1513,9 @@ const Bulk = () => {
                         {loading && <Spinner />}
                         <div className="result__list">
                             {notFound}
-                            {discount[pushIndex].data_list &&
-                            discount[pushIndex].data_list.length > 0
-                                ? discount[pushIndex].data_list.map(item => (
+                            {bulk[pushIndex].data_list &&
+                            bulk[pushIndex].data_list.length > 0
+                                ? bulk[pushIndex].data_list.map(item => (
                                       <div className="list" key={item.id}>
                                           <div className="left__item">
                                               <Checkbox
@@ -1624,53 +1527,6 @@ const Bulk = () => {
                                           <div className="right__item">
                                               <p className="primary_name">
                                                   {item.title}
-                                              </p>
-                                          </div>
-                                      </div>
-                                  ))
-                                : ""}
-
-                            {isFetching && (
-                                <p className="text-center">loading...</p>
-                            )}
-                        </div>
-                    </Fragment>
-                </CustomModal>
-            )}
-
-            {/* Products Modal */}
-            {countryModalOpen && (
-                <CustomModal
-                    open={countryModalOpen}
-                    onClose={handleModalClose}
-                    titleOne="Add"
-                    titleTwo="Cancel"
-                    handleSave={addData}
-                    onScrolledToBottom={handleScrollBottom}
-                    disabled={checkedId && checkedId.length > 0 ? false : true}
-                    heading="Add countries"
-                    placeholder="Search countries"
-                    searchText={search}
-                    handleSearch={handleSearch}
-                >
-                    <Fragment>
-                        {loading && <Spinner />}
-                        <div className="result__list">
-                            {notFound}
-                            {discount[pushIndex].data_list &&
-                            discount[pushIndex].data_list.length > 0
-                                ? discount[pushIndex].data_list.map(item => (
-                                      <div className="list" key={item.id}>
-                                          <div className="left__item">
-                                              <Checkbox
-                                                  checked={item.isChecked}
-                                                  id={item.id}
-                                                  onChange={handleCheckbox}
-                                              />
-                                          </div>
-                                          <div className="right__item">
-                                              <p className="primary_name">
-                                                  {item.name}
                                               </p>
                                           </div>
                                       </div>

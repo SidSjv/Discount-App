@@ -1127,7 +1127,7 @@ const Discount = props => {
                 collectionsModalOpen = true;
             }
             if (discount[i].applies_to === "specific_product") {
-                collectionsModalOpen = true;
+                productsModalOpen = true;
             }
         }
 
@@ -1424,6 +1424,7 @@ const Discount = props => {
                                     handleModalOpenOnClick={
                                         handleModalOpenOnClick
                                     }
+                                    length={discount && discount.length}
                                 />
                             ))}
 

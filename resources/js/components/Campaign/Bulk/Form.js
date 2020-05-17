@@ -19,21 +19,25 @@ const Form = ({
     handleSelectChange,
     handleSelect,
     removeSelectedCustomer,
-    removeSelectedAppliedIds,
-    removeSelectedCountry,
+    removeSelectedBuyIds,
     handleMaxUses,
+    handleMinUses,
     handleLimitUser,
     removeClick,
+    removeLevelClick,
+    addLevel,
     handleSeeMore,
-    handleModalOpenOnClick
+    handleModalOpenOnClick,
+    handleLevleChange,
+    length,
+    levelLength
 }) => {
     const discountValueOptions = [
         { label: "Percentage", value: "percentage" },
-        { label: "Fixed amount", value: "fixed_amount" },
-        { label: "Free shipping", value: "free_shipping" }
+        { label: "Price Discount", value: "price_discount" },
+        { label: "Fixed At Prioce", value: "fixed_amount" }
     ];
-    const appliesValueOptions = [
-        { label: "Entire order", value: "*" },
+    const buysOptions = [
         {
             label: "Specific collections",
             value: "specific_collections"
@@ -43,17 +47,7 @@ const Form = ({
             value: "specific_product"
         }
     ];
-    const requirmentValueOptions = [
-        { label: "None", value: "none" },
-        {
-            label: "Minimum purchase amount",
-            value: "minimum_purchase_amount"
-        },
-        {
-            label: "Minimum quantity of items",
-            value: "minimum_quantity_of_items"
-        }
-    ];
+
     const customerEligibilityOptions = [
         { label: "Everyone", value: "*" },
         {
@@ -63,13 +57,6 @@ const Form = ({
         {
             label: "Specific  customers",
             value: "specific_customer"
-        }
-    ];
-    const countriesOptions = [
-        { label: "All countries", value: "*" },
-        {
-            label: "Specific countries",
-            value: "specific_countries"
         }
     ];
 
@@ -96,12 +83,14 @@ const Form = ({
                                     label="Rule type"
                                     value="Bulk"
                                 />
-                                <button
-                                    className="icon link__btn"
-                                    onClick={() => removeClick(idx)}
-                                >
-                                    <Icon source={DeleteMajorMonotone} />
-                                </button>
+                                {length > 1 && (
+                                    <button
+                                        className="icon link__btn"
+                                        onClick={() => removeClick(idx)}
+                                    >
+                                        <Icon source={DeleteMajorMonotone} />
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -109,152 +98,20 @@ const Form = ({
                         <div className="see_more">
                             <div className="flex__wrapper">
                                 <div className="flex__item">
-                                    <SelectField
-                                        name="discount_type"
-                                        options={discountValueOptions}
-                                        onChange={e =>
-                                            handleSelectChange(e, idx)
-                                        }
-                                        value={el.discount_type}
-                                        label="At discount value"
-                                        error={
-                                            el.error.discount_type &&
-                                            el.error.discount_type
-                                        }
-                                    />
-                                </div>
-
-                                <div className="flex__item">
-                                    {el.discount_type === "free_shipping" && (
-                                        <Fragment>
-                                            <div className="field__item">
-                                                <div className="flex__item-wrapper">
-                                                    <div className="flex_one">
-                                                        <SelectField
-                                                            name="select_country"
-                                                            options={
-                                                                countriesOptions
-                                                            }
-                                                            onChange={e =>
-                                                                handleSelect(
-                                                                    e,
-                                                                    idx
-                                                                )
-                                                            }
-                                                            value={
-                                                                el.select_country
-                                                            }
-                                                            label="Countries"
-                                                            error={
-                                                                el.error
-                                                                    .select_country &&
-                                                                el.error
-                                                                    .select_country
-                                                            }
-                                                        />
-                                                    </div>
-                                                    <div className="browse__btn">
-                                                        <div>
-                                                            <Button
-                                                                onClick={() =>
-                                                                    handleModalOpenOnClick(
-                                                                        idx,
-                                                                        "country"
-                                                                    )
-                                                                }
-                                                            >
-                                                                Browse
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="field__item">
-                                                {el.countries_applicable &&
-                                                el.countries_applicable.length >
-                                                    0
-                                                    ? el.countries_applicable.map(
-                                                          el => (
-                                                              <div className="customer__checked-list">
-                                                                  <div className="name">
-                                                                      {el.name}
-                                                                  </div>
-
-                                                                  <div className="remove__btn">
-                                                                      <button
-                                                                          onClick={() =>
-                                                                              removeSelectedCountry(
-                                                                                  idx,
-                                                                                  el.id
-                                                                              )
-                                                                          }
-                                                                      >
-                                                                          <Icon
-                                                                              source={
-                                                                                  CancelSmallMinor
-                                                                              }
-                                                                          />
-                                                                      </button>
-                                                                  </div>
-                                                              </div>
-                                                          )
-                                                      )
-                                                    : ""}
-                                            </div>
-                                            <div className="field__item">
-                                                <label className="Polaris-Label Polaris-Labelled__LabelWrapper">
-                                                    Shipping rates
-                                                </label>
-                                                <Checkbox label="Exclude shipping rates over a certain amount" />
-                                            </div>
-                                        </Fragment>
-                                    )}
-                                    {el.discount_type !== "free_shipping" && (
-                                        <div className="field__item">
-                                            <InputField
-                                                type="number"
-                                                suffix={
-                                                    el.discount_type ===
-                                                    "percentage"
-                                                        ? "%"
-                                                        : null
-                                                }
-                                                prefix={
-                                                    el.discount_type ===
-                                                    "fixed_amount"
-                                                        ? "RM"
-                                                        : null
-                                                }
-                                                label="Value"
-                                                value={el.discount_value}
-                                                name="discount_value"
-                                                onChange={e =>
-                                                    handleInputChange(e, idx)
-                                                }
-                                                error={
-                                                    el.error.discount_value &&
-                                                    el.error.discount_value
-                                                }
-                                            />
-                                        </div>
-                                    )}
-
                                     <div className="field__item">
                                         <div className="flex__item-wrapper">
                                             <div className="flex_one">
                                                 <SelectField
-                                                    name="applies_to"
-                                                    options={
-                                                        appliesValueOptions
-                                                    }
+                                                    name="buy_type"
+                                                    options={buysOptions}
                                                     onChange={e =>
                                                         handleSelect(e, idx)
                                                     }
-                                                    value={el.applies_to}
-                                                    label="Applies to"
+                                                    value={el.buy_type}
+                                                    label="Customer buys"
                                                     error={
-                                                        el.error.applies_to &&
-                                                        el.error.applies_to
+                                                        el.error.buy_type &&
+                                                        el.error.buy_type
                                                     }
                                                 />
                                             </div>
@@ -275,9 +132,8 @@ const Form = ({
                                         </div>
                                     </div>
                                     <div className="field__item">
-                                        {el.applied_ids &&
-                                        el.applied_ids.length > 0
-                                            ? el.applied_ids.map(el => (
+                                        {el.buy_ids && el.buy_ids.length > 0
+                                            ? el.buy_ids.map(el => (
                                                   <div className="customer__checked-list">
                                                       <div className="name">
                                                           {el.title}
@@ -286,7 +142,7 @@ const Form = ({
                                                       <div className="remove__btn">
                                                           <button
                                                               onClick={() =>
-                                                                  removeSelectedAppliedIds(
+                                                                  removeSelectedBuyIds(
                                                                       idx,
                                                                       el.id
                                                                   )
@@ -303,53 +159,124 @@ const Form = ({
                                               ))
                                             : ""}
                                     </div>
-                                    <div className="field__item">
-                                        <div className="flex__row">
-                                            <SelectField
-                                                name="min_requirements"
-                                                options={requirmentValueOptions}
-                                                onChange={e =>
-                                                    handleSelectChange(e, idx)
-                                                }
-                                                value={el.min_requirements}
-                                                label="Minimum requirment"
-                                                error={
-                                                    el.error.min_requirements &&
-                                                    el.error.min_requirements
-                                                }
-                                            />
-                                            {(el.min_requirements ===
-                                                "minimum_purchase_amount" ||
-                                                el.min_requirements ===
-                                                    "minimum_quantity_of_items") && (
-                                                <div className="min__value">
-                                                    <InputField
-                                                        type="number"
-                                                        prefix={
-                                                            el.min_requirements ===
-                                                            "minimum_purchase_amount"
-                                                                ? "RM"
-                                                                : null
-                                                        }
-                                                        label="Value"
-                                                        value={el.min_req_value}
-                                                        name="min_req_value"
-                                                        onChange={e =>
-                                                            handleInputChange(
-                                                                e,
-                                                                idx
-                                                            )
-                                                        }
-                                                        error={
-                                                            el.error
-                                                                .min_req_value &&
-                                                            el.error
-                                                                .min_req_value
-                                                        }
-                                                    />
+                                </div>
+
+                                <div className="flex__item">
+                                    {el.discount_levels &&
+                                        el.discount_levels.length > 0 &&
+                                        el.discount_levels.map((item, i) => (
+                                            <Fragment key={i}>
+                                                <div className="field__item ">
+                                                    <div className="flex__item-wrapper add__level">
+                                                        <InputField
+                                                            label="Quantity"
+                                                            type="number"
+                                                            placeholder="e.g. 0-9"
+                                                            name="quantity"
+                                                            value={
+                                                                item.quantity
+                                                            }
+                                                            onChange={e =>
+                                                                handleLevleChange(
+                                                                    e,
+                                                                    idx,
+                                                                    i
+                                                                )
+                                                            }
+                                                        />
+                                                        {levelLength > 1 && (
+                                                            <button
+                                                                className="icon link__btn"
+                                                                onClick={() =>
+                                                                    removeLevelClick(
+                                                                        idx,
+                                                                        i
+                                                                    )
+                                                                }
+                                                            >
+                                                                <Icon
+                                                                    source={
+                                                                        DeleteMajorMonotone
+                                                                    }
+                                                                />
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            )}
-                                        </div>
+                                                <div className="field__item">
+                                                    <div className="flex__row-equal">
+                                                        <div className="flex__row-item">
+                                                            <SelectField
+                                                                name="discount_type"
+                                                                options={
+                                                                    discountValueOptions
+                                                                }
+                                                                onChange={e =>
+                                                                    handleLevleChange(
+                                                                        e,
+                                                                        idx,
+                                                                        i
+                                                                    )
+                                                                }
+                                                                value={
+                                                                    item.discount_type
+                                                                }
+                                                                label="At discount value"
+                                                                error={
+                                                                    el.error
+                                                                        .discount_type &&
+                                                                    el.error
+                                                                        .discount_type
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <div className="flex__row-item">
+                                                            <InputField
+                                                                type="number"
+                                                                suffix={
+                                                                    item.discount_type ===
+                                                                    "percentage"
+                                                                        ? "%"
+                                                                        : null
+                                                                }
+                                                                prefix={
+                                                                    item.discount_type ===
+                                                                    "fixed_amount"
+                                                                        ? "RM"
+                                                                        : null
+                                                                }
+                                                                label="Value"
+                                                                value={
+                                                                    item.discount_value
+                                                                }
+                                                                name="discount_value"
+                                                                onChange={e =>
+                                                                    handleLevleChange(
+                                                                        e,
+                                                                        idx,
+                                                                        i
+                                                                    )
+                                                                }
+                                                                error={
+                                                                    el.error
+                                                                        .discount_value &&
+                                                                    el.error
+                                                                        .discount_value
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Fragment>
+                                        ))}
+
+                                    <div className="pull__right mt-2">
+                                        <Button
+                                            primary
+                                            onClick={() => addLevel(idx)}
+                                        >
+                                            + Add Level
+                                        </Button>
                                     </div>
                                     <div className="field__item">
                                         <div className="flex__item-wrapper">
@@ -435,8 +362,10 @@ const Form = ({
                                             <div className="col-5">
                                                 <InputField
                                                     type="text"
-                                                    value={el.max_no_of_uses}
-                                                    name="max_no_of_uses"
+                                                    value={
+                                                        el.max_uses_per_order
+                                                    }
+                                                    name="max_uses_per_order"
                                                     onChange={e =>
                                                         handleInputChange(
                                                             e,
@@ -448,8 +377,38 @@ const Form = ({
                                         )}
                                         <InlineError
                                             message={
-                                                el.error.max_no_of_uses &&
-                                                el.error.max_no_of_uses
+                                                el.error.max_uses_per_order &&
+                                                el.error.max_uses_per_order
+                                            }
+                                        />
+                                    </div>
+                                    <div className="field__item">
+                                        <Checkbox
+                                            label="Limit number of times this discount can be used in total"
+                                            checked={el.min_uses}
+                                            onChange={e =>
+                                                handleMinUses(e, idx)
+                                            }
+                                        />
+                                        {el.min_uses && (
+                                            <div className="col-5">
+                                                <InputField
+                                                    type="text"
+                                                    value={el.min_use_per_order}
+                                                    name="min_use_per_order"
+                                                    onChange={e =>
+                                                        handleInputChange(
+                                                            e,
+                                                            idx
+                                                        )
+                                                    }
+                                                />
+                                            </div>
+                                        )}
+                                        <InlineError
+                                            message={
+                                                el.error.min_use_per_order &&
+                                                el.error.min_use_per_order
                                             }
                                         />
                                     </div>
