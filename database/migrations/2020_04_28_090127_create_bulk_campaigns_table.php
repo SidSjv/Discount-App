@@ -20,9 +20,9 @@ class CreateBulkCampaignsTable extends Migration {
             $table->longText('buy_ids')->nullable();
             $table->string('eligible_customers')->nullable();
             $table->string('max_uses_per_order')->nullable();
-            $table->string('min_use_per_order')->nullable();
-            $table->string('max_no_of_uses')->nullable();
-            $table->string('limit_to_one_use_per_customer')->nullable();
+            $table->integer('min_use_per_order')->nullable();
+            $table->integer('max_no_of_uses')->nullable();
+            $table->boolean('limit_to_one_use_per_customer')->nullable();
             $table->timestamps();
         });
     }

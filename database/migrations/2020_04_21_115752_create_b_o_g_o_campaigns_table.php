@@ -24,9 +24,9 @@ class CreateBOGOCampaignsTable extends Migration {
             $table->string('get_quantity')->nullable();
             $table->string('discount_type')->nullable();
             $table->string('discount_value')->nullable();
-            $table->string('max_use_per_order')->nullable();
-            $table->string('min_use_per_order')->nullable();
-            $table->string('limit_to_one_use_per_customer');
+            $table->integer('max_use_per_order')->nullable();
+            $table->integer('min_use_per_order')->nullable();
+            $table->boolean('limit_to_one_use_per_customer')->nullable();
             $table->timestamps();
         });
     }

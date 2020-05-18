@@ -20,8 +20,8 @@ class CreateDiscountCampaignsTable extends Migration {
             $table->string('applies_to')->nullable();
             $table->longText('eligible_customers')->nullable();
             $table->string('customer_eligibility')->nullable();
-            $table->string('max_no_of_uses')->nullable();
-            $table->string('limit_to_one_use_per_customer')->nullable();
+            $table->integer('max_no_of_uses')->nullable();
+            $table->boolean('limit_to_one_use_per_customer')->nullable();
             $table->timestamps();
         });
     }

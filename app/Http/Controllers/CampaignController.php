@@ -66,9 +66,26 @@ class CampaignController extends Controller {
                     'created_at' => date('Y-m-d h:i:s', strtotime($campaign->created_at)),
                     'favourite' => $campaign->favorite
                 ];
-                $payload['BOGO'] = BOGOCampaign::where('campaign_id', $id)->get();
-                $payload['Discount'] = DiscountCampaigns::where('campaign_id', $id)->get();
-                $payload['Bulk'] = BulkCampaigns::where('campaign_id', $id)->get();
+                $bogo_data = BOGOCampaign::where('campaign_id', $id)->get();
+                $bogo_payload = [];
+                if($bogo_data !== null && $bogo_data->count() > 0)
+                    foreach($bogo_data as $bogo_item)
+                        $bogo_payload[] = $bogo_item->getInformation();
+                $payload['BOGO'] = $bogo_payload;
+
+                $discount_data = DiscountCampaigns::where('campaign_id', $id)->get();
+                $discount_payload = [];
+                if($discount_data !== null && $discount_data->count() > 0)
+                    foreach($discount_data as $discount_item) 
+                        $discount_payload[] = $discount_item->getInformation();
+                $payload['Discount'] = $discount_payload;
+
+                $bulk_data = BulkCampaigns::where('campaign_id', $id)->get();
+                $bulk_payload = [];
+                if($bulk_data !== null && $bulk_data->count() > 0)
+                    foreach($bulk_data as $bulk_item)
+                        $bulk_payload[] = $bulk_item->getInformation();
+                $payload['Bulk'] = $bulk_payload;
                 return response()->json(['status' => true, 'campaign' => $payload], 200);
             }
             return response()->json(['status' => true, 'message' => 'Campaign Not Found !']);
