@@ -66,7 +66,7 @@ class CampaignController extends Controller {
                     'created_at' => date('Y-m-d h:i:s', strtotime($campaign->created_at)),
                     'favourite' => $campaign->favorite
                 ];
-                $payload[] = BOGOCampaign::where('campaign_id', $id)->get();
+                $payload['BOGO'] = BOGOCampaign::where('campaign_id', $id)->get();
                 $payload['Discount'] = DiscountCampaigns::where('campaign_id', $id)->get();
                 $payload['Bulk'] = BulkCampaigns::where('campaign_id', $id)->get();
                 return response()->json(['status' => true, 'campaign' => $payload], 200);
