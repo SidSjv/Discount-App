@@ -123,7 +123,7 @@ class CampaignController extends Controller {
                 $bundle_payload[] = $bundle_item;
             }
             if(count($bundle_payload) > 0) 
-            BundleCampaign::insert($bundle_payload);
+                BundleCampaign::insert($bundle_payload);
         }
         if(isset($request['BOGO'])) {
             $bogo_payload = [];
@@ -152,10 +152,13 @@ class CampaignController extends Controller {
             $bulk_payload = [];
             foreach($request['Bulk'] as $bulk_item) {
                 $bulk_item['campaign_id'] = $campaign_row->id;
+                if(is_array($bulk_item['buy_ids'])) $bulk_item['buy_ids'] = implode(',', $bulk_item['buy_ids']);
+                if(is_array($bulk_item['eligible_customers'])) $bulk_item['eligible_customers'] = implode(',', $bulk_item['eligible_customers']);
+                if(is_array($bulk_item['discount_levels'])) $bulk_item['discount_levels'] = json_encode($bulk_item['discount_levels']);
                 $bulk_payload[] = $bulk_item;
             }
             if(count($bulk_payload) > 0)
-            BulkCampaigns::insert($bulk_payload);
+                BulkCampaigns::insert($bulk_payload);
         }
         DB::commit();
         return response()->json(['status' => true, 'message' => 'Campaign '.$message.' Successfully !'], 200);
