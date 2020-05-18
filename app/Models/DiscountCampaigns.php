@@ -32,11 +32,13 @@ class DiscountCampaigns extends Model {
     }
 
     public function getAppliedIds() {
-        if($this->applied_ids !== '*' && $this->applied_ids !== null) {
-            if($this->applied_ids == 'specific_collections')
+        if($this->applies_to !== '*' && $this->applies_to !== null) {
+            if($this->applies_to == 'specific_collections'){
                 return Collections::whereIn('id', explode(',', $this->applied_ids))->select(['id', 'title'])->get()->toArray();
-            if($this->applied_ids == 'specific_product')
+            }
+            if($this->applies_to == 'specific_product'){
                 return Products::whereIn('id', explode(',', $this->applied_ids))->select(['id', 'title'])->get()->toArray();    
+            }
         }
         return null;
     }
