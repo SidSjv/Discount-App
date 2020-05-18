@@ -44,8 +44,12 @@ class DiscountCampaigns extends Model {
     }
 
     public function getCustomers() {
-        if($this->customere_eligibility !== null && $this->customere_eligibilty !== '*')
-            return Customers::whereIn('id', explode(',', $this->customere_eligibilty))->select(['id', 'name'])->get()->toArray();
+        if($this->customer_eligibility !== null && $this->customer_eligibility !== '*'){
+            if($this->customer_eligibility == 'specific_group_customer')
+                return CustomerGroups::whereIn('id', explode(',', $this->eligible_customers))->select(['id', 'name'])->get()->toArray();
+            if($this->customer_eligibility == 'specific_customer')
+                return Customers::whereIn('id', explode(',', $this->eligible_customers))->select(['id', 'first_name', 'last_name'])->get()->toArray();
+        }
         return null;   
     }
 }
