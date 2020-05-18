@@ -1200,10 +1200,10 @@ const Discount = props => {
                 isValid = false;
                 item.error.customer_eligibility = "Required";
             }
-            if (item.max_no_of_uses === "") {
-                isValid = false;
-                item.error.max_no_of_uses = "Required";
-            }
+            // if (item.max_no_of_uses === "") {
+            //     isValid = false;
+            //     item.error.max_no_of_uses = "Required";
+            // }
         });
 
         setState({

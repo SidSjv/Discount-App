@@ -1153,14 +1153,14 @@ const Bogo = props => {
                 isValid = false;
                 item.error.discount_value = "Required";
             }
-            if (item.max_use_per_order === "") {
-                isValid = false;
-                item.error.max_use_per_order = "Required";
-            }
-            if (item.min_use_per_order === "") {
-                isValid = false;
-                item.error.min_use_per_order = "Required";
-            }
+            // if (item.max_use_per_order === "") {
+            //     isValid = false;
+            //     item.error.max_use_per_order = "Required";
+            // }
+            // if (item.min_use_per_order === "") {
+            //     isValid = false;
+            //     item.error.min_use_per_order = "Required";
+            // }
 
             if (
                 item.buy_ids === "" ||
@@ -1294,9 +1294,9 @@ const Bogo = props => {
                 let getIds = el.get_ids.map(get => get.id);
                 let customerIds;
                 if (el.customer_eligible !== "everyone") {
-                    customerIds = el.customer_ids_eligible.map(
-                        customer => customer.id
-                    );
+                    customerIds =
+                        el.customer_ids_eligible &&
+                        el.customer_ids_eligible.map(customer => customer.id);
                 }
 
                 return bogoArry.push({
@@ -1304,7 +1304,7 @@ const Bogo = props => {
                     buy_type: el.buy_type,
                     buy_ids: buyIds ? buyIds : "",
                     buy_quantity: el.buy_quantity,
-                    customer_ids_eligible: customerIds ? customerIds : "",
+                    customer_ids_eligible: customerIds ? customerIds : "*",
                     get_type: el.get_type,
                     get_ids: getIds ? getIds : "",
                     get_quantity: el.get_quantity,
