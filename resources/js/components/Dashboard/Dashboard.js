@@ -81,23 +81,29 @@ const Dashboard = () => {
                     times_used: i.times_used
                 };
                 let description = [];
+                let types = "";
+
                 obj.description = description;
+
                 if (i.bogo && i.bogo.length > 0) {
                     i.bogo.map(item => {
                         description.push(item);
                     });
+                    types = "bogo";
                 }
                 if (i.bulk && i.bulk.length > 0) {
                     i.bulk.map(item => {
                         description.push(item);
                     });
+                    types = "bulk";
                 }
                 if (i.discount && i.discount.length > 0) {
                     i.discount.map(item => {
                         description.push(item);
                     });
+                    types = "discount";
                 }
-
+                obj.type = types;
                 return obj;
             });
 
@@ -680,7 +686,7 @@ function renderItem(item, _, index) {
             sortOrder={index}
             accessibilityLabel={`View details for ${name}`}
         >
-            <table>
+            <table onClick={() => console.log("clicked")}>
                 <tbody>
                     <tr>
                         <td style={{ width: "50%" }}>

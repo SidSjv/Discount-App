@@ -27,7 +27,7 @@ import moment from "moment";
 
 import "../campaign.scss";
 
-const Bulk = () => {
+const Bulk = props => {
     let initData = {
         store_id: "",
         campaign_name: "",
@@ -43,7 +43,8 @@ const Bulk = () => {
                     {
                         quantity: "",
                         discount_type: "percentage",
-                        discount_value: ""
+                        discount_value: "",
+                        levelErr: {}
                     }
                 ],
                 buy_type: "specific_collections",
@@ -59,6 +60,7 @@ const Bulk = () => {
                 isOpen: true
             }
         ],
+        param_id: "",
         checkedId: [],
         customerModalOpen: false,
         customerGroupModalOpen: false,
@@ -361,10 +363,17 @@ const Bulk = () => {
 
     useEffect(() => {
         let id = localStorage.discountapp_storeId;
+        let param_id = props.match.params.id;
+        if (param_id) {
+            bulk.map(obj => {
+                obj.name = param_id;
+            });
+        }
         if (!store_id) {
             setState({
                 ...state,
-                store_id: id
+                store_id: id,
+                param_id: param_id
             });
         }
 
@@ -392,10 +401,10 @@ const Bulk = () => {
     const toggleActive = useCallback(() => setToast(toast => !toast), []);
     //Step form
     const nextStep = () => {
-        // if (handleValidations()) {
-        //     setStep(step + 1);
-        // }
-        setStep(step + 1);
+        if (handleValidations()) {
+            setStep(step + 1);
+        }
+        //setStep(step + 1);
     };
     const prevStep = () => {
         setStep(step - 1);
@@ -897,7 +906,8 @@ const Bulk = () => {
                 {
                     quantity: "",
                     discount_type: "percentage",
-                    discount_value: ""
+                    discount_value: "",
+                    levelErr: {}
                 }
             ],
             buy_type: "specific_collections",
@@ -912,7 +922,9 @@ const Bulk = () => {
             error: {},
             isOpen: true
         };
-
+        if (param_id) {
+            obj.name = param_id;
+        }
         setState({
             ...state,
             bulk: [...bulk, obj]
@@ -1032,11 +1044,19 @@ const Bulk = () => {
     const handleValidations = () => {
         let isValid = true;
 
-        let discounts = [...discount];
-        discounts.map((item, idx) => {
+        let bulks = [...bulk];
+        bulks.map((item, idx) => {
             if (item.name === "") {
                 isValid = false;
                 item.error.name = "Required";
+            }
+            if (item.buy_type === "") {
+                isValid = false;
+                item.error.buy_type = "Required";
+            }
+            if (item.buy_ids === "" || item.buy_ids.length < 1) {
+                isValid = false;
+                item.error.buy_type = "Required";
             }
             if (item.discount_type === "") {
                 isValid = false;
@@ -1050,33 +1070,7 @@ const Bulk = () => {
                 isValid = false;
                 item.error.discount_value = "Required";
             }
-            if (item.applies_to === "") {
-                isValid = false;
-                item.error.applies_to = "Required";
-            }
-            if (
-                item.applies_to !== "*" &&
-                item.applies_to !== "" &&
-                item.applied_ids === ""
-            ) {
-                isValid = false;
-                item.error.applies_to = "Required";
-            }
 
-            if (item.select_country === "") {
-                isValid = false;
-                item.error.select_country = "Required";
-            }
-            if (
-                item.select_country.length > 1 &&
-                item.countries_applicable === ""
-            ) {
-                item.error.select_country = "Required";
-            }
-            if (item.min_requirements !== "none" && item.min_req_value === "") {
-                isValid = false;
-                item.error.min_req_value = "Required";
-            }
             if (
                 item.customer_eligibility.length > 1 &&
                 (item.eligible_customers === "" ||
@@ -1086,15 +1080,22 @@ const Bulk = () => {
                 isValid = false;
                 item.error.customer_eligibility = "Required";
             }
-            if (item.max_no_of_uses === "") {
-                isValid = false;
-                item.error.max_no_of_uses = "Required";
-            }
+
+            item.discount_levels.map(el => {
+                if (el.quantity === "") {
+                    isValid = false;
+                    el.levelErr.quantity = "Required";
+                }
+                if (el.discount_value === "") {
+                    isValid = false;
+                    el.levelErr.discount_value = "Required";
+                }
+            });
         });
 
         setState({
             ...state,
-            discount: discounts
+            bulk: bulks
         });
         return isValid;
     };
@@ -1171,30 +1172,10 @@ const Bulk = () => {
                 start_date: `${start_date} ${start_time}`,
                 end_date: `${end_date} ${end_time}`,
                 discount_type: "Single",
-                Discount: discountArry
+                Bulk: discountArry
             };
 
-            discount.map(el => {
-                let AppliedIds =
-                    el.applies_to.length > 1
-                        ? el.applied_ids.length &&
-                          el.applied_ids.map(item => item.id)
-                        : "";
-                let countries;
-                if (el.discount_value === "free_shipping") {
-                    if (el.select_country.length > 1) {
-                        countries =
-                            el.countries_applicable &&
-                            el.countries_applicable.length
-                                ? el.countries_applicable.map(
-                                      country => country.id
-                                  )
-                                : "";
-                    } else {
-                        countries = "*";
-                    }
-                }
-
+            bulk.map(el => {
                 let customerIds;
                 if (el.customer_eligibility.length > 1) {
                     customerIds =
@@ -1202,20 +1183,24 @@ const Bulk = () => {
                         el.eligible_customers.length &&
                         el.eligible_customers.map(customer => customer.id);
                 }
+                let buyIds = el.buy_ids.map(buy => buy.id);
+                let discountLevels = el.discount_levels.map(item => {
+                    return {
+                        quantity: item.quantity,
+                        discount_type: item.discount_type,
+                        discount_value: item.discount_value
+                    };
+                });
 
                 discountArry.push({
                     name: el.name,
-                    discount_type: el.discount_type,
-                    discount_value: el.discount_value ? el.discount_value : "",
-                    applies_to: el.applies_to,
-                    applied_ids: AppliedIds,
-                    countries_applicable: countries ? countries : "",
-                    min_requirements: el.min_requirements,
-                    min_req_value:
-                        el.min_requirements !== "none" ? el.min_req_value : "",
+                    discount_levels: discountLevels,
+                    buy_type: el.buy_type,
+                    buy_ids: buyIds ? buyIds : "",
                     customer_eligibility: el.customer_eligibility,
                     eligible_customers: customerIds ? customerIds : "",
-                    max_no_of_uses: el.max_no_of_uses,
+                    max_uses_per_order: el.max_uses_per_order,
+                    min_use_per_order: el.min_use_per_order,
                     limit_to_one_use_per_customer:
                         el.limit_to_one_use_per_customer
                 });

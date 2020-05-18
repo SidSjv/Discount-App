@@ -35,7 +35,7 @@ const Form = ({
     const discountValueOptions = [
         { label: "Percentage", value: "percentage" },
         { label: "Price Discount", value: "price_discount" },
-        { label: "Fixed At Prioce", value: "fixed_amount" }
+        { label: "Fixed At Price", value: "fixed_amount" }
     ];
     const buysOptions = [
         {
@@ -183,6 +183,11 @@ const Form = ({
                                                                     i
                                                                 )
                                                             }
+                                                            error={
+                                                                item.levelErr &&
+                                                                item.levelErr
+                                                                    .quantity
+                                                            }
                                                         />
                                                         {levelLength > 1 && (
                                                             <button
@@ -223,9 +228,9 @@ const Form = ({
                                                                 }
                                                                 label="At discount value"
                                                                 error={
-                                                                    el.error
-                                                                        .discount_type &&
-                                                                    el.error
+                                                                    item.levelErr &&
+                                                                    item
+                                                                        .levelErr
                                                                         .discount_type
                                                                 }
                                                             />
@@ -241,7 +246,7 @@ const Form = ({
                                                                 }
                                                                 prefix={
                                                                     item.discount_type ===
-                                                                    "fixed_amount"
+                                                                    "price_discount"
                                                                         ? "RM"
                                                                         : null
                                                                 }
@@ -258,9 +263,9 @@ const Form = ({
                                                                     )
                                                                 }
                                                                 error={
-                                                                    el.error
-                                                                        .discount_value &&
-                                                                    el.error
+                                                                    item.levelErr &&
+                                                                    item
+                                                                        .levelErr
                                                                         .discount_value
                                                                 }
                                                             />
@@ -352,7 +357,7 @@ const Form = ({
                                     </div>
                                     <div className="field__item">
                                         <Checkbox
-                                            label="Limit number of times this discount can be used in total"
+                                            label="Set a maximum number of uses per order"
                                             checked={el.max_uses}
                                             onChange={e =>
                                                 handleMaxUses(e, idx)

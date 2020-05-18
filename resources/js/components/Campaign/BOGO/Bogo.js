@@ -1411,18 +1411,20 @@ const Bogo = props => {
                                                         label="Rule type"
                                                         value="BOGO"
                                                     />
-                                                    <button
-                                                        className="icon link__btn"
-                                                        onClick={() =>
-                                                            removeClick(idx)
-                                                        }
-                                                    >
-                                                        <Icon
-                                                            source={
-                                                                DeleteMajorMonotone
+                                                    {bogo.length > 1 && (
+                                                        <button
+                                                            className="icon link__btn"
+                                                            onClick={() =>
+                                                                removeClick(idx)
                                                             }
-                                                        />
-                                                    </button>
+                                                        >
+                                                            <Icon
+                                                                source={
+                                                                    DeleteMajorMonotone
+                                                                }
+                                                            />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

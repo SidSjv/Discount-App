@@ -25,7 +25,8 @@ const Form = ({
     handleLimitUser,
     removeClick,
     handleSeeMore,
-    handleModalOpenOnClick
+    handleModalOpenOnClick,
+    length
 }) => {
     const discountValueOptions = [
         { label: "Percentage", value: "percentage" },
@@ -96,12 +97,14 @@ const Form = ({
                                     label="Rule type"
                                     value="Discount"
                                 />
-                                <button
-                                    className="icon link__btn"
-                                    onClick={() => removeClick(idx)}
-                                >
-                                    <Icon source={DeleteMajorMonotone} />
-                                </button>
+                                {length > 1 && (
+                                    <button
+                                        className="icon link__btn"
+                                        onClick={() => removeClick(idx)}
+                                    >
+                                        <Icon source={DeleteMajorMonotone} />
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -331,7 +334,12 @@ const Form = ({
                                                                 ? "RM"
                                                                 : null
                                                         }
-                                                        label="Value"
+                                                        label={
+                                                            el.min_requirements ===
+                                                            "minimum_quantity_of_items"
+                                                                ? "Quantity"
+                                                                : "Value"
+                                                        }
                                                         value={el.min_req_value}
                                                         name="min_req_value"
                                                         onChange={e =>
