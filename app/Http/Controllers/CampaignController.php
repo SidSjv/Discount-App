@@ -53,7 +53,27 @@ class CampaignController extends Controller {
     }
 
     public function show($id, Request $request) {
-
+        if(isset($id)) {
+            $campaign = Campaign::where('id', $id)->first();
+            if($campaign !== null && $campaign->count() > 0) {
+                $payload = [
+                    'name' => $campaign->name, 
+                    'status' => $campaign->status, 
+                    'start_date' => $campaign->start_date, 
+                    'end_date' => $campaign->end_date,
+                    'discount_type' => $campaign->discount_type,
+                    'times_used' => $campaign->times_used,
+                    'created_at' => date('Y-m-d h:i:s', strtotime($campaign->created_at)),
+                    'favourite' => $campaign->favorite
+                ];
+                $payload[] = BOGOCampaign::where('campaign_id', $id)->get();
+                $payload['Discount'] = DiscountCampaigns::where('campaign_id', $id)->get();
+                $payload['Bulk'] = BulkCampaigns::where('campaign_id', $id)->get();
+                return response()->json(['status' => true, 'campaign' => $payload], 200);
+            }
+            return response()->json(['status' => true, 'message' => 'Campaign Not Found !']);
+        }
+        return response()->json(['status' => true, 'message' => 'ID should be passed.']);
     }
 
     private function filterCampaigns($campaigns, $request) {
@@ -97,11 +117,13 @@ class CampaignController extends Controller {
             $bundle_payload = [];
             foreach($request['Bundle'] as $bundle_item) {
                 $bundle_item['campaign_id'] = $campaign_row->id;
-                $bundle_item['get_ids'] = implode($bundle_item['get_ids']);
+                if(is_array($bundle_item['get_ids'])) $bundle_item['get_ids'] = implode(',', $bundle_item['get_ids']);
+                if(is_array($bundle_item['buy_ids'])) $bundle_item['buy_ids'] = implode(',', $bundle_item['buy_ids']);
+                if(is_array($bundle_item['customer_ids_eligible'])) $bundle_item['customer_ids_eligible'] = implode(',', $bundle_item['customer_ids_eligible']);
                 $bundle_payload[] = $bundle_item;
             }
             if(count($bundle_payload) > 0) 
-            BundleCampaign::insert($bundle_payload);
+                BundleCampaign::insert($bundle_payload);
         }
         if(isset($request['BOGO'])) {
             $bogo_payload = [];
@@ -131,10 +153,13 @@ class CampaignController extends Controller {
             $bulk_payload = [];
             foreach($request['Bulk'] as $bulk_item) {
                 $bulk_item['campaign_id'] = $campaign_row->id;
+                if(is_array($bulk_item['buy_ids'])) $bulk_item['buy_ids'] = implode(',', $bulk_item['buy_ids']);
+                if(is_array($bulk_item['eligible_customers'])) $bulk_item['eligible_customers'] = implode(',', $bulk_item['eligible_customers']);
+                if(is_array($bulk_item['discount_levels'])) $bulk_item['discount_levels'] = json_encode($bulk_item['discount_levels']);
                 $bulk_payload[] = $bulk_item;
             }
             if(count($bulk_payload) > 0)
-            BulkCampaigns::insert($bulk_payload);
+                BulkCampaigns::insert($bulk_payload);
         }
         DB::commit();
         return response()->json(['status' => true, 'message' => 'Campaign '.$message.' Successfully !'], 200);

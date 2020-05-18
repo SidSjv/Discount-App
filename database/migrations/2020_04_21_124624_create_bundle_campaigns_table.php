@@ -17,6 +17,8 @@ class CreateBundleCampaignsTable extends Migration {
             $table->string('name')->nullable();
             $table->string('buy_type')->nullable();
             $table->longText('buy_ids')->nullable();
+            $table->string('get_type')->nullable();
+            $table->longText('get_ids')->nullable();
             $table->string('quantity')->nullable();
             $table->string('discount_type')->nullable();
             $table->string('discount_value')->nullable();
