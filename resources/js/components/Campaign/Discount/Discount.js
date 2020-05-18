@@ -27,7 +27,7 @@ import moment from "moment";
 
 import "../campaign.scss";
 
-const Discount = () => {
+const Discount = props => {
     let initData = {
         store_id: "",
         campaign_name: "",
@@ -56,6 +56,7 @@ const Discount = () => {
                 isOpen: true
             }
         ],
+        param_id: "",
         checkedId: [],
         customerModalOpen: false,
         customerGroupModalOpen: false,
@@ -424,10 +425,19 @@ const Discount = () => {
 
     useEffect(() => {
         let id = localStorage.discountapp_storeId;
+        let param_id = props.match.params.id;
+
+        if (param_id) {
+            discount.map(obj => {
+                obj.name = param_id;
+            });
+        }
         if (!store_id) {
             setState({
                 ...state,
-                store_id: id
+                store_id: id,
+                discount,
+                param_id
             });
         }
 
@@ -1033,6 +1043,9 @@ const Discount = () => {
             isOpen: true
         };
 
+        if (param_id) {
+            obj.name = param_id;
+        }
         setState({
             ...state,
             discount: [...discount, obj]
@@ -1082,7 +1095,7 @@ const Discount = () => {
     //O click of Browse  button open the specific modal
 
     const handleModalOpenOnClick = (i, modalName) => {
-        //console.log(i, modalName);
+        console.log(i, modalName);
         let customerModalOpen = false,
             customerGroupModalOpen = false,
             countryModalOpen = false,
@@ -1114,7 +1127,7 @@ const Discount = () => {
                 collectionsModalOpen = true;
             }
             if (discount[i].applies_to === "specific_product") {
-                collectionsModalOpen = true;
+                productsModalOpen = true;
             }
         }
 
@@ -1324,6 +1337,11 @@ const Discount = () => {
                 return discountArry;
             });
 
+            setState({
+                ...state,
+                loading: true
+            });
+
             axios
                 .post("/campaign", sendObj)
                 .then(res => {
@@ -1334,12 +1352,20 @@ const Discount = () => {
                         setToastErr(false);
                         setToast(true);
                     }
+                    setState({
+                        ...state,
+                        loading: false
+                    });
 
                     setTimeout(() => {
                         window.location.href = `/home?store_id=${store_id}`;
                     }, 2000);
                 })
                 .catch(err => {
+                    setState({
+                        ...state,
+                        loading: false
+                    });
                     setToast(true);
                     setToastErr(true);
                     setToastMsg("Something went wrong, please try again later");
@@ -1398,6 +1424,7 @@ const Discount = () => {
                                     handleModalOpenOnClick={
                                         handleModalOpenOnClick
                                     }
+                                    length={discount && discount.length}
                                 />
                             ))}
 
@@ -1431,6 +1458,7 @@ const Discount = () => {
                         handleEndTimeChange={handleEndTimeChange}
                         launchCampaign={launchCampaign}
                         error={lunchErr}
+                        loading={loading}
                     />
                 )}
             </Frame>

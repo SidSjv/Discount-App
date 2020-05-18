@@ -134,7 +134,7 @@
 }
 .flex__row-equal {
     @include flexbox();
-    align-items: flex-end;
+    //align-items: flex-end;
     .flex__row-item {
         width: 50%;
     }
@@ -147,6 +147,20 @@
     }
     .min__value {
         max-width: 12rem;
+    }
+}
+
+.add__level {
+    .input_field {
+        flex: 1;
+    }
+    .icon {
+        min-height: 3.6rem;
+        max-height: 3.6rem;
+        padding: 0 1rem;
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+        align-self: flex-end;
     }
 }
 

@@ -22,6 +22,7 @@ import InputField from "../../UI/InputField";
 import CustomModal from "./../../UI/CustomModal";
 import LunchPage from "./../LunchPage";
 import { getCurrentTime } from "../../Utils";
+import moment from "moment";
 
 import "../campaign.scss";
 
@@ -29,9 +30,9 @@ const Bogo = props => {
     let initData = {
         store_id: "",
         campaign_name: "",
-        start_date: new Date(),
+        start_date: moment(new Date()).format("YYYY-MM-DD"),
         start_time: getCurrentTime(),
-        end_date: new Date(),
+        end_date: moment(new Date()).format("YYYY-MM-DD"),
         end_time: getCurrentTime(),
         lunchErr: {},
         selected: "",
@@ -48,7 +49,7 @@ const Bogo = props => {
                 collection_list: "",
                 product_list: "",
                 customer_group_list: "",
-                customer_eligible: "everyone",
+                customer_eligible: "*",
                 get_type: "specific_collections",
                 get_ids: "",
                 get_quantity: "",
@@ -59,7 +60,7 @@ const Bogo = props => {
                 min_user: false,
                 min_use_per_order: "",
                 limit_to_one_use_per_customer: false,
-                isOpen: false,
+                isOpen: true,
                 error: {}
             }
         ],
@@ -71,9 +72,10 @@ const Bogo = props => {
         GetProductsModalOpen: false,
         page: 1,
         isFetching: false,
+        isFetched: false,
         loading: false,
         customerList: [],
-        selectedCustomers: [],
+        checkedId: [],
         customers: "",
         pushIndex: 0
     };
@@ -101,6 +103,7 @@ const Bogo = props => {
         GetCollectionsModalOpen,
         GetProductsModalOpen,
         isFetching,
+        isFetched,
         loading,
         customerList,
         selectedCustomers,
@@ -109,11 +112,12 @@ const Bogo = props => {
         pushIndex,
         param_id,
         lunchErr,
-        store_id
+        store_id,
+        checkedId
     } = state;
 
     // Get customers
-    const getCustomers = search => {
+    const getCustomers = (search, name) => {
         let bogos = [...bogo];
         let params = {
             page: page
@@ -121,13 +125,17 @@ const Bogo = props => {
         if (search) {
             params.searchTerm = search;
         }
+        if (name) {
+            params.searchBy = "name";
+        }
         if (searchCustomer) {
             params.searchTerm = searchCustomer;
         }
 
         setState({
             ...state,
-            loading: true
+            loading: true,
+            isFetched: false
         });
 
         axios
@@ -158,7 +166,8 @@ const Bogo = props => {
                     customers: data.customers,
                     bogo: bogos,
                     isFetching: false,
-                    loading: false
+                    loading: false,
+                    isFetched: true
                 });
             })
             .catch(err => {
@@ -166,13 +175,14 @@ const Bogo = props => {
                 setState({
                     ...state,
                     isFetching: false,
-                    loading: false
+                    loading: false,
+                    isFetched: true
                 });
             });
     };
 
     //Get customers groups
-    const getCustomerGroups = search => {
+    const getCustomerGroups = (search, name) => {
         let bogos = [...bogo];
         let params = {
             page: page
@@ -180,13 +190,17 @@ const Bogo = props => {
         if (search) {
             params.searchTerm = search;
         }
+        if (name) {
+            params.searchBy = "name";
+        }
         if (searchCustomer) {
             params.searchTerm = searchCustomer;
         }
 
         setState({
             ...state,
-            loading: true
+            loading: true,
+            isFetched: false
         });
 
         axios
@@ -216,7 +230,8 @@ const Bogo = props => {
                     customers: data.customer_groups,
                     bogo: bogos,
                     isFetching: false,
-                    loading: false
+                    loading: false,
+                    isFetched: true
                 });
             })
             .catch(err => {
@@ -224,13 +239,14 @@ const Bogo = props => {
                 setState({
                     ...state,
                     isFetching: false,
-                    loading: false
+                    loading: false,
+                    isFetched: true
                 });
             });
     };
 
     //Get collections
-    const getCollections = search => {
+    const getCollections = (search, name) => {
         let bogos = [...bogo];
         let params = {
             page: page
@@ -238,13 +254,17 @@ const Bogo = props => {
         if (search) {
             params.searchTerm = search;
         }
+        if (name) {
+            params.searchBy = "title";
+        }
         if (searchCustomer) {
             params.searchTerm = searchCustomer;
         }
 
         setState({
             ...state,
-            loading: true
+            loading: true,
+            isFetched: false
         });
 
         axios
@@ -285,7 +305,8 @@ const Bogo = props => {
                     customers: data.collections,
                     bogo: bogos,
                     isFetching: false,
-                    loading: false
+                    loading: false,
+                    isFetched: true
                 });
             })
             .catch(err => {
@@ -293,14 +314,15 @@ const Bogo = props => {
                 setState({
                     ...state,
                     isFetching: false,
-                    loading: false
+                    loading: false,
+                    isFetched: true
                 });
             });
     };
 
     //Get Products
 
-    const getProducts = search => {
+    const getProducts = (search, name) => {
         let bogos = [...bogo];
         let params = {
             page: page
@@ -308,13 +330,17 @@ const Bogo = props => {
         if (search) {
             params.searchTerm = search;
         }
+        if (name) {
+            params.searchBy = "title";
+        }
         if (searchCustomer) {
             params.searchTerm = searchCustomer;
         }
 
         setState({
             ...state,
-            loading: true
+            loading: true,
+            isFetched: false
         });
 
         axios
@@ -355,7 +381,8 @@ const Bogo = props => {
                     customers: data.products,
                     bogo: bogos,
                     isFetching: false,
-                    loading: false
+                    loading: false,
+                    isFetched: true
                 });
             })
             .catch(err => {
@@ -363,7 +390,8 @@ const Bogo = props => {
                 setState({
                     ...state,
                     isFetching: false,
-                    loading: false
+                    loading: false,
+                    isFetched: true
                 });
             });
     };
@@ -371,10 +399,14 @@ const Bogo = props => {
         let param_id = props.match.params.id;
 
         let new_bogo;
-        if (param_id === "buy-two-get-one") {
+        if (param_id) {
             new_bogo = bogo.map(obj => {
-                obj.buy_quantity = 2;
-                obj.get_quantity = 1;
+                if (param_id === "buy-two-get-one") {
+                    obj.buy_quantity = 2;
+                    obj.get_quantity = 1;
+                }
+
+                obj.name = param_id;
                 return obj;
             });
         } else {
@@ -428,7 +460,7 @@ const Bogo = props => {
         }
     ];
     const customerEligibilityOptions = [
-        { label: "Everyone", value: "everyone" },
+        { label: "Everyone", value: "*" },
         {
             label: "Specific group of customers",
             value: "specific_group_customer"
@@ -498,11 +530,37 @@ const Bogo = props => {
         console.log(e, i);
         const { value, name } = e.target;
         let bogos = [...bogo];
-        bogos[i] = { ...bogos[i], [name]: value };
+        bogos[i] = {
+            ...bogos[i],
+            [name]: value,
+            error: { ...bogos[i].error, [name]: "" }
+        };
+
+        let BuyCollectionsModalOpen = false,
+            BuyProductsModalOpen = false,
+            GetCollectionsModalOpen = false,
+            GetProductsModalOpen = false;
+
+        if (name === "buy_type" && value === "specific_product") {
+            BuyProductsModalOpen = true;
+        }
+        if (name === "buy_type" && value === "specific_collections") {
+            BuyCollectionsModalOpen = true;
+        }
+        if (name === "get_type" && value === "specific_product") {
+            GetProductsModalOpen = true;
+        }
+        if (name === "get_type" && value === "specific_collections") {
+            GetCollectionsModalOpen = true;
+        }
         setState({
             ...state,
             bogo: bogos,
-            pushIndex: i
+            pushIndex: i,
+            BuyCollectionsModalOpen,
+            BuyProductsModalOpen,
+            GetCollectionsModalOpen,
+            GetProductsModalOpen
         });
     };
 
@@ -511,7 +569,12 @@ const Bogo = props => {
     const handleInputChange = (e, i) => {
         const { name, value } = e.target;
         let bogos = [...bogo];
-        bogos[i] = { ...bogos[i], [name]: value };
+        bogos[i] = {
+            ...bogos[i],
+            [name]: value,
+            error: { ...bogos[i].error, [name]: "" }
+        };
+
         setState({
             ...state,
             bogo: bogos
@@ -521,7 +584,11 @@ const Bogo = props => {
     //handel checkbox
     const handleMaxUser = (value, i) => {
         let bogos = [...bogo];
-        bogos[i] = { ...bogos[i], max_user: value };
+        bogos[i] = {
+            ...bogos[i],
+            max_user: value,
+            error: { ...bogos[i].error, max_use_per_order: "" }
+        };
         setState({
             ...state,
             bogo: bogos
@@ -530,7 +597,12 @@ const Bogo = props => {
 
     const handleMinUser = (value, i) => {
         let bogos = [...bogo];
-        bogos[i] = { ...bogos[i], min_user: value };
+        bogos[i] = {
+            ...bogos[i],
+            min_user: value,
+            error: { ...bogos[i].error, min_use_per_order: "" }
+        };
+
         setState({
             ...state,
             bogo: bogos
@@ -609,16 +681,16 @@ const Bogo = props => {
 
         setTimeout(() => {
             if (customerModalOpen) {
-                getCustomers(value);
+                getCustomers(value, "name");
             }
             if (customerGroupModalOpen) {
-                getCustomerGroups(value);
+                getCustomerGroups(value, "name");
             }
             if (BuyCollectionsModalOpen || GetCollectionsModalOpen) {
-                getCollections(value);
+                getCollections(value, "title");
             }
             if (BuyProductsModalOpen || GetProductsModalOpen) {
-                fetchProducts(value);
+                getProducts(value, "title");
             }
         }, 1000);
     };
@@ -648,22 +720,16 @@ const Bogo = props => {
             }
         });
 
-        let customer_list_ids = [...bogo[pushIndex].customer_list];
+        let checkedIds = [...checkedId];
 
         if (value === true) {
-            customer_list_ids.forEach(customer => {
-                if (customer.id === id) {
-                    customer_list_ids.push(customer);
-                }
-            });
+            checkedIds.push(id);
         } else {
-            customer_list_ids = customer_list_ids.filter(
-                item => item.id !== id
-            );
+            checkedIds = checkedIds.filter(el => el !== id);
         }
         setState({
             ...state,
-            customerList,
+            checkedId: checkedIds,
             bogo
         });
     };
@@ -1149,12 +1215,16 @@ const Bogo = props => {
             min_user: false,
             min_use_per_order: "",
             limit_to_one_use_per_customer: false,
-            isOpen: false,
+            isOpen: true,
             error: {}
         };
-        if (param_id === "buy-two-get-one") {
-            obj.buy_quantity = 2;
-            obj.get_quantity = 1;
+        if (param_id) {
+            if (param_id === "buy-two-get-one") {
+                obj.buy_quantity = 2;
+                obj.get_quantity = 1;
+            }
+
+            obj.name = param_id;
         }
         setState({
             ...state,
@@ -1232,11 +1302,11 @@ const Bogo = props => {
                 return bogoArry.push({
                     name: el.name,
                     buy_type: el.buy_type,
-                    buy_ids: buyIds,
+                    buy_ids: buyIds ? buyIds : "",
                     buy_quantity: el.buy_quantity,
-                    customer_ids_eligible: customerIds,
+                    customer_ids_eligible: customerIds ? customerIds : "",
                     get_type: el.get_type,
-                    get_ids: getIds,
+                    get_ids: getIds ? getIds : "",
                     get_quantity: el.get_quantity,
                     discount_type: el.get_quantity,
                     discount_value: el.discount_value,
@@ -1245,6 +1315,11 @@ const Bogo = props => {
                     limit_to_one_use_per_customer:
                         el.limit_to_one_use_per_customer
                 });
+            });
+
+            setState({
+                ...state,
+                loading: true
             });
 
             axios
@@ -1258,11 +1333,19 @@ const Bogo = props => {
                         setToast(true);
                     }
 
+                    setState({
+                        ...state,
+                        loading: false
+                    });
                     setTimeout(() => {
                         window.location.href = `/home?store_id=${store_id}`;
                     }, 2000);
                 })
                 .catch(err => {
+                    setState({
+                        ...state,
+                        loading: false
+                    });
                     setToast(true);
                     setToastErr(true);
                     setToastMsg("Something went wrong, please try again later");
@@ -1276,7 +1359,14 @@ const Bogo = props => {
     const toastMarkup = toast ? (
         <Toast content={toastMsg} error={toastErr} onDismiss={toggleActive} />
     ) : null;
-
+    const notFound =
+        isFetched &&
+        bogo[pushIndex].customer_list &&
+        bogo[pushIndex].customer_list.length < 1 ? (
+            <div className="no__result">
+                No results found for "{searchCustomer}"
+            </div>
+        ) : null;
     return (
         <Fragment>
             <Frame>
@@ -1642,6 +1732,7 @@ const Bogo = props => {
                                                                                 ? "%"
                                                                                 : null
                                                                         }
+                                                                        label="Value"
                                                                         value={
                                                                             el.discount_value
                                                                         }
@@ -1808,6 +1899,7 @@ const Bogo = props => {
                         handleEndTimeChange={handleEndTimeChange}
                         launchCampaign={launchCampaign}
                         error={lunchErr}
+                        loading={loading}
                     />
                 )}
 
@@ -1820,7 +1912,9 @@ const Bogo = props => {
                         titleTwo="Cancel"
                         handleSave={addCustomers}
                         onScrolledToBottom={handleScrollBottom}
-                        disabled={false}
+                        disabled={
+                            checkedId && checkedId.length > 0 ? false : true
+                        }
                         heading="Add customers"
                         placeholder="Search customers"
                         searchText={searchCustomer}
@@ -1828,6 +1922,7 @@ const Bogo = props => {
                     >
                         <Fragment>
                             {loading && <Spinner />}
+                            {notFound}
                             <div className="result__list">
                                 {bogo[pushIndex].customer_list &&
                                 bogo[pushIndex].customer_list.length > 0
@@ -1876,7 +1971,9 @@ const Bogo = props => {
                         titleTwo="Cancel"
                         handleSave={addCustomers}
                         onScrolledToBottom={handleScrollBottom}
-                        disabled={false}
+                        disabled={
+                            checkedId && checkedId.length > 0 ? false : true
+                        }
                         heading="Add customers groups"
                         placeholder="search customers groups"
                         searchText={searchCustomer}
@@ -1884,6 +1981,7 @@ const Bogo = props => {
                     >
                         <Fragment>
                             {loading && <Spinner />}
+                            {notFound}
                             <div className="result__list">
                                 {bogo[pushIndex].customer_list &&
                                 bogo[pushIndex].customer_list.length > 0
@@ -1933,7 +2031,9 @@ const Bogo = props => {
                         titleTwo="Cancel"
                         handleSave={addCollections}
                         onScrolledToBottom={handleScrollBottom}
-                        disabled={false}
+                        disabled={
+                            checkedId && checkedId.length > 0 ? false : true
+                        }
                         heading="Add collections"
                         placeholder="search collections"
                         searchText={searchCustomer}
@@ -1941,6 +2041,7 @@ const Bogo = props => {
                     >
                         <Fragment>
                             {loading && <Spinner />}
+                            {notFound}
                             <div className="result__list">
                                 {bogo[pushIndex].customer_list &&
                                 bogo[pushIndex].customer_list.length > 0
@@ -1988,7 +2089,9 @@ const Bogo = props => {
                         titleTwo="Cancel"
                         handleSave={addCollections}
                         onScrolledToBottom={handleScrollBottom}
-                        disabled={false}
+                        disabled={
+                            checkedId && checkedId.length > 0 ? false : true
+                        }
                         heading="Add products"
                         placeholder="search products"
                         searchText={searchCustomer}
@@ -1996,6 +2099,7 @@ const Bogo = props => {
                     >
                         <Fragment>
                             {loading && <Spinner />}
+                            {notFound}
                             <div className="result__list">
                                 {bogo[pushIndex].customer_list &&
                                 bogo[pushIndex].customer_list.length > 0

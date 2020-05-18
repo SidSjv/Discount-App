@@ -14,6 +14,7 @@ Route::get('campaign', 'HomeController@index');
 Route::get('campaign/bogo/', 'HomeController@index');
 Route::get('campaign/bogo/{id}', 'HomeController@index');
 Route::get('campaign/discount/{id}', 'HomeController@index');
+Route::get('campaign/bulk/{id}', 'HomeController@index');
 Route::get('settings', 'HomeController@index');
 
 //Webhooks Routes
