@@ -149,7 +149,6 @@ class CampaignController extends Controller {
                 DiscountCampaigns::insert($discount_payload);
         }
         if(isset($request['Bulk'])) {
-            dd($request['Bulk']);
             $bulk_payload = [];
             foreach($request['Bulk'] as $bulk_item) {
                 $bulk_item['campaign_id'] = $campaign_row->id;
