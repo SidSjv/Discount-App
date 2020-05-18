@@ -15,12 +15,12 @@ class CreateBulkCampaignsTable extends Migration {
             $table->bigIncrements('id')->index();
             $table->string('campaign_id')->nullable();
             $table->string('name')->nullable();
+            $table->longText('discount_levels')->nullable();
             $table->string('buy_type')->nullable();
-            $table->string('quantity')->nullable();
-            $table->string('discount_type')->nullable();
-            $table->string('discount_value')->nullable();
+            $table->longText('buy_ids')->nullable();
             $table->string('eligible_customers')->nullable();
             $table->string('max_uses_per_order')->nullable();
+            $table->string('min_use_per_order')->nullable();
             $table->string('max_no_of_uses')->nullable();
             $table->string('limit_to_one_use_per_customer')->nullable();
             $table->timestamps();

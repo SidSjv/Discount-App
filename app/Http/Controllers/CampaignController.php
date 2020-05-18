@@ -53,7 +53,27 @@ class CampaignController extends Controller {
     }
 
     public function show($id, Request $request) {
-
+        if(isset($id)) {
+            $campaign = Campaign::where('id', $id)->first();
+            if($campaign !== null && $campaign->count() > 0) {
+                $payload = [
+                    'name' => $campaign->name, 
+                    'status' => $campaign->status, 
+                    'start_date' => $campaign->start_date, 
+                    'end_date' => $campaign->end_date,
+                    'discount_type' => $campaign->discount_type,
+                    'times_used' => $campaign->times_used,
+                    'created_at' => date('Y-m-d h:i:s', strtotime($campaign->created_at)),
+                    'favourite' => $campaign->favorite
+                ];
+                $payload[] = BOGOCampaign::where('campaign_id', $id)->get();
+                $payload['Discount'] = DiscountCampaigns::where('campaign_id', $id)->get();
+                $payload['Bulk'] = BulkCampaigns::where('campaign_id', $id)->get();
+                return response()->json(['status' => true, 'campaign' => $payload], 200);
+            }
+            return response()->json(['status' => true, 'message' => 'Campaign Not Found !']);
+        }
+        return response()->json(['status' => true, 'message' => 'ID should be passed.']);
     }
 
     private function filterCampaigns($campaigns, $request) {
