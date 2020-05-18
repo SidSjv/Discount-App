@@ -55,42 +55,11 @@ class CampaignController extends Controller {
     public function show($id, Request $request) {
         if(isset($id)) {
             $campaign = Campaign::where('id', $id)->first();
-            if($campaign !== null && $campaign->count() > 0) {
-                $payload = [
-                    'name' => $campaign->name, 
-                    'status' => $campaign->status, 
-                    'start_date' => $campaign->start_date, 
-                    'end_date' => $campaign->end_date,
-                    'discount_type' => $campaign->discount_type,
-                    'times_used' => $campaign->times_used,
-                    'created_at' => date('Y-m-d h:i:s', strtotime($campaign->created_at)),
-                    'favourite' => $campaign->favorite
-                ];
-                $bogo_data = BOGOCampaign::where('campaign_id', $id)->get();
-                $bogo_payload = [];
-                if($bogo_data !== null && $bogo_data->count() > 0)
-                    foreach($bogo_data as $bogo_item)
-                        $bogo_payload[] = $bogo_item->getInformation();
-                $payload['BOGO'] = $bogo_payload;
-
-                $discount_data = DiscountCampaigns::where('campaign_id', $id)->get();
-                $discount_payload = [];
-                if($discount_data !== null && $discount_data->count() > 0)
-                    foreach($discount_data as $discount_item) 
-                        $discount_payload[] = $discount_item->getInformation();
-                $payload['Discount'] = $discount_payload;
-
-                $bulk_data = BulkCampaigns::where('campaign_id', $id)->get();
-                $bulk_payload = [];
-                if($bulk_data !== null && $bulk_data->count() > 0)
-                    foreach($bulk_data as $bulk_item)
-                        $bulk_payload[] = $bulk_item->getInformation();
-                $payload['Bulk'] = $bulk_payload;
-                return response()->json(['status' => true, 'campaign' => $payload], 200);
-            }
-            return response()->json(['status' => true, 'message' => 'Campaign Not Found !']);
+            if($campaign !== null && $campaign->count() > 0)
+                return response()->json(['status' => true, 'campaign' => $campaign->getInformation()], 200);
+            return response()->json(['status' => false, 'message' => 'Campaign Not Found !']);
         }
-        return response()->json(['status' => true, 'message' => 'ID should be passed.']);
+        return response()->json(['status' => false, 'message' => 'ID should be passed.']);
     }
 
     private function filterCampaigns($campaigns, $request) {
