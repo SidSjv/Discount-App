@@ -22,8 +22,8 @@ class CreateBundleCampaignsTable extends Migration {
             $table->string('quantity')->nullable();
             $table->string('discount_type')->nullable();
             $table->string('discount_value')->nullable();
+            $table->string('customer_eligibility')->nullable();
             $table->longText('customer_ids_eligible')->nullable();
-            $table->integer('max_no_of_uses_per_order')->nullable();
             $table->integer('max_no_of_uses')->nullable();
             $table->boolean('limit_to_one_use_per_order')->nullable();
             $table->timestamps();

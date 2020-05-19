@@ -146,6 +146,18 @@ class CampaignController extends Controller {
             if(count($bulk_payload) > 0)
                 BulkCampaigns::insert($bulk_payload);
         }
+        if(isset($request['Bundle'])) {
+            $bundle_payload = [];
+            foreach($request['Bundle'] as $bundle_item) {
+                $bundle_item['campaign_id'] = $campaign_row->id;
+                if(is_array($bundle_item['buy_ids'])) $bundle_item['buy_ids'] = implode(',', $bundle_item['buy_ids']);
+                if(is_array($bundle_item['get_ids'])) $bundle_item['get_ids'] = implode(',', $bundle_item['get_ids']);
+                if(is_array($bundle_item['customer_ids_eligible'])) $bundle_item['customer_ids_eligible'] = implode(',', $bundle_item['customer_ids_eligible']);
+                $bundle_payload[] = $bundle_item;
+            }
+            if(count($bundle_item) > 0)
+                BundleCampaign::insert($bundle_payload);
+        }
         DB::commit();
         return response()->json(['status' => true, 'message' => 'Campaign '.$message.' Successfully !'], 200);
         } catch(Exception $e) {
