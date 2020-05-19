@@ -17,7 +17,7 @@ class DiscountCampaigns extends Model {
             'applies_to' => $this->applies_to,
             'applied_ids' => $this->getAppliedIds(),
             'min_requirements' => $this->min_requirements,
-            'min_req_value' => $this->min_req_values,
+            'min_req_value' => $this->min_req_value,
             'eligible_customers' => $this->getCustomers(),
             'customer_eligibility' => $this->customer_eligibility,
             'max_no_of_uses' => $this->max_no_of_uses,
