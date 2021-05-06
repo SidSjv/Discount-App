@@ -27,7 +27,7 @@
         "@shopify/polaris": "^4.21.0",
         "antd": "^4.2.0",
         "dayjs": "^1.8.26",
-        "highcharts": "^8.0.4",
+        "highcharts": "^9.0.0",
         "highcharts-react-official": "^3.0.0",
         "moment": "^2.25.3",
         "popper.js": "^1.16.1",
